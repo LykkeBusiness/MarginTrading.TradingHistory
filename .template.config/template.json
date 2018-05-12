@@ -1,0 +1,47 @@
+{
+  "author": "Lykke",
+  "classifications": ["LykkeService"],
+  "name": "LykkeService",
+  "identity": "LykkeService",
+  "shortName": "lkeservice",
+  "preferNameDirectory" : "true",
+  "tags": {
+    "language": "C#"
+  },
+  "sourceName": "LykkeService",
+  "symbols": {
+    "serviceName": {
+      "type": "parameter",
+      "defaultValue": "LykkeService",
+      "replaces":"LykkeService"
+    },
+    "ifdef": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value":"#"
+      },
+      "replaces":"//#$"
+    },
+    "ifdefUncomment": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value":""
+      },
+      "replaces":"//$#$//"
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "exclude": [
+            "README.md",
+            "src/Lykke.Service.LykkeService/Readme.md"
+          ]
+        }
+      ]
+    }
+  ]
+}
