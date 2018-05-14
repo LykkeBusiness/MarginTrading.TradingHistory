@@ -7,9 +7,9 @@ using Common.Log;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
-using Lykke.Service.LykkeService.Core.Services;
-using Lykke.Service.LykkeService.Settings;
-using Lykke.Service.LykkeService.Modules;
+using MarginTrading.TradingHistory.Core.Services;
+using MarginTrading.TradingHistory.Settings;
+using MarginTrading.TradingHistory.Modules;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
 using Lykke.MonitoringServiceApiCaller;
@@ -18,7 +18,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Lykke.Service.LykkeService
+namespace MarginTrading.TradingHistory
 {
     public class Startup
     {
@@ -62,7 +62,7 @@ namespace Lykke.Service.LykkeService
 
                 Log = CreateLogWithSlack(services, appSettings);
 
-                builder.RegisterModule(new ServiceModule(appSettings.Nested(x => x.LykkeServiceService), Log));
+                builder.RegisterModule(new ServiceModule(appSettings.Nested(x => x.TradingHistoryService), Log));
                 builder.Populate(services);
                 ApplicationContainer = builder.Build();
 
@@ -180,7 +180,7 @@ namespace Lykke.Service.LykkeService
 
             aggregateLogger.AddLog(consoleLogger);
 
-            var dbLogConnectionStringManager = settings.Nested(x => x.LykkeServiceService.Db.LogsConnString);
+            var dbLogConnectionStringManager = settings.Nested(x => x.TradingHistoryService.Db.LogsConnString);
             var dbLogConnectionString = dbLogConnectionStringManager.CurrentValue;
 
             if (string.IsNullOrEmpty(dbLogConnectionString))
@@ -193,17 +193,22 @@ namespace Lykke.Service.LykkeService
                 throw new InvalidOperationException($"LogsConnString {dbLogConnectionString} is not filled in settings");
 
             var persistenceManager = new LykkeLogToAzureStoragePersistenceManager(
-                AzureTableStorage<LogEntity>.Create(dbLogConnectionStringManager, "LykkeServiceLog", consoleLogger),
+                AzureTableStorage<LogEntity>.Create(dbLogConnectionStringManager, "TradingHistoryServiceLog", consoleLogger),
                 consoleLogger);
 
             // Creating slack notification service, which logs own azure queue processing messages to aggregate log
-            var slackService = services.UseSlackNotificationsSenderViaAzureQueue(new AzureQueueIntegration.AzureQueueSettings
+            ILykkeLogToAzureSlackNotificationsManager slackNotificationsManager = null;
+            if (settings.CurrentValue.SlackNotifications != null)
             {
-                ConnectionString = settings.CurrentValue.SlackNotifications.AzureQueue.ConnectionString,
-                QueueName = settings.CurrentValue.SlackNotifications.AzureQueue.QueueName
-            }, aggregateLogger);
+                var slackService = services.UseSlackNotificationsSenderViaAzureQueue(
+                    new Lykke.AzureQueueIntegration.AzureQueueSettings
+                    {
+                        ConnectionString = settings.CurrentValue.SlackNotifications.AzureQueue.ConnectionString,
+                        QueueName = settings.CurrentValue.SlackNotifications.AzureQueue.QueueName
+                    }, aggregateLogger);
 
-            var slackNotificationsManager = new LykkeLogToAzureSlackNotificationsManager(slackService, consoleLogger);
+                slackNotificationsManager = new LykkeLogToAzureSlackNotificationsManager(slackService, consoleLogger);
+            }
 
             // Creating azure storage logger, which logs own messages to concole log
             var azureStorageLogger = new LykkeLogToAzureStorage(

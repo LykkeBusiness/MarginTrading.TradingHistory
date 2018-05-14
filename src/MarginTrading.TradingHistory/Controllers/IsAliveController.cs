@@ -3,9 +3,9 @@ using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Lykke.Common.Api.Contract.Responses;
-using Lykke.Service.LykkeService.Core.Services;
+using MarginTrading.TradingHistory.Core.Services;
 
-namespace Lykke.Service.LykkeService.Controllers
+namespace MarginTrading.TradingHistory.Controllers
 {
     // NOTE: See https://lykkex.atlassian.net/wiki/spaces/LKEWALLET/pages/35755585/Add+your+app+to+Monitoring
     [Route("api/[controller]")]

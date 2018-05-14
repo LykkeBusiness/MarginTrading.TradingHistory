@@ -1,18 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <AssemblyName>Lykke.Service.LykkeService.AzureRepositories</AssemblyName>
-    <RootNamespace>Lykke.Service.LykkeService.AzureRepositories</RootNamespace>
+    <AssemblyName>MarginTrading.TradingHistory.AzureRepositories</AssemblyName>
+    <RootNamespace>MarginTrading.TradingHistory.AzureRepositories</RootNamespace>
     <Version>1.0.0</Version>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Lykke.AzureStorage" Version="8.3.0" />
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\Lykke.Service.LykkeService.Core\Lykke.Service.LykkeService.Core.csproj" />
+    <ProjectReference Include="..\MarginTrading.TradingHistory.Core\MarginTrading.TradingHistory.Core.csproj" />
   </ItemGroup>
-
 </Project>

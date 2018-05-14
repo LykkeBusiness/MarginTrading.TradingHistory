@@ -1,4 +1,4 @@
-﻿namespace Lykke.Service.LykkeService.Core.Domain.Health
+﻿namespace MarginTrading.TradingHistory.Core.Domain.Health
 {
     public class HealthIssue
     {
