@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
@@ -60,11 +61,21 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [CloseExternalOrderId] [nvarchar] (64) NULL,
 [CloseExternalProviderId] [nvarchar] (64) NULL,
 [MatchingEngineMode] [nvarchar] (64) NULL,
-[LegalEntity] [nvarchar] (64) NULL);";
+[LegalEntity] [nvarchar] (64) NULL),
+[ParentPositionId] [nvarchar](64) NULL,
+[ParentOrderId] [nvarchar](64) NULL;";
 
         private readonly string _reportsSqlConnString;
         private readonly ILog _log;
-        private IOrdersHistoryRepository _ordersHistoryRepositoryImplementation;
+
+        private static readonly string GetColumns =
+            string.Join(",", typeof(IOrderHistory).GetProperties().Select(x => x.Name));
+
+        private static readonly string GetFields =
+            string.Join(",", typeof(IOrderHistory).GetProperties().Select(x => "@" + x.Name));
+
+        private static readonly string GetUpdateClause = string.Join(",",
+            typeof(IOrderHistory).GetProperties().Select(x => "[" + x.Name + "]=@" + x.Name));
 
         public OrdersHistorySqlRepository(string reportsSqlConnString, ILog log)
         {
@@ -86,27 +97,11 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         {
             using (var conn = new SqlConnection(_reportsSqlConnString))
             {
-                var query = $"insert into {TableName} " +
-                            @"(Id, Code, ClientId, TradingConditionId, AccountAssetId, Instrument, Type, CreateDate, OpenDate,
-                            CloseDate, ExpectedOpenPrice, OpenPrice, ClosePrice, QuoteRate, Volume, TakeProfit, 
-                            StopLoss, CommissionLot, OpenCommission, CloseCommission, SwapCommission, StartClosingDate, 
-                            Status, CloseReason, FillType, RejectReason, RejectReasonText, Comment, MatchedVolume,
-                            MatchedCloseVolume, Fpl, PnL, InterestRateSwap, MarginInit, MarginMaintenance, 
-                            OrderUpdateType, OpenExternalOrderId, OpenExternalProviderId, CloseExternalOrderId,
-                            CloseExternalProviderId, MatchingEngineMode, LegalEntity) 
-                             values 
-                            (@Id, @Code, @ClientId, @TradingConditionId, @AccountAssetId, @Instrument, @Type, @CreateDate, @OpenDate,
-                            @CloseDate, @ExpectedOpenPrice, @OpenPrice, @ClosePrice, @QuoteRate, @Volume, @TakeProfit, 
-                            @StopLoss, @CommissionLot, @OpenCommission, @CloseCommission, @SwapCommission, @StartClosingDate, 
-                            @Status, @CloseReason, @FillType, @RejectReason, @RejectReasonText, @Comment, @MatchedVolume,
-                            @MatchedCloseVolume, @Fpl, @PnL, @InterestRateSwap, @MarginInit, @MarginMaintenance, 
-                            @OrderUpdateType, @OpenExternalOrderId, @OpenExternalProviderId, @CloseExternalOrderId,
-                            @CloseExternalProviderId, @MatchingEngineMode, @LegalEntity)";
-
                 try
                 {
                     var entity = OrderHistoryEntity.Create(order);
-                    await conn.ExecuteAsync(query, entity);
+                    await conn.ExecuteAsync(
+                        $"insert into {TableName} ({GetColumns}) values ({GetFields})", entity);
                 }
                 catch (Exception ex)
                 {
@@ -121,12 +116,12 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync()
+        public Task<IEnumerable<IOrderHistory>> GetHistoryAsync()
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IReadOnlyList<IOrderHistory>> GetHistoryAsync(string[] accountIds, DateTime? @from, DateTime? to)
+        public Task<IReadOnlyList<IOrderHistory>> GetHistoryAsync(string[] accountIds, DateTime? @from, DateTime? to)
         {
             throw new NotImplementedException();
         }

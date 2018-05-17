@@ -62,6 +62,8 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public MatchingEngineMode MatchingEngineMode { get; set; }
         public string LegalEntity { get; set; }
         public OrderUpdateType OrderUpdateType { get; set; }
+        public string ParentPositionId { get; set; }
+        public string ParentOrderId { get; set; }
 
         public DateTime UpdateTimestamp
         {
@@ -134,6 +136,8 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
                 MatchingEngineMode = src.MatchingEngineMode,
                 LegalEntity = src.LegalEntity,
                 UpdateTimestamp = src.UpdateTimestamp,
+                ParentPositionId = src.ParentPositionId,
+                ParentOrderId = src.ParentOrderId,
             };
         }
     }

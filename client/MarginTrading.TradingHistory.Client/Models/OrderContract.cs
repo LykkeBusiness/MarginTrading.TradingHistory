@@ -1,57 +1,106 @@
 ﻿using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using JetBrains.Annotations;
 
 namespace MarginTrading.TradingHistory.Client.Models
 {
-
+    /// <summary>
+    /// Info about an order
+    /// </summary>
     public class OrderContract
     {
+        /// <summary>
+        /// Order id 
+        /// </summary>
         public string Id { get; set; }
-        public long Code { get; set; }
-        public string ClientId { get; set; }
-        public string AccountId { get; set; }
-        public string AccountAssetId { get; set; }
-        public string Instrument { get; set; }
-        public OrderDirectionContract Type { get; set; }
-        public OrderStatusContract Status { get; set; }
-        public OrderCloseReasonContract CloseReason { get; set; }
-        public OrderRejectReasonContract RejectReason { get; set; }
-        public string RejectReasonText { get; set; }
-        public decimal? ExpectedOpenPrice { get; set; }
-        public decimal OpenPrice { get; set; }
-        public decimal ClosePrice { get; set; }
-        public DateTime CreateDate { get; set; }
-        public DateTime? OpenDate { get; set; }
-        public DateTime? CloseDate { get; set; }
-        public decimal Volume { get; set; }
-        public decimal MatchedVolume { get; set; }
-        public decimal MatchedCloseVolume { get; set; }
-        public decimal? TakeProfit { get; set; }
-        public decimal? StopLoss { get; set; }
-        /// <summary> Floating profit </summary>
-        public decimal Fpl { get; set; }
-        /// <summary> Total profit </summary>
-        /// <remarks> Fpl + comissions </remarks>
-        public decimal PnL { get; set; }
-        public decimal CommissionLot { get; set; }
-        public decimal OpenCommission { get; set; }
-        public decimal CloseCommission { get; set; }
-        public decimal SwapCommission { get; set; }
-        public string EquivalentAsset { get; set; }
-        public decimal OpenPriceEquivalent { get; set; }
-        public decimal ClosePriceEquivalent { get; set; }
-        public string OpenExternalOrderId { get; set; }
-        public string OpenExternalProviderId { get; set; }
-        public string CloseExternalOrderId { get; set; }
-        public string CloseExternalProviderId { get; set; }
-        public List<MatchedOrderBackendContract> MatchedOrders { get; set; } = new List<MatchedOrderBackendContract>();
-        public List<MatchedOrderBackendContract> MatchedCloseOrders { get; set; } = new List<MatchedOrderBackendContract>();
-        public string LegalEntity { get; set; }  
         
-        [JsonConverter(typeof(StringEnumConverter))]
-        public MatchingEngineModeContract MatchingEngineMode { get; set; }
-    }
+        /// <summary>
+        /// Account id
+        /// </summary>
+        public string AccountId { get; set; }
+        
+        /// <summary>
+        /// Instrument id
+        /// </summary>
+        public string AssetPairId { get; set; }
+        
+        /// <summary>
+        /// Parent order id. Filled if it's a related order.
+        /// </summary>
+        [CanBeNull]
+        public string ParentOrderId { get; set; }
+        
+        /// <summary>
+        /// Position id. Filled if it's a basic executed order.
+        /// </summary>
+        [CanBeNull]
+        public string PositionId { get; set; }
 
+        /// <summary>
+        /// The order direction (buy or sell)
+        /// </summary>
+        public OrderDirectionContract Direction { get; set; }
+        
+        /// <summary>
+        /// The order type (Market, Limit, etc.)
+        /// </summary>
+        public OrderTypeContract Type { get; set; }
+        
+        /// <summary>
+        /// The order status (Active, Executed, etc.)
+        /// </summary>
+        public OrderStatusContract Status { get; set; }
+        
+        /// <summary>
+        /// Who created the order
+        /// </summary>
+        public OriginatorTypeContract Originator { get; set; }
+
+        /// <summary>
+        /// Order volume in quoting asset units. Not filled for related orders.
+        /// </summary>
+        public decimal? Volume { get; set; }
+        
+        /// <summary>
+        /// Expected open price in base asset units. Not filled for market orders.
+        /// </summary>
+        public decimal? ExpectedOpenPrice { get; set; }
+        
+        /// <summary>
+        /// Execution open price in base asset units. Filled for executed orders only.
+        /// </summary>
+        public decimal? ExecutionPrice { get; set; }
+
+        /// <summary>
+        /// Execution trades ids. Filled for executed orders only.
+        /// If the order execution affected multiple positions - there will be multiple trades.
+        /// </summary>
+        [CanBeNull]
+        public List<string> TradesIds { get; set; }
+
+        /// <summary>
+        /// The related orders
+        /// </summary>
+        public List<string> RelatedOrders { get; set; }
+
+        /// <summary>
+        /// Force open a sepatate position, ignoring any exising ones
+        /// </summary>
+        public bool ForceOpen { get; set; }
+
+        /// <summary>
+        /// Till validity time
+        /// </summary>
+        public DateTime? ValidityTime { get; set; }
+        
+        /// <summary>
+        /// Creation date and time
+        /// </summary>
+        public DateTime CreatedTimestamp { get; set; }
+        
+        /// <summary>
+        /// Last modification date and time
+        /// </summary>
+        public DateTime ModifiedTimestamp { get; set; }
+    }
 }

@@ -18,7 +18,7 @@ namespace MarginTrading.TradingHistory.TradeHistoryBroker
         {
         }
 
-        protected override string ApplicationName => "TradesBroker";
+        protected override string ApplicationName => "TradeHistoryBroker";
 
         protected override void RegisterCustomServices(IServiceCollection services, ContainerBuilder builder, IReloadingManager<Settings> settings, ILog log, bool isLive)
         {

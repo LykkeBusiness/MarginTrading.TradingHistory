@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace MarginTrading.TradingHistory.Core.Domain
 {
@@ -59,5 +60,11 @@ namespace MarginTrading.TradingHistory.Core.Domain
         MatchingEngineMode MatchingEngineMode { get; }
         string LegalEntity { get; }  
         DateTime UpdateTimestamp { get; }  
+
+        [CanBeNull]
+        string ParentPositionId { get; }
+
+        [CanBeNull]
+        string ParentOrderId { get; }
     }
 }

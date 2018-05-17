@@ -8,7 +8,7 @@ using Refit;
 namespace MarginTrading.TradingHistory.Client
 {
     [PublicAPI]
-    public interface ITradeMonitoringReadingApi
+    public interface ITradesReadingApi
     {
         
     }
