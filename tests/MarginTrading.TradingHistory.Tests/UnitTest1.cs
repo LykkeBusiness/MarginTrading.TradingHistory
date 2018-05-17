@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace Lykke.Service.LykkeService.Tests
+namespace MarginTrading.TradingHistory.Tests
 {
     public class UnitTest1
     {

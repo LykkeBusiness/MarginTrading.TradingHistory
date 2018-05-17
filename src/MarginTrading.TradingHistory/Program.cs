@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.PlatformAbstractions;
 
-namespace Lykke.Service.LykkeService
+namespace MarginTrading.TradingHistory
 {
     internal sealed class Program
     {
@@ -13,11 +13,11 @@ namespace Lykke.Service.LykkeService
         public static async Task Main(string[] args)
         {
             Console.WriteLine($"{PlatformServices.Default.Application.ApplicationName} version {PlatformServices.Default.Application.ApplicationVersion}");
-//#$if DEBUG
+#if DEBUG
             Console.WriteLine("Is DEBUG");
-//#$else
-            //$#$//Console.WriteLine("Is RELEASE");
-//#$endif           
+#else
+            Console.WriteLine("Is RELEASE");
+#endif           
             Console.WriteLine($"ENV_INFO: {EnvInfo}");
 
             try

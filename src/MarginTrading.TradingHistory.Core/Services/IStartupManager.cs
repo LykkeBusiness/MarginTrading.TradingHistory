@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Lykke.Service.LykkeService.Core.Services
+namespace MarginTrading.TradingHistory.Core.Services
 {
     public interface IStartupManager
     {

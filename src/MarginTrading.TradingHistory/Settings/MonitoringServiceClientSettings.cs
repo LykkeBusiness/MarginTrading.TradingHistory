@@ -1,6 +1,6 @@
 ﻿using Lykke.SettingsReader.Attributes;
 
-namespace Lykke.Service.LykkeService.Settings
+namespace MarginTrading.TradingHistory.Settings
 {
     public class MonitoringServiceClientSettings
     {

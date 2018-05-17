@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MarginTrading.TradingHistory.Client</name>
+    </assembly>
+    <members>
+        <member name="F:MarginTrading.TradingHistory.Client.Models.MatchingEngineModeContract.MarketMaker">
+            <summary>
+            Market making mode with actual matching on our side
+            </summary>
+        </member>
+        <member name="F:MarginTrading.TradingHistory.Client.Models.MatchingEngineModeContract.Stp">
+            <summary>
+            Straight through processing with orders matching on external exchanges
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.Fpl">
+            <summary> Floating profit </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.PnL">
+            <summary> Total profit </summary>
+            <remarks> Fpl + comissions </remarks>
+        </member>
+    </members>
+</doc>

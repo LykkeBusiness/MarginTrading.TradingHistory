@@ -1,9 +1,9 @@
 ﻿using JetBrains.Annotations;
 
-namespace Lykke.Service.LykkeService.Settings.ServiceSettings
+namespace MarginTrading.TradingHistory.Settings.ServiceSettings
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    public class LykkeServiceSettings
+    public class TradingHistorySettings
     {
         public DbSettings Db { get; set; }
     }
