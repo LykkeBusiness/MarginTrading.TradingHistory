@@ -127,12 +127,15 @@ namespace MarginTrading.TradingHistory.BrokerBase
 
             aggregateLogger.AddLog(logToConsole);
 
-            var commonSlackService =
-                services.UseSlackNotificationsSenderViaAzureQueue(settings.CurrentValue.SlackNotifications.AzureQueue,
-                    aggregateLogger);
+            ISlackNotificationsSender slackNotificationsSender = null;
+            if (settings.CurrentValue.SlackNotifications != null)
+            {
+                slackNotificationsSender = services.UseSlackNotificationsSenderViaAzureQueue(
+                    settings.CurrentValue.SlackNotifications.AzureQueue, aggregateLogger);
+            }
 
             var slackService =
-                new MtSlackNotificationsSender(commonSlackService, ApplicationName, Configuration.ServerType());
+                new MtSlackNotificationsSender(slackNotificationsSender, ApplicationName, Configuration.ServerType());
 
             services.AddSingleton<ISlackNotificationsSender>(slackService);
 

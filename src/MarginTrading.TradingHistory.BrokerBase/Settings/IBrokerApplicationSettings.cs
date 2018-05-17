@@ -6,6 +6,7 @@ namespace MarginTrading.TradingHistory.BrokerBase.Settings
     public interface IBrokerApplicationSettings<TBrokerSettings> 
         where TBrokerSettings : BrokerSettingsBase
     {
+        [Optional, CanBeNull]
         SlackNotificationSettings SlackNotifications { get; }
         
         [Optional, CanBeNull]
