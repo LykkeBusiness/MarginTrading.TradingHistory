@@ -14,7 +14,7 @@ namespace MarginTrading.TradingHistory.Controllers
 {
     [Authorize]
     [Route("api/trade/")]
-    public class TradesController : Controller, ITradesReadingApi
+    public class TradesController : Controller, ITradesApi
     {
         private readonly ITradesRepository _tradesRepository;
         private readonly IConvertService _convertService;
@@ -26,6 +26,15 @@ namespace MarginTrading.TradingHistory.Controllers
             _tradesRepository = tradesRepository;
             _convertService = convertService;
         }
+        
+        /// <summary>
+        /// Get a trade by id  
+        /// </summary> 
+        [HttpGet, Route("{tradeId}")] 
+        public async Task<TradeContract> Get(string tradeId) 
+        { 
+            return Convert(await _tradesRepository.GetAsync(tradeId)); 
+        } 
         
         /// <summary>
         /// Get trades with optional filtering by order or position 
