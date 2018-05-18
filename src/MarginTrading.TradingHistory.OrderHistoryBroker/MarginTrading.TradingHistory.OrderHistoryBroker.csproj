@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <AssemblyName>MarginTrading.OrderHistoryBroker</AssemblyName>
+    <AssemblyName>MarginTrading.TradingHistory.OrderHistoryBroker</AssemblyName>
     <OutputType>Exe</OutputType>
-    <PackageId>MarginTrading.OrderHistoryBroker</PackageId>
+    <PackageId>MarginTrading.TradingHistory.OrderHistoryBroker</PackageId>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
