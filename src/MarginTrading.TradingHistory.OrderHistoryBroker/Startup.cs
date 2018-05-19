@@ -6,6 +6,7 @@ using MarginTrading.TradingHistory.AzureRepositories;
 using MarginTrading.TradingHistory.BrokerBase;
 using MarginTrading.TradingHistory.BrokerBase.Settings;
 using MarginTrading.TradingHistory.Core.Repositories;
+using MarginTrading.TradingHistory.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,7 +29,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
             {
                 repositories.Add(
                     AzureRepoFactories.MarginTrading.CreateOrdersHistoryRepository(
-                        settings.Nested(s => s.Db.HistoryConnString), log));
+                        settings.Nested(s => s.Db.HistoryConnString), log, new ConvertService()));
             }
 
             if (settings.CurrentValue.Db.ReportsSqlConnString != null)

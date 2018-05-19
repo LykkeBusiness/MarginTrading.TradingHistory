@@ -7,7 +7,7 @@ namespace MarginTrading.TradingHistory.Core.Repositories
     public interface ITradesRepository
     {
         [ItemCanBeNull]
-        Task<ITrade> GetAsync(string id);
-        Task UpsertAsync(ITrade obj);
+        Task<Trade> GetAsync(string id);
+        Task UpsertAsync(Trade obj);
     }
 }

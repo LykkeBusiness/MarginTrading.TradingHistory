@@ -5,6 +5,7 @@ using MarginTrading.TradingHistory.AzureRepositories.Entities;
 using MarginTrading.TradingHistory.BrokerBase;
 using MarginTrading.TradingHistory.BrokerBase.Settings;
 using MarginTrading.TradingHistory.Client.Models;
+using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
 
@@ -29,9 +30,11 @@ namespace MarginTrading.TradingHistory.TradeHistoryBroker
         protected override string ExchangeName => _settings.RabbitMqQueues.Trades.ExchangeName;
         protected override string QueuePostfix => ".Trades";
 
-        protected override Task HandleMessage(TradeContract trade)
+        protected override Task HandleMessage(TradeContract tradeContract)
         {
-            return _tradesRepository.UpsertAsync(_convertService.Convert<TradeContract, TradeEntity>(trade));
+            var trade = tradeContract.ToTradeDomain();
+            
+            return _tradesRepository.UpsertAsync(trade);
         }
     }
 }

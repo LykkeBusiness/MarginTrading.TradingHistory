@@ -16,7 +16,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
             _repositories.AddRange(repositories);
         }
 
-        public async Task AddAsync(IOrderHistory report)
+        public async Task AddAsync(OrderHistory report)
         {
             foreach (var item in _repositories)
             {
@@ -24,17 +24,17 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
             }
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync()
+        public async Task<IEnumerable<OrderHistory>> GetHistoryAsync()
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IReadOnlyList<IOrderHistory>> GetHistoryAsync(string[] accountIds, DateTime? @from, DateTime? to)
+        public async Task<IReadOnlyList<OrderHistory>> GetHistoryAsync(string[] accountIds, DateTime? @from, DateTime? to)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(Func<IOrderHistory, bool> predicate)
+        public async Task<IEnumerable<OrderHistory>> GetHistoryAsync(Func<OrderHistory, bool> predicate)
         {
             throw new NotImplementedException();
         }

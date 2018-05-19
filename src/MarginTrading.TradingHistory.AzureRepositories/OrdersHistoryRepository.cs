@@ -6,19 +6,24 @@ using AzureStorage;
 using MarginTrading.TradingHistory.AzureRepositories.Entities;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
+using MarginTrading.TradingHistory.Core.Services;
 
 namespace MarginTrading.TradingHistory.AzureRepositories
 {
     public class OrdersHistoryRepository : IOrdersHistoryRepository
     {
         private readonly INoSQLTableStorage<OrderHistoryEntity> _tableStorage;
+        private readonly IConvertService _convertService;
 
-        public OrdersHistoryRepository(INoSQLTableStorage<OrderHistoryEntity> tableStorage)
+        public OrdersHistoryRepository(
+            INoSQLTableStorage<OrderHistoryEntity> tableStorage,
+            IConvertService convertService)
         {
             _tableStorage = tableStorage;
+            _convertService = convertService;
         }
 
-        public Task AddAsync(IOrderHistory order)
+        public Task AddAsync(OrderHistory order)
         {
             var entity = OrderHistoryEntity.Create(order);
             // ReSharper disable once RedundantArgumentDefaultValue
@@ -26,22 +31,29 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 entity.UpdateTimestamp, RowKeyDateTimeFormat.Iso);
         }
 
-        public async Task<IReadOnlyList<IOrderHistory>> GetHistoryAsync(string[] accountIds,
+        public async Task<IReadOnlyList<OrderHistory>> GetHistoryAsync(string[] accountIds,
             DateTime? from, DateTime? to)
         {
-            return (await _tableStorage.WhereAsync(accountIds,
-                    from ?? DateTime.MinValue, to?.Date.AddDays(1) ?? DateTime.MaxValue, ToIntervalOption.IncludeTo))
+            var entities = (await _tableStorage.WhereAsync(accountIds,
+                    from ?? DateTime.MinValue, to?.Date.AddDays(1) ?? DateTime.MaxValue, ToIntervalOption.IncludeTo));
+            
+            return entities.Select(_convertService.Convert<OrderHistoryEntity, OrderHistory>)
                 .OrderByDescending(entity => entity.CloseDate ?? entity.OpenDate ?? entity.CreateDate).ToList();
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync()
+        public async Task<IEnumerable<OrderHistory>> GetHistoryAsync()
         {
-            return (await _tableStorage.GetDataAsync()).OrderByDescending(item => item.Timestamp);
+            var entities = await _tableStorage.GetDataAsync();
+            return entities.Select(_convertService.Convert<OrderHistoryEntity, OrderHistory>)
+                .OrderByDescending(item => item.UpdateTimestamp);
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(Func<IOrderHistory, bool> predicate)
+        public async Task<IEnumerable<OrderHistory>> GetHistoryAsync(Func<OrderHistory, bool> predicate)
         {
-            return await _tableStorage.GetDataAsync(predicate);
+            var entities = await _tableStorage.GetDataAsync(x =>
+                predicate(_convertService.Convert<OrderHistoryEntity, OrderHistory>(x)));
+            return entities.Select(_convertService.Convert<OrderHistoryEntity, OrderHistory>)
+                .OrderByDescending(item => item.UpdateTimestamp);
         }
     }
 }

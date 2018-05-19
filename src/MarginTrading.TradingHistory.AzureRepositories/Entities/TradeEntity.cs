@@ -1,4 +1,5 @@
 ﻿using System;
+using Common;
 using Lykke.AzureStorage.Tables;
 using MarginTrading.TradingHistory.Core.Domain;
 
@@ -23,7 +24,8 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public string ClientId { get; set; }
         public DateTime TradeTimestamp { get; set; }
         public string AssetPairId { get; set; }
-        public TradeType Type { get; set; }
+        TradeType ITrade.Type => this.Type.ParseEnum<TradeType>();
+        public string Type { get; set; }
         decimal ITrade.Price => (decimal) Price;
         public double Price { get; set; }
         decimal ITrade.Volume => (decimal) Volume;
