@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using MarginTrading.TradingHistory.Client;
 using MarginTrading.TradingHistory.Client.Models;
@@ -10,6 +11,7 @@ using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MarginTrading.TradingHistory.Controllers
 {
@@ -50,26 +52,33 @@ namespace MarginTrading.TradingHistory.Controllers
                 throw new ArgumentException(
                     $"{nameof(orderId)} and {nameof(positionId)} should be equal if both passed, separation is not yet supported");
 
-            var id = orderId ?? positionId;
-            return new List<TradeContract> {Convert(await _tradesRepository.GetAsync(id))};
+            var entity = await _tradesRepository.GetAsync(orderId ?? positionId);
+            return entity == null ? new List<TradeContract>() : new List<TradeContract>() {Convert(entity)};
         }
         
         private TradeContract Convert(ITrade tradeEntity)
         {
-            return new TradeContract
+            try
             {
-                // todo: separate order from position and trade and use there ids correctly
-                Id = tradeEntity.Id,
-                ClientId = tradeEntity.ClientId,
-                AccountId = tradeEntity.AccountId,
-                OrderId = tradeEntity.Id,
-                PositionId = tradeEntity.Id,
-                AssetPairId = tradeEntity.AssetPairId,
-                Type = tradeEntity.Type.ToType<TradeTypeContract>(),
-                Timestamp = tradeEntity.TradeTimestamp,
-                Price = tradeEntity.Price,
-                Volume = tradeEntity.Volume,
-            };
+                return new TradeContract
+                {
+                    // todo: separate order from position and trade and use there ids correctly
+                    Id = tradeEntity.Id,
+                    ClientId = tradeEntity.ClientId,
+                    AccountId = tradeEntity.AccountId,
+                    OrderId = tradeEntity.Id,
+                    PositionId = tradeEntity.Id,
+                    AssetPairId = tradeEntity.AssetPairId,
+                    Type = tradeEntity.Type.ToType<TradeTypeContract>(),
+                    Timestamp = tradeEntity.TradeTimestamp,
+                    Price = tradeEntity.Price,
+                    Volume = tradeEntity.Volume,
+                };
+            }
+            catch (Exception e)
+            {
+                return new TradeContract();
+            }
         }
     }
 }

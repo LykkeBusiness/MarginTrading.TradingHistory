@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AzureStorage;
+using Common;
 using Lykke.AzureStorage.Tables;
 using Lykke.AzureStorage.Tables.Entity.Annotation;
 using Lykke.AzureStorage.Tables.Entity.Serializers;
@@ -25,43 +26,71 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public DateTime CreateDate { get; set; }
         public DateTime? OpenDate { get; set; }
         public DateTime? CloseDate { get; set; }
-        public decimal? ExpectedOpenPrice { get; set; }
-        public decimal OpenPrice { get; set; }
-        public decimal ClosePrice { get; set; }
-        public decimal Volume { get; set; }
-        public decimal MatchedVolume { get; set; }
-        public decimal MatchedCloseVolume { get; set; }
-        public decimal? TakeProfit { get; set; }
-        public decimal? StopLoss { get; set; }
-        public decimal Fpl { get; set; }
-        public decimal PnL { get; set; }
-        public decimal InterestRateSwap { get; set; }
-        public decimal CommissionLot { get; set; }
-        public decimal OpenCommission { get; set; }
-        public decimal CloseCommission { get; set; }
-        public decimal QuoteRate { get; set; }
+        decimal? IOrderHistory.ExpectedOpenPrice => (decimal?) ExpectedOpenPrice;
+        public double? ExpectedOpenPrice { get; set; }
+        decimal IOrderHistory.OpenPrice => (decimal) OpenPrice;
+        public double OpenPrice { get; set; }
+        decimal IOrderHistory.ClosePrice => (decimal) ClosePrice;
+        public double ClosePrice { get; set; }
+        decimal IOrderHistory.Volume => (decimal) Volume;
+        public double Volume { get; set; }
+        decimal IOrderHistory.MatchedVolume => (decimal) MatchedVolume;
+        public double MatchedVolume { get; set; }
+        decimal IOrderHistory.MatchedCloseVolume => (decimal) MatchedCloseVolume;
+        public double MatchedCloseVolume { get; set; }
+        decimal? IOrderHistory.TakeProfit => (decimal?) TakeProfit;
+        public double? TakeProfit { get; set; }
+        decimal? IOrderHistory.StopLoss => (decimal?) StopLoss;
+        public double? StopLoss { get; set; }
+        decimal IOrderHistory.Fpl => (decimal) Fpl;
+        public double Fpl { get; set; }
+        decimal IOrderHistory.PnL => (decimal) PnL;
+        public double PnL { get; set; }
+        decimal IOrderHistory.InterestRateSwap => (decimal) InterestRateSwap;
+        public double InterestRateSwap { get; set; }
+        decimal IOrderHistory.CommissionLot => (decimal) CommissionLot;
+        public double CommissionLot { get; set; }
+        decimal IOrderHistory.OpenCommission => (decimal) OpenCommission;
+        public double OpenCommission { get; set; }
+        decimal IOrderHistory.CloseCommission => (decimal) CloseCommission;
+        public double CloseCommission { get; set; }
+        decimal IOrderHistory.QuoteRate => (decimal) QuoteRate;
+        public double QuoteRate { get; set; }
         public int AssetAccuracy { get; set; }
-        public decimal MarginInit { get; set; }
-        public decimal MarginMaintenance { get; set; }
+        decimal IOrderHistory.MarginInit => (decimal) MarginInit;
+        public double MarginInit { get; set; }
+        decimal IOrderHistory.MarginMaintenance => (decimal) MarginMaintenance;
+        public double MarginMaintenance { get; set; }
         public DateTime? StartClosingDate { get; set; }
-        public OrderDirection Type { get; set; }
-        public OrderStatus Status { get; set; }
-        public OrderCloseReason CloseReason { get; set; }
-        public OrderFillType FillType { get; set; }
-        public OrderRejectReason RejectReason { get; set; }
+        public string Type { get; set; }
+        OrderDirection IOrderHistory.Type => Type.ParseEnum(OrderDirection.Buy);
+        public string Status { get; set; }
+        OrderStatus IOrderHistory.Status => Status.ParseEnum(OrderStatus.Closed);
+        public string CloseReason { get; set; }
+        OrderCloseReason IOrderHistory.CloseReason => CloseReason.ParseEnum(OrderCloseReason.Close);
+        public string FillType { get; set; }
+        OrderFillType IOrderHistory.FillType => FillType.ParseEnum(OrderFillType.FillOrKill);
+        public string RejectReason { get; set; }
+        OrderRejectReason IOrderHistory.RejectReason => RejectReason.ParseEnum(OrderRejectReason.None);
         public string RejectReasonText { get; set; }
         public string Comment { get; set; }
-        public decimal SwapCommission { get; set; }
+        decimal IOrderHistory.SwapCommission => (decimal) SwapCommission;
+        public double SwapCommission { get; set; }
         public string EquivalentAsset { get; set; }
-        public decimal OpenPriceEquivalent { get; set; }
-        public decimal ClosePriceEquivalent { get; set; }
+        decimal IOrderHistory.OpenPriceEquivalent => (decimal) OpenPriceEquivalent;
+        public double OpenPriceEquivalent { get; set; }
+        decimal IOrderHistory.ClosePriceEquivalent => (decimal) ClosePriceEquivalent;
+        public double ClosePriceEquivalent { get; set; }
         public string OpenExternalOrderId { get; set; }
         public string OpenExternalProviderId { get; set; }
         public string CloseExternalOrderId { get; set; }
         public string CloseExternalProviderId { get; set; }
-        public MatchingEngineMode MatchingEngineMode { get; set; }
+        MatchingEngineMode IOrderHistory.MatchingEngineMode =>
+            MatchingEngineMode.ParseEnum(Core.Domain.MatchingEngineMode.MarketMaker);
+        public string MatchingEngineMode { get; set; }
         public string LegalEntity { get; set; }
-        public OrderUpdateType OrderUpdateType { get; set; }
+        OrderUpdateType IOrderHistory.OrderUpdateType => OrderUpdateType.ParseEnum(Core.Domain.OrderUpdateType.Close);
+        public string OrderUpdateType { get; set; }
         public string ParentPositionId { get; set; }
         public string ParentOrderId { get; set; }
 
@@ -93,47 +122,47 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
                 TradingConditionId = src.TradingConditionId,
                 AccountAssetId = src.AccountAssetId,
                 Instrument = src.Instrument,
-                Type = src.Type,
+                Type = src.Type.ToString(),
                 CreateDate = src.CreateDate,
                 OpenDate = src.OpenDate,
                 CloseDate = src.CloseDate,
-                ExpectedOpenPrice = src.ExpectedOpenPrice,
-                OpenPrice = src.OpenPrice,
-                ClosePrice = src.ClosePrice,
-                TakeProfit = src.TakeProfit,
-                StopLoss = src.StopLoss,
-                Fpl = src.Fpl,
-                PnL = src.PnL,
-                InterestRateSwap = src.InterestRateSwap,
-                CommissionLot = src.CommissionLot,
-                OpenCommission = src.OpenCommission,
-                CloseCommission = src.CloseCommission,
-                QuoteRate = src.QuoteRate,
+                ExpectedOpenPrice = (double?) src.ExpectedOpenPrice,
+                OpenPrice = (double) src.OpenPrice,
+                ClosePrice = (double) src.ClosePrice,
+                TakeProfit = (double?) src.TakeProfit,
+                StopLoss = (double?) src.StopLoss,
+                Fpl = (double) src.Fpl,
+                PnL = (double) src.PnL,
+                InterestRateSwap = (double) src.InterestRateSwap,
+                CommissionLot = (double) src.CommissionLot,
+                OpenCommission = (double) src.OpenCommission,
+                CloseCommission = (double) src.CloseCommission,
+                QuoteRate = (double) src.QuoteRate,
                 AssetAccuracy = src.AssetAccuracy,
-                MarginInit = src.MarginInit,
-                MarginMaintenance = src.MarginMaintenance,
+                MarginInit = (double) src.MarginInit,
+                MarginMaintenance = (double) src.MarginMaintenance,
                 StartClosingDate = src.StartClosingDate,
-                Status = src.Status,
-                CloseReason = src.CloseReason,
-                FillType = src.FillType,
-                Volume = src.Volume,
-                MatchedVolume = src.MatchedVolume,
-                MatchedCloseVolume = src.MatchedCloseVolume,
-                RejectReason = src.RejectReason,
+                Status = src.Status.ToString(),
+                CloseReason = src.CloseReason.ToString(),
+                FillType = src.FillType.ToString(),
+                Volume = (double) src.Volume,
+                MatchedVolume = (double) src.MatchedVolume,
+                MatchedCloseVolume = (double) src.MatchedCloseVolume,
+                RejectReason = src.RejectReason.ToString(),
                 RejectReasonText = src.RejectReasonText,
                 MatchedOrders = src.MatchedOrders,
                 MatchedCloseOrders = src.MatchedCloseOrders,
-                SwapCommission = src.SwapCommission,
+                SwapCommission = (double) src.SwapCommission,
                 EquivalentAsset = src.EquivalentAsset,
-                OpenPriceEquivalent = src.OpenPriceEquivalent,
-                ClosePriceEquivalent = src.ClosePriceEquivalent,
+                OpenPriceEquivalent = (double) src.OpenPriceEquivalent,
+                ClosePriceEquivalent = (double) src.ClosePriceEquivalent,
                 Comment = src.Comment,
-                OrderUpdateType = src.OrderUpdateType,
+                OrderUpdateType = src.OrderUpdateType.ToString(),
                 OpenExternalOrderId = src.OpenExternalOrderId,
                 OpenExternalProviderId = src.OpenExternalProviderId,
                 CloseExternalOrderId = src.CloseExternalOrderId,
                 CloseExternalProviderId = src.CloseExternalProviderId,
-                MatchingEngineMode = src.MatchingEngineMode,
+                MatchingEngineMode = src.MatchingEngineMode.ToString(),
                 LegalEntity = src.LegalEntity,
                 UpdateTimestamp = src.UpdateTimestamp,
                 ParentPositionId = src.ParentPositionId,

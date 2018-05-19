@@ -93,7 +93,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public async Task AddAsync(IOrderHistory order)
+        public async Task AddAsync(OrderHistory order)
         {
             using (var conn = new SqlConnection(_reportsSqlConnString))
             {
@@ -116,17 +116,17 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public Task<IEnumerable<IOrderHistory>> GetHistoryAsync()
+        public Task<IEnumerable<OrderHistory>> GetHistoryAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task<IReadOnlyList<IOrderHistory>> GetHistoryAsync(string[] accountIds, DateTime? @from, DateTime? to)
+        public Task<IReadOnlyList<OrderHistory>> GetHistoryAsync(string[] accountIds, DateTime? @from, DateTime? to)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(Func<IOrderHistory, bool> predicate)
+        public async Task<IEnumerable<OrderHistory>> GetHistoryAsync(Func<OrderHistory, bool> predicate)
         {
             throw new NotImplementedException();
         }

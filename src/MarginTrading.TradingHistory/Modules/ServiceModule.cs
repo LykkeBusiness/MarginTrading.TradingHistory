@@ -50,13 +50,15 @@ namespace MarginTrading.TradingHistory.Modules
 
             // TODO: Add your dependencies here
 
+            var convertService = new ConvertService();
+
             builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateOrdersHistoryRepository(
-                    _settings.Nested(s => s.Db.HistoryConnString), _log))
+                    _settings.Nested(s => s.Db.HistoryConnString), _log, convertService))
                 .As<IOrdersHistoryRepository>()
                 .SingleInstance();
             
             builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateTradesRepository(
-                    _settings.Nested(s => s.Db.HistoryConnString), _log, new ConvertService()))
+                    _settings.Nested(s => s.Db.HistoryConnString), _log, convertService))
                 .As<ITradesRepository>()
                 .SingleInstance();
 

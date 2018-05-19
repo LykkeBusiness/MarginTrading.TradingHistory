@@ -6,7 +6,8 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
 {
     public static class MappingExtension
     {
-        public static IOrderHistory ToOrderHistoryDomain(this OrderFullContract src)
+        
+        public static OrderHistory ToOrderHistoryDomain(this OrderFullContract src)
         {
             var orderContract = new OrderHistory
             {

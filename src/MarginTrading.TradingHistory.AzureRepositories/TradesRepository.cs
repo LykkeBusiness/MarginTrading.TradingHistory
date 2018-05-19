@@ -20,16 +20,16 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             _convertService = convertService;
         }
 
-        public async Task<ITrade> GetAsync(string id)
+        public async Task<Trade> GetAsync(string id)
         {
             var data = await _tableStorage.GetDataAsync(TradeEntity.GetPartitionKey(id), TradeEntity.GetRowKey());
-            return _convertService.Convert<TradeEntity, ITrade>(data);
+            return _convertService.Convert<TradeEntity, Trade>(data);
         }
 
         // todo: use internal models instead of entity in the repo api
-        public async Task UpsertAsync(ITrade obj)
+        public async Task UpsertAsync(Trade obj)
         {
-            var entity = _convertService.Convert<ITrade, TradeEntity>(obj);
+            var entity = _convertService.Convert<Trade, TradeEntity>(obj);
             await _tableStorage.InsertOrReplaceAsync(entity);
         }
     }
