@@ -12,8 +12,5 @@ namespace MarginTrading.TradingHistory.Settings
 
         [Optional, CanBeNull]
         public SlackNotificationsSettings SlackNotifications { get; set; }
-
-        [Optional]
-        public MonitoringServiceClientSettings MonitoringServiceClient { get; set; }
     }
 }
