@@ -4,6 +4,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AzureStorage.Tables;
 using Common.Log;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
@@ -17,6 +18,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace MarginTrading.TradingHistory
 {
@@ -28,6 +30,9 @@ namespace MarginTrading.TradingHistory
         public IContainer ApplicationContainer { get; private set; }
         public IConfigurationRoot Configuration { get; }
         public ILog Log { get; private set; }
+
+        public static string ServiceName { get; } = PlatformServices.Default
+            .Application.ApplicationName;
 
         public Startup(IHostingEnvironment env)
         {
@@ -52,7 +57,7 @@ namespace MarginTrading.TradingHistory
 
                 services.AddSwaggerGen(options =>
                 {
-                    options.DefaultLykkeConfiguration("v1", "LykkeService API");
+                    options.DefaultLykkeConfiguration("v1", "TradingHistory API");
                 });
 
                 var builder = new ContainerBuilder();
@@ -85,8 +90,13 @@ namespace MarginTrading.TradingHistory
                 }
 
                 app.UseLykkeForwardedHeaders();
-                app.UseLykkeMiddleware("LykkeService", ex => new { Message = "Technical problem" });
-
+                
+#if DEBUG
+                app.UseLykkeMiddleware(ServiceName, ex => ex.ToString());
+#else
+                app.UseLykkeMiddleware(ServiceName, ex => new ErrorResponse {ErrorMessage = ex.Message});
+#endif
+                
                 app.UseMvc();
                 app.UseSwagger(c =>
                 {

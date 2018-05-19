@@ -10,5 +10,6 @@ namespace MarginTrading.TradingHistory.Core.Repositories
         Task AddAsync(IOrderHistory order);
         Task<IEnumerable<IOrderHistory>> GetHistoryAsync();
         Task<IReadOnlyList<IOrderHistory>> GetHistoryAsync(string[] accountIds, DateTime? from, DateTime? to);
+        Task<IEnumerable<IOrderHistory>> GetHistoryAsync(Func<IOrderHistory, bool> predicate);
     }
 }

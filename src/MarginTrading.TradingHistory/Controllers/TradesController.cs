@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MarginTrading.TradingHistory.Client;
 using MarginTrading.TradingHistory.Client.Models;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
@@ -12,8 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MarginTrading.TradingHistory.Controllers
 {
-    [Authorize]
-    [Route("api/trade/")]
+    [Route("api/trades/")]
     public class TradesController : Controller, ITradesApi
     {
         private readonly ITradesRepository _tradesRepository;
@@ -42,6 +42,7 @@ namespace MarginTrading.TradingHistory.Controllers
         [HttpGet, Route("")]
         public async Task<List<TradeContract>> List([FromQuery] string orderId, [FromQuery] string positionId)
         {
+            //TODO WTF is this ???
             if (orderId == null && positionId == null)
                 throw new ArgumentException($"{nameof(orderId)} or {nameof(positionId)} should be passed");
 
@@ -59,10 +60,15 @@ namespace MarginTrading.TradingHistory.Controllers
             {
                 // todo: separate order from position and trade and use there ids correctly
                 Id = tradeEntity.Id,
+                ClientId = tradeEntity.ClientId,
                 AccountId = tradeEntity.AccountId,
                 OrderId = tradeEntity.Id,
                 PositionId = tradeEntity.Id,
+                AssetPairId = tradeEntity.AssetPairId,
+                Type = tradeEntity.Type.ToType<TradeTypeContract>(),
                 Timestamp = tradeEntity.TradeTimestamp,
+                Price = tradeEntity.Price,
+                Volume = tradeEntity.Volume,
             };
         }
     }

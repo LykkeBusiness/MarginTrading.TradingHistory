@@ -125,5 +125,10 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         {
             throw new NotImplementedException();
         }
+
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(Func<IOrderHistory, bool> predicate)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

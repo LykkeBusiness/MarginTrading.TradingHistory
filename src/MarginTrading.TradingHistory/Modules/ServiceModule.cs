@@ -5,6 +5,8 @@ using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Settings.ServiceSettings;
 using MarginTrading.TradingHistory.Services;
 using Lykke.SettingsReader;
+using MarginTrading.TradingHistory.AzureRepositories;
+using MarginTrading.TradingHistory.Core.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MarginTrading.TradingHistory.Modules
@@ -47,6 +49,18 @@ namespace MarginTrading.TradingHistory.Modules
                 .As<IShutdownManager>();
 
             // TODO: Add your dependencies here
+
+            builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateOrdersHistoryRepository(
+                    _settings.Nested(s => s.Db.HistoryConnString), _log))
+                .As<IOrdersHistoryRepository>()
+                .SingleInstance();
+            
+            builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateTradesRepository(
+                    _settings.Nested(s => s.Db.HistoryConnString), _log, new ConvertService()))
+                .As<ITradesRepository>()
+                .SingleInstance();
+
+            builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();
 
             builder.Populate(_services);
         }

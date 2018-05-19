@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using AutoMapper;
 using JetBrains.Annotations;
+using MarginTrading.TradingHistory.AzureRepositories.Entities;
+using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Services;
 using Microsoft.AspNetCore.Routing;
@@ -22,6 +24,7 @@ namespace MarginTrading.TradingHistory.Services
             return new MapperConfiguration(cfg =>
             {
                 // todo: specify common conversion rules?
+                cfg.CreateMap<TradeContract, TradeEntity>();
             }).CreateMapper();
         }
 

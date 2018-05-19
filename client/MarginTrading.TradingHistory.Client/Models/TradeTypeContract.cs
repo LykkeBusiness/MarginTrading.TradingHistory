@@ -4,10 +4,9 @@ using Newtonsoft.Json.Converters;
 namespace MarginTrading.TradingHistory.Client.Models
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum OriginatorTypeContract
+    public enum TradeTypeContract
     {
-        Investor = 1,
-        System = 2,
-        OnBehalf = 3
+        Buy = 0,
+        Sell = 1
     }
 }

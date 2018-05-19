@@ -10,7 +10,16 @@ namespace MarginTrading.TradingHistory.Client
     [PublicAPI]
     public interface ITradesApi
     {
-        Task<TradeContract> Get(string tradeId); 
-        Task<List<TradeContract>> List([Query] string orderId, [Query] string positionId); 
+        /// <summary>
+        /// Get a trade by id  
+        /// </summary>
+        [Get("/api/trades/{tradeId}")]
+        Task<TradeContract> Get([NotNull] string tradeId);
+        
+        /// <summary>
+        /// Get trades with optional filtering by order or position 
+        /// </summary> 
+        [Get("/api/trades/")]
+        Task<List<TradeContract>> List([Query, CanBeNull] string orderId, [Query, CanBeNull] string positionId); 
     }
 }

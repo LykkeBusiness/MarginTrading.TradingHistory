@@ -24,8 +24,10 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public DateTime TradeTimestamp { get; set; }
         public string AssetPairId { get; set; }
         public TradeType Type { get; set; }
-        public decimal Price { get; set; }
-        public decimal Volume { get; set; }
+        decimal ITrade.Price => (decimal) Price;
+        public double Price { get; set; }
+        decimal ITrade.Volume => (decimal) Volume;
+        public double Volume { get; set; }
 
         public static string GetPartitionKey(string id)
         {

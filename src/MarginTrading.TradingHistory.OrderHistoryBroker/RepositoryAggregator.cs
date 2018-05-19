@@ -33,5 +33,10 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         {
             throw new NotImplementedException();
         }
+
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(Func<IOrderHistory, bool> predicate)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

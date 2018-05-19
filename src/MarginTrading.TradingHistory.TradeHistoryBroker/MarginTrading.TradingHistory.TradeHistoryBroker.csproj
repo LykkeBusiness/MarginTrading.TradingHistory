@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <AssemblyName>MarginTrading.TradingHistory.OrderHistoryBroker</AssemblyName>
+    <AssemblyName>MarginTrading.TradingHistory.TradeHistoryBroker</AssemblyName>
     <OutputType>Exe</OutputType>
-    <PackageId>MarginTrading.TradingHistory.OrderHistoryBroker</PackageId>
+    <PackageId>MarginTrading.TradingHistory.TradeHistoryBroker</PackageId>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -38,6 +38,5 @@
     <ProjectReference Include="..\..\client\MarginTrading.TradingHistory.Client\MarginTrading.TradingHistory.Client.csproj" />
     <ProjectReference Include="..\MarginTrading.TradingHistory.AzureRepositories\MarginTrading.TradingHistory.AzureRepositories.csproj" />
     <ProjectReference Include="..\MarginTrading.TradingHistory.BrokerBase\MarginTrading.TradingHistory.BrokerBase.csproj" />
-    <ProjectReference Include="..\MarginTrading.TradingHistory.SqlRepositories\MarginTrading.TradingHistory.SqlRepositories.csproj" />
   </ItemGroup>
 </Project>
