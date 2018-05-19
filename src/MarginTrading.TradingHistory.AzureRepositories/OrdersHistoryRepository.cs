@@ -36,9 +36,12 @@ namespace MarginTrading.TradingHistory.AzureRepositories
 
         public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync()
         {
-            var entities = (await _tableStorage.GetDataAsync()).OrderByDescending(item => item.Timestamp);
+            return (await _tableStorage.GetDataAsync()).OrderByDescending(item => item.Timestamp);
+        }
 
-            return entities;
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(Func<IOrderHistory, bool> predicate)
+        {
+            return await _tableStorage.GetDataAsync(predicate);
         }
     }
 }

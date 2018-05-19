@@ -16,7 +16,6 @@ namespace MarginTrading.TradingHistory.Controllers
     /// <summary>
     /// Provides order history
     /// </summary>
-    [Authorize]
     [Route("api/orders")]
     public class OrdersController : Controller, IOrdersApi
     {

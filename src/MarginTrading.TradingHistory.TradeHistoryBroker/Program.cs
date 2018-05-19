@@ -6,7 +6,7 @@ namespace MarginTrading.TradingHistory.TradeHistoryBroker
     {
         public static void Main(string[] args)
         {
-            RunOnPort(5013);
+            RunOnPort(5014);
         }
     }
 }

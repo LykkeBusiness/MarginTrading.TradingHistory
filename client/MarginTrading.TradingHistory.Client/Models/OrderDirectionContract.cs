@@ -1,8 +1,12 @@
-﻿namespace MarginTrading.TradingHistory.Client.Models
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace MarginTrading.TradingHistory.Client.Models
 {
     /// <summary>
     /// The direction of an order
     /// </summary>
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum OrderDirectionContract
     {
         /// <summary>
