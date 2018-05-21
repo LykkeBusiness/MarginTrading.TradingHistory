@@ -12,13 +12,14 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
             RowKey = GetRowKey();
         }
 
-        public string Id
+        public string Id { get; set; }
+        
+        public string OrderId
         {
             get => PartitionKey;
             set => PartitionKey = value;
         }
 
-        public string OrderId { get; set; }
         public string PositionId { get; set; }
         public string AccountId { get; set; }
         public string ClientId { get; set; }

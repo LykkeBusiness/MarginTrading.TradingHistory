@@ -33,11 +33,10 @@ namespace MarginTrading.TradingHistory.Controllers
         public async Task<List<PositionContract>> PositionHistory(
             [FromQuery] string accountId, [FromQuery] string instrument)
         {
-            var orders = string.IsNullOrEmpty(accountId) && string.IsNullOrEmpty(instrument) 
-                ? await _ordersHistoryRepository.GetHistoryAsync()
-                : await _ordersHistoryRepository.GetHistoryAsync(x => 
-                    (string.IsNullOrEmpty(accountId) || x.AccountId == accountId)
-                    && (string.IsNullOrEmpty(instrument) || x.Instrument == instrument));
+            var orders = await _ordersHistoryRepository.GetHistoryAsync(x =>
+                x.OrderUpdateType == OrderUpdateType.Close &&
+                (string.IsNullOrEmpty(accountId) || x.AccountId == accountId)
+                && (string.IsNullOrEmpty(instrument) || x.Instrument == instrument));
             
             return orders.Select(Convert).ToList();
         }

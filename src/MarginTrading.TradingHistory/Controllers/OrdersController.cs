@@ -66,10 +66,7 @@ namespace MarginTrading.TradingHistory.Controllers
         
         private static IEnumerable<OrderContract> MakeOrderContractsFromHistory(IOrderHistory r)
         {
-            yield return Convert(r, false);
-
-            if (r.Status == OrderStatus.Closed)
-                yield return Convert(r, true);
+            yield return Convert(r, r.Status == OrderStatus.Closed);
         }
         
         private static List<string> GetTrades(string orderId, OrderStatus status, OrderDirection orderDirection)
