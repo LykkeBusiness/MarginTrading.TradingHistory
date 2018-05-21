@@ -59,12 +59,12 @@ namespace MarginTrading.TradingHistory.Core.Domain
         
         MatchingEngineMode MatchingEngineMode { get; }
         string LegalEntity { get; }  
-        DateTime UpdateTimestamp { get; }  
+        //DateTime UpdateTimestamp { get; }  
 
-        [CanBeNull]
-        string ParentPositionId { get; }
+        //[CanBeNull]
+        //string ParentPositionId { get; }
 
-        [CanBeNull]
-        string ParentOrderId { get; }
+        //[CanBeNull]
+        //string ParentOrderId { get; }
     }
 }

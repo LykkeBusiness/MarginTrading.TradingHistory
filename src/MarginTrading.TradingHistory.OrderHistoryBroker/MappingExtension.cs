@@ -57,7 +57,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                 CloseExternalOrderId = src.CloseExternalOrderId,
                 CloseExternalProviderId = src.CloseExternalProviderId,
                 MatchingEngineMode = src.MatchingEngineMode.ToType<MatchingEngineMode>(),
-                LegalEntity = src.LegalEntity,
+                LegalEntity = src.LegalEntity
             };
 
             foreach (var order in src.MatchedOrders)

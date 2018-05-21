@@ -91,14 +91,14 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public string LegalEntity { get; set; }
         OrderUpdateType IOrderHistory.OrderUpdateType => OrderUpdateType.ParseEnum(Core.Domain.OrderUpdateType.Close);
         public string OrderUpdateType { get; set; }
-        public string ParentPositionId { get; set; }
-        public string ParentOrderId { get; set; }
+        //public string ParentPositionId { get; set; }
+        //public string ParentOrderId { get; set; }
 
-        public DateTime UpdateTimestamp
-        {
-            get => DateTime.ParseExact(RowKey, RowKeyDateTimeFormat.Iso.ToDateTimeMask(), null);
-            set => RowKey = value.ToString(RowKeyDateTimeFormat.Iso.ToDateTimeMask());
-        }
+//        public DateTime UpdateTimestamp
+//        {
+//            get => DateTime.ParseExact(RowKey, RowKeyDateTimeFormat.Iso.ToDateTimeMask(), null);
+//            set => RowKey = value.ToString(RowKeyDateTimeFormat.Iso.ToDateTimeMask());
+//        }
 
         [ValueSerializer(typeof(JsonStorageValueSerializer))]
         public List<MatchedOrder> MatchedOrders { get; set; } = new List<MatchedOrder>();
@@ -164,9 +164,9 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
                 CloseExternalProviderId = src.CloseExternalProviderId,
                 MatchingEngineMode = src.MatchingEngineMode.ToString(),
                 LegalEntity = src.LegalEntity,
-                UpdateTimestamp = src.UpdateTimestamp,
-                ParentPositionId = src.ParentPositionId,
-                ParentOrderId = src.ParentOrderId,
+                //UpdateTimestamp = src.UpdateTimestamp,
+                //ParentPositionId = src.ParentPositionId,
+                //ParentOrderId = src.ParentOrderId,
             };
         }
     }

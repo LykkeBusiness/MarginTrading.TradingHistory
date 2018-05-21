@@ -120,9 +120,9 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 CloseExternalProviderId = src.CloseExternalProviderId,
                 MatchingEngineMode = src.MatchingEngineMode,
                 LegalEntity = src.LegalEntity,
-                UpdateTimestamp = src.UpdateTimestamp,
-                ParentPositionId = src.ParentPositionId,
-                ParentOrderId = src.ParentOrderId,
+                //UpdateTimestamp = src.UpdateTimestamp,
+                //ParentPositionId = src.ParentPositionId,
+                //ParentOrderId = src.ParentOrderId,
             };
         }
     }
