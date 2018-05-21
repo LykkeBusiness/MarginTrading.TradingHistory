@@ -54,8 +54,8 @@ namespace MarginTrading.TradingHistory.Core.Domain
         public string CloseExternalProviderId { get; set; }
         public MatchingEngineMode MatchingEngineMode { get; set; }
         public string LegalEntity { get; set; }
-        public DateTime UpdateTimestamp { get; set; }
-        public string ParentPositionId { get; set; }
-        public string ParentOrderId { get; set; }
+        //public DateTime UpdateTimestamp { get; set; }
+        //public string ParentPositionId { get; set; }
+        //public string ParentOrderId { get; set; }
     }
 }

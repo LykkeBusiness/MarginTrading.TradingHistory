@@ -27,8 +27,9 @@ namespace MarginTrading.TradingHistory.AzureRepositories
         {
             var entity = OrderHistoryEntity.Create(order);
             // ReSharper disable once RedundantArgumentDefaultValue
+            //TODO: use event datetime
             return _tableStorage.InsertAndGenerateRowKeyAsDateTimeAsync(entity,
-                entity.UpdateTimestamp, RowKeyDateTimeFormat.Iso);
+                DateTime.UtcNow, RowKeyDateTimeFormat.Iso);
         }
 
         public async Task<IReadOnlyList<OrderHistory>> GetHistoryAsync(string[] accountIds,
@@ -44,16 +45,17 @@ namespace MarginTrading.TradingHistory.AzureRepositories
         public async Task<IEnumerable<OrderHistory>> GetHistoryAsync()
         {
             var entities = await _tableStorage.GetDataAsync();
-            return entities.Select(_convertService.Convert<OrderHistoryEntity, OrderHistory>)
-                .OrderByDescending(item => item.UpdateTimestamp);
+            return entities.OrderByDescending(item => item.Timestamp)
+                .Select(_convertService.Convert<OrderHistoryEntity, OrderHistory>);
+
         }
 
         public async Task<IEnumerable<OrderHistory>> GetHistoryAsync(Func<OrderHistory, bool> predicate)
         {
             var entities = await _tableStorage.GetDataAsync(x =>
                 predicate(_convertService.Convert<OrderHistoryEntity, OrderHistory>(x)));
-            return entities.Select(_convertService.Convert<OrderHistoryEntity, OrderHistory>)
-                .OrderByDescending(item => item.UpdateTimestamp);
+            return entities.OrderByDescending(item => item.Timestamp)
+                .Select(_convertService.Convert<OrderHistoryEntity, OrderHistory>);
         }
     }
 }

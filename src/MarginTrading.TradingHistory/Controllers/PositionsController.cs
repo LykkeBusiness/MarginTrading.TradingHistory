@@ -49,7 +49,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 Id = orderHistory.Id,
                 AccountId = orderHistory.AccountAssetId,
                 Instrument = orderHistory.Instrument,
-                Timestamp = orderHistory.UpdateTimestamp,
+                Timestamp = orderHistory.OpenDate ?? orderHistory.CreateDate,
                 Direction = ConvertDirection(orderHistory.Type),
                 Price = orderHistory.ClosePrice == default ? orderHistory.OpenPrice : orderHistory.ClosePrice,
                 Volume = orderHistory.Volume,
