@@ -16,8 +16,8 @@ namespace MarginTrading.TradingHistory.Controllers
     /// <summary>
     /// Provides order history
     /// </summary>
-    [Route("api/orders")]
-    public class OrdersController : Controller, IOrdersApi
+    [Route("api/orders-history")]
+    public class OrdersController : Controller, IOrdersHistoryApi
     {
         private readonly IOrdersHistoryRepository _ordersHistoryRepository;
         private readonly IConvertService _convertService;
@@ -35,7 +35,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// <summary>
         /// Get executed orders with optional filtering
         /// </summary>
-        [HttpGet, Route("orderHistory")]
+        [HttpGet, Route("")]
         public async Task<List<OrderContract>> OrderHistory(
             [FromQuery] string accountId = null, [FromQuery] string assetPairId = null)
         {
