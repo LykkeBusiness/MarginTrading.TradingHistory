@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using AutoMapper;
 using AzureStorage;
 using MarginTrading.TradingHistory.AzureRepositories.Entities;
@@ -31,6 +32,9 @@ namespace MarginTrading.TradingHistory.AzureRepositories
         public async Task UpsertAsync(Trade obj)
         {
             var entity = _convertService.Convert<Trade, TradeEntity>(obj, o => o.ConfigureMap(MemberList.Source));
+            
+            entity.TradeTimestamp = DateTime.UtcNow;
+            entity.Timestamp = DateTimeOffset.UtcNow;
             entity.PartitionKey = TradeEntity.GetPartitionKey(obj.OrderId);
             entity.RowKey = TradeEntity.GetRowKey();
                 

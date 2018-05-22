@@ -12,8 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MarginTrading.TradingHistory.Controllers
 {
-    [Route("api/positions")]
-    public class PositionsController : Controller, IPositionsApi
+    [Route("api/positions-history")]
+    public class PositionsController : Controller, IPositionsHistoryApi
     {
         private readonly IOrdersHistoryRepository _ordersHistoryRepository;
         private readonly IConvertService _convertService;
