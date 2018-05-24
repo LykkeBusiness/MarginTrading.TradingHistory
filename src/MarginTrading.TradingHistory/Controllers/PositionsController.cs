@@ -46,14 +46,14 @@ namespace MarginTrading.TradingHistory.Controllers
             return new PositionContract
             {
                 Id = orderHistory.Id,
-                AccountId = orderHistory.AccountAssetId,
+                AccountId = orderHistory.AccountId,
                 Instrument = orderHistory.Instrument,
                 Timestamp = orderHistory.OpenDate ?? orderHistory.CreateDate,
                 Direction = ConvertDirection(orderHistory.Type),
                 Price = orderHistory.ClosePrice == default ? orderHistory.OpenPrice : orderHistory.ClosePrice,
                 Volume = orderHistory.Volume,
                 PnL = orderHistory.PnL,
-                TradeId = "", //TODO need to be fixed
+                TradeId = orderHistory.Id, //TODO need to be fixed
                 RelatedOrders = new List<string>(),//TODO need to be fixed
             };
         }
