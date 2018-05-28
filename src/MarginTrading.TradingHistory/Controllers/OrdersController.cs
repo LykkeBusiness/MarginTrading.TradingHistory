@@ -105,7 +105,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 AccountId = history.AccountId,
                 AssetPairId = history.Instrument,
                 CreatedTimestamp = history.CreateDate,
-                Direction = history.Type.ToType<OrderDirectionContract>(),
+                Direction = Convert(history.Type, isCloseOrder),
                 ExecutionPrice = history.OpenPrice,
                 ExpectedOpenPrice = history.ExpectedOpenPrice,
                 ForceOpen = true,
@@ -118,7 +118,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 TradesIds = GetTrades(history.Id, history.Status, orderDirection),
                 Type = history.ExpectedOpenPrice == null ? OrderTypeContract.Market : OrderTypeContract.Limit,
                 ValidityTime = null,
-                Volume = history.Volume,
+                Volume = isCloseOrder ? -history.Volume : history.Volume,
             };
         }
         
@@ -139,6 +139,22 @@ namespace MarginTrading.TradingHistory.Controllers
                 default:
                     throw new ArgumentOutOfRangeException(nameof(orderStatus), orderStatus, null);
             }
+        }
+
+        private static OrderDirectionContract Convert(OrderDirection direction, bool isCloseOrder)
+        {
+            if (!isCloseOrder)
+            {
+                return direction.ToType<OrderDirectionContract>();
+            }
+
+            if (direction == OrderDirection.Buy)
+                return OrderDirectionContract.Sell;
+
+            if (direction == OrderDirection.Sell)
+                return OrderDirectionContract.Buy;
+
+            throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
         }
 
         private static OrderContract CreateSlTpOrder(IOrderHistory history, bool isSlOrTp)
