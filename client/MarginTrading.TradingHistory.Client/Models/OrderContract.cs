@@ -72,6 +72,11 @@ namespace MarginTrading.TradingHistory.Client.Models
         public decimal? ExecutionPrice { get; set; }
 
         /// <summary>
+        /// Current FxRate
+        /// </summary>
+        public decimal FxRate { get; set; }
+        
+        /// <summary>
         /// Execution trades ids. Filled for executed orders only.
         /// If the order execution affected multiple positions - there will be multiple trades.
         /// </summary>

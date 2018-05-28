@@ -108,6 +108,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 Direction = Convert(history.Type, isCloseOrder),
                 ExecutionPrice = history.OpenPrice,
                 ExpectedOpenPrice = history.ExpectedOpenPrice,
+                FxRate = history.QuoteRate,
                 ForceOpen = true,
                 ModifiedTimestamp = history.CloseDate ?? history.OpenDate ?? history.CreateDate, //history.UpdateTimestamp,
                 Originator = OriginatorTypeContract.Investor,
