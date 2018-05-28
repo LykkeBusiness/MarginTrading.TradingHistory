@@ -46,7 +46,16 @@ namespace MarginTrading.TradingHistory.Controllers
             if (!string.IsNullOrWhiteSpace(assetPairId))
                 history = history.Where(o => o.Instrument == assetPairId);
 
-            return history.SelectMany(MakeOrderContractsFromHistory).ToList();
+            return history.Where(CheckOrderUpdateType).SelectMany(MakeOrderContractsFromHistory).ToList();
+        }
+
+        private bool CheckOrderUpdateType(IOrderHistory orderHistory)
+        {
+            return new []
+            {
+                OrderUpdateType.Activate,
+                OrderUpdateType.Close,
+            }.Contains(orderHistory.OrderUpdateType);
         }
         
         private static OrderDirection GetOrderDirection(OrderDirection openDirection, bool isCloseOrder)
@@ -63,13 +72,17 @@ namespace MarginTrading.TradingHistory.Controllers
             {
                 var slOrder = CreateSlTpOrder(r, true);
                 baseOrder.RelatedOrders.Add(slOrder.Id);
-                yield return slOrder;
+                
+                if (slOrder.Status == OrderStatusContract.Executed)
+                    yield return slOrder;
             }
             if (r.TakeProfit != null && r.Status == OrderStatus.Closed)
             {
                 var tpOrder = CreateSlTpOrder(r, false);
                 baseOrder.RelatedOrders.Add(tpOrder.Id);
-                yield return tpOrder;
+                
+                if (tpOrder.Status == OrderStatusContract.Executed)
+                    yield return tpOrder;
             }
 
             yield return baseOrder;
