@@ -195,7 +195,7 @@
             Account id
             </summary>
         </member>
-        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.AssetPairId">
+        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Instrument">
             <summary>
             Asset pair id
             </summary>
