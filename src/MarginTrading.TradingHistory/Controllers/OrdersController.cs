@@ -107,17 +107,26 @@ namespace MarginTrading.TradingHistory.Controllers
                 CreatedTimestamp = isCloseOrder ? history.CloseDate.Value : history.CreateDate,
                 Direction = Convert(history.Type, isCloseOrder),
                 ExecutionPrice = isCloseOrder ? history.ClosePrice : history.OpenPrice,
-                ExpectedOpenPrice = history.ExpectedOpenPrice,
+                ExpectedOpenPrice = isCloseOrder ? null : history.ExpectedOpenPrice,
                 FxRate = history.QuoteRate,
                 ForceOpen = true,
-                ModifiedTimestamp = history.CloseDate ?? history.OpenDate ?? history.CreateDate, //history.UpdateTimestamp,
-                Originator = OriginatorTypeContract.Investor,
-                ParentOrderId = "",//history.ParentOrderId,
+                ModifiedTimestamp =
+                    history.CloseDate ?? history.OpenDate ?? history.CreateDate, //history.UpdateTimestamp,
+                Originator =
+                    history.CloseReason == OrderCloseReason.CanceledByBroker ||
+                    history.CloseReason == OrderCloseReason.CanceledBySystem ||
+                    history.CloseReason == OrderCloseReason.ClosedByBroker ||
+                    history.CloseReason == OrderCloseReason.StopOut
+                        ? OriginatorTypeContract.System
+                        : OriginatorTypeContract.Investor,
+                ParentOrderId = "", //history.ParentOrderId,
                 PositionId = history.Id,
                 RelatedOrders = new List<string>(),
                 Status = Convert(history.Status),
                 TradesIds = GetTrades(history.Id, history.Status, orderDirection),
-                Type = history.ExpectedOpenPrice == null ? OrderTypeContract.Market : OrderTypeContract.Limit,
+                Type = history.ExpectedOpenPrice == null || isCloseOrder
+                    ? OrderTypeContract.Market
+                    : OrderTypeContract.Limit,
                 ValidityTime = null,
                 Volume = isCloseOrder ? -history.Volume : history.Volume,
             };
