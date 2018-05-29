@@ -46,7 +46,7 @@ namespace MarginTrading.TradingHistory.Controllers
             if (!string.IsNullOrWhiteSpace(assetPairId))
                 history = history.Where(o => o.Instrument == assetPairId);
 
-            return history.Where(CheckOrderUpdateType).SelectMany(MakeOrderContractsFromHistory).ToList();
+            return history.Where(CheckOrderUpdateType).Select(MakeOrderContractFromHistory).ToList();
         }
 
         private bool CheckOrderUpdateType(IOrderHistory orderHistory)
@@ -63,31 +63,30 @@ namespace MarginTrading.TradingHistory.Controllers
             return !isCloseOrder ? openDirection :
                 openDirection == OrderDirection.Buy ? OrderDirection.Sell : OrderDirection.Buy;
         }
-        
-        private static IEnumerable<OrderContract> MakeOrderContractsFromHistory(IOrderHistory r)
+
+        private static OrderContract MakeOrderContractFromHistory(IOrderHistory r)
         {
             var baseOrder = Convert(r, r.Status == OrderStatus.Closed);
 
             if (r.StopLoss != null && r.Status == OrderStatus.Closed)
             {
                 var slOrder = CreateSlTpOrder(r, true);
-                baseOrder.RelatedOrders.Add(slOrder.Id);
-                
+
                 if (slOrder.Status == OrderStatusContract.Executed)
-                    yield return slOrder;
+                    return slOrder;
             }
+
             if (r.TakeProfit != null && r.Status == OrderStatus.Closed)
             {
                 var tpOrder = CreateSlTpOrder(r, false);
-                baseOrder.RelatedOrders.Add(tpOrder.Id);
-                
+
                 if (tpOrder.Status == OrderStatusContract.Executed)
-                    yield return tpOrder;
+                    return tpOrder;
             }
 
-            yield return baseOrder;
+            return baseOrder;
         }
-        
+
         private static List<string> GetTrades(string orderId, OrderStatus status, OrderDirection orderDirection)
         {
             if (status == OrderStatus.WaitingForExecution)
@@ -194,11 +193,8 @@ namespace MarginTrading.TradingHistory.Controllers
                 : history.CloseReason == OrderCloseReason.TakeProfit;
             result.Status = GetStatus(isAnyOfSlTp);
             result.Type = isSlOrTp ? OrderTypeContract.StopLoss : OrderTypeContract.TakeProfit;
-            result.ParentOrderId = result.Id;
+            result.ParentOrderId = result.PositionId;
             result.Id = result.PositionId + (isSlOrTp ? "_StopLoss" : "_TakeProfit");
-            result.Direction = result.Direction == OrderDirectionContract.Buy
-                ? OrderDirectionContract.Sell
-                : OrderDirectionContract.Buy;
             result.TradesIds = new List<string>();
             result.ExpectedOpenPrice = isSlOrTp ? history.StopLoss : history.TakeProfit;
             if (isAnyOfSlTp)
