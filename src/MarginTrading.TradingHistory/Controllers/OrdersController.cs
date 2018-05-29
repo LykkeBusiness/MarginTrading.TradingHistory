@@ -108,7 +108,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 Direction = Convert(history.Type, isCloseOrder),
                 ExecutionPrice = isCloseOrder ? history.ClosePrice : history.OpenPrice,
                 ExpectedOpenPrice = isCloseOrder ? null : history.ExpectedOpenPrice,
-                FxRate = history.QuoteRate,
+                FxRate = history.QuoteRate > 0 ? history.QuoteRate : 1,
                 ForceOpen = true,
                 ModifiedTimestamp =
                     history.CloseDate ?? history.OpenDate ?? history.CreateDate, //history.UpdateTimestamp,
@@ -124,14 +124,25 @@ namespace MarginTrading.TradingHistory.Controllers
                 RelatedOrders = new List<string>(),
                 Status = Convert(history.Status),
                 TradesIds = GetTrades(history.Id, history.Status, orderDirection),
-                Type = history.ExpectedOpenPrice == null || isCloseOrder
-                    ? OrderTypeContract.Market
-                    : OrderTypeContract.Limit,
+                Type = GetOrderType(history, isCloseOrder),
                 ValidityTime = null,
                 Volume = isCloseOrder ? -history.Volume : history.Volume,
             };
         }
-        
+
+        private static OrderTypeContract GetOrderType(IOrderHistory history, bool isCloseOrder)
+        {
+            if (isCloseOrder && history.CloseReason == OrderCloseReason.StopLoss)
+                return OrderTypeContract.StopLoss;
+            
+            if (isCloseOrder && history.CloseReason == OrderCloseReason.TakeProfit)
+                return OrderTypeContract.TakeProfit;
+            
+            return history.ExpectedOpenPrice == null || isCloseOrder
+                ? OrderTypeContract.Market
+                : OrderTypeContract.Limit;
+        }
+
         private static OrderStatusContract Convert(OrderStatus orderStatus)
         {
             switch (orderStatus)
