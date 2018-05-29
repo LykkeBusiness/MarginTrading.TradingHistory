@@ -184,7 +184,7 @@ namespace MarginTrading.TradingHistory.Controllers
             result.Status = GetStatus(isAnyOfSlTp);
             result.Type = isSlOrTp ? OrderTypeContract.StopLoss : OrderTypeContract.TakeProfit;
             result.ParentOrderId = result.Id;
-            result.Id += isSlOrTp ? "_StopLoss" : "_TakeProfit";
+            result.Id = result.PositionId + (isSlOrTp ? "_StopLoss" : "_TakeProfit");
             result.Direction = result.Direction == OrderDirectionContract.Buy
                 ? OrderDirectionContract.Sell
                 : OrderDirectionContract.Buy;
