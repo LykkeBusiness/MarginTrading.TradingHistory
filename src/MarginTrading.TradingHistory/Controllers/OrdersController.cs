@@ -68,7 +68,7 @@ namespace MarginTrading.TradingHistory.Controllers
         {
             var baseOrder = Convert(r, r.Status == OrderStatus.Closed);
 
-            if (r.StopLoss == null && r.Status == OrderStatus.Closed)
+            if (r.StopLoss != null && r.Status == OrderStatus.Closed)
             {
                 var slOrder = CreateSlTpOrder(r, true);
                 baseOrder.RelatedOrders.Add(slOrder.Id);
