@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Lykke.Service.LykkeService.Core.Domain.Health;
-using Lykke.Service.LykkeService.Core.Services;
+using MarginTrading.TradingHistory.Core.Domain.Health;
+using MarginTrading.TradingHistory.Core.Services;
 
-namespace Lykke.Service.LykkeService.Services
+namespace MarginTrading.TradingHistory.Services
 {
     // NOTE: See https://lykkex.atlassian.net/wiki/spaces/LKEWALLET/pages/35755585/Add+your+app+to+Monitoring
     public class HealthService : IHealthService

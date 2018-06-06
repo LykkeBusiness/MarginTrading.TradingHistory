@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Lykke.Service.LykkeService.Core.Domain.Health
+namespace MarginTrading.TradingHistory.Core.Domain.Health
 {
     public class HealthIssuesCollection : IReadOnlyCollection<HealthIssue>
     {

@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace Lykke.Service.LykkeService.Settings.SlackNotifications
+namespace MarginTrading.TradingHistory.Settings.SlackNotifications
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public class SlackNotificationsSettings

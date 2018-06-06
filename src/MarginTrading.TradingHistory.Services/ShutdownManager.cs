@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
-using Lykke.Service.LykkeService.Core.Services;
+using MarginTrading.TradingHistory.Core.Services;
 
-namespace Lykke.Service.LykkeService.Services
+namespace MarginTrading.TradingHistory.Services
 {
     // NOTE: Sometimes, shutdown process should be expressed explicitly. 
     // If this is your case, use this class to manage shutdown.

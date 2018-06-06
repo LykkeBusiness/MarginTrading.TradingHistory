@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Lykke.Service.LykkeService.Core.Domain.Health;
+using MarginTrading.TradingHistory.Core.Domain.Health;
 
-namespace Lykke.Service.LykkeService.Core.Services
+namespace MarginTrading.TradingHistory.Core.Services
 {
     // NOTE: See https://lykkex.atlassian.net/wiki/spaces/LKEWALLET/pages/35755585/Add+your+app+to+Monitoring
     public interface IHealthService

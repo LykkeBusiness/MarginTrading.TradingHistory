@@ -1,1 +1,1 @@
-﻿Please, read this document https://github.com/LykkeCity/lykke.dotnettemplates/blob/master/Lykke.Service.LykkeService/README.md
+﻿Please, read this document https://github.com/LykkeCity/lykke.dotnettemplates/blob/master/MarginTrading.TradingHistory/README.md

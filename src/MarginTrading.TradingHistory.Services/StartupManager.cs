@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Common.Log;
-using Lykke.Service.LykkeService.Core.Services;
+using MarginTrading.TradingHistory.Core.Services;
 
-namespace Lykke.Service.LykkeService.Services
+namespace MarginTrading.TradingHistory.Services
 {
     // NOTE: Sometimes, startup process which is expressed explicitly is not just better, 
     // but the only way. If this is your case, use this class to manage startup.

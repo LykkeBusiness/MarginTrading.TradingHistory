@@ -1,18 +1,16 @@
 ﻿using JetBrains.Annotations;
-using Lykke.Service.LykkeService.Settings.ServiceSettings;
-using Lykke.Service.LykkeService.Settings.SlackNotifications;
+using MarginTrading.TradingHistory.Settings.ServiceSettings;
+using MarginTrading.TradingHistory.Settings.SlackNotifications;
 using Lykke.SettingsReader.Attributes;
 
-namespace Lykke.Service.LykkeService.Settings
+namespace MarginTrading.TradingHistory.Settings
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public class AppSettings
     {
-        public LykkeServiceSettings LykkeServiceService { get; set; }
+        public TradingHistorySettings TradingHistoryService { get; set; }
 
+        [Optional, CanBeNull]
         public SlackNotificationsSettings SlackNotifications { get; set; }
-
-        [Optional]
-        public MonitoringServiceClientSettings MonitoringServiceClient { get; set; }
     }
 }
