@@ -12,20 +12,21 @@ using MarginTrading.TradingHistory.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Extensions.Localization.Internal;
 
 namespace MarginTrading.TradingHistory.Controllers
 {
     [Route("api/trades/")]
     public class TradesController : Controller, ITradesApi
     {
-        private readonly ITradesRepository _tradesRepository;
+        private readonly IOrdersHistoryRepository _ordersHistoryRepository;
         private readonly IConvertService _convertService;
 
         public TradesController(
-            ITradesRepository tradesRepository,
+            IOrdersHistoryRepository ordersHistoryRepository,
             IConvertService convertService)
         {
-            _tradesRepository = tradesRepository;
+            _ordersHistoryRepository = ordersHistoryRepository;
             _convertService = convertService;
         }
         
@@ -35,9 +36,15 @@ namespace MarginTrading.TradingHistory.Controllers
         [HttpGet, Route("{tradeId}")] 
         public async Task<TradeContract> Get(string tradeId)
         {
-            var trade = await _tradesRepository.GetAsync(tradeId);
-            
-            return trade != null ? Convert(trade) : null; 
+            if (string.IsNullOrWhiteSpace(tradeId))
+            {
+                throw new ArgumentException("Trade id must be set", nameof(tradeId));
+            }
+
+            var history = await _ordersHistoryRepository
+                .GetHistoryAsync(x => x.UpdateType == OrderUpdateType.Executed && x.Id == tradeId);
+
+            return history.Select(Convert).FirstOrDefault();
         } 
         
         /// <summary>
@@ -46,41 +53,26 @@ namespace MarginTrading.TradingHistory.Controllers
         [HttpGet, Route("")]
         public async Task<List<TradeContract>> List([FromQuery] string orderId, [FromQuery] string positionId)
         {
-            //TODO WTF is this ???
-            if (orderId == null && positionId == null)
-                throw new ArgumentException($"{nameof(orderId)} or {nameof(positionId)} should be passed");
+            var history = await _ordersHistoryRepository
+                .GetHistoryAsync(x => x.UpdateType == OrderUpdateType.Executed);
 
-            if (orderId != null && positionId != null && orderId != positionId)
-                throw new ArgumentException(
-                    $"{nameof(orderId)} and {nameof(positionId)} should be equal if both passed, separation is not yet supported");
-
-            var entity = await _tradesRepository.GetAsync(orderId ?? positionId);
-            return entity == null ? new List<TradeContract>() : new List<TradeContract>() {Convert(entity)};
+            return history.Select(Convert).ToList();
         }
-        
-        private TradeContract Convert(ITrade tradeEntity)
+
+        private TradeContract Convert(IOrderHistory tradeEntity)
         {
-            try
+            return new TradeContract
             {
-                return new TradeContract
-                {
-                    // todo: separate order from position and trade and use there ids correctly
-                    Id = tradeEntity.Id,
-                    ClientId = tradeEntity.ClientId,
-                    AccountId = tradeEntity.AccountId,
-                    OrderId = tradeEntity.Id,
-                    PositionId = tradeEntity.Id,
-                    AssetPairId = tradeEntity.AssetPairId,
-                    Type = tradeEntity.Type.ToType<TradeTypeContract>(),
-                    Timestamp = tradeEntity.TradeTimestamp,
-                    Price = tradeEntity.Price,
-                    Volume = tradeEntity.Volume,
-                };
-            }
-            catch (Exception e)
-            {
-                return new TradeContract();
-            }
+                Id = tradeEntity.Id,
+                AccountId = tradeEntity.AccountId,
+                OrderId = tradeEntity.Id,
+                PositionId = tradeEntity.Id,
+                AssetPairId = tradeEntity.AssetPairId,
+                Type = tradeEntity.Direction.ToType<TradeTypeContract>(),
+                Timestamp = tradeEntity.ModifiedTimestamp,
+                Price = tradeEntity.ExecutionPrice.Value,
+                Volume = tradeEntity.Volume
+            };
         }
     }
 }

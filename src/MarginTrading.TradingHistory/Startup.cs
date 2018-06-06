@@ -14,11 +14,15 @@ using MarginTrading.TradingHistory.Modules;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
 using Lykke.MonitoringServiceApiCaller;
+using MarginTrading.TradingHistory.Core;
+using MarginTrading.TradingHistory.Services;
+using MarginTrading.TradingHistory.SqlRepositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
+using LogEntity = Lykke.Logs.LogEntity;
 
 namespace MarginTrading.TradingHistory
 {
@@ -212,15 +216,25 @@ namespace MarginTrading.TradingHistory
                 slackNotificationsManager = new LykkeLogToAzureSlackNotificationsManager(slackService, consoleLogger);
             }
 
-            // Creating azure storage logger, which logs own messages to concole log
-            var azureStorageLogger = new LykkeLogToAzureStorage(
-                persistenceManager,
-                slackNotificationsManager,
-                consoleLogger);
+            if (settings.CurrentValue.TradingHistoryService.Db.StorageMode == StorageMode.Azure)
+            {
+                // Creating azure storage logger, which logs own messages to concole log
+                var azureStorageLogger = new LykkeLogToAzureStorage(
+                    persistenceManager,
+                    slackNotificationsManager,
+                    consoleLogger);
 
-            azureStorageLogger.Start();
+                azureStorageLogger.Start();
 
-            aggregateLogger.AddLog(azureStorageLogger);
+                aggregateLogger.AddLog(azureStorageLogger);
+            }
+            else if (settings.CurrentValue.TradingHistoryService.Db.StorageMode == StorageMode.SqlServer)
+            {
+                var sqlLogger = new LogToSql(new SqlLogRepository("TradingHistoryAPIsLog",
+                    settings.CurrentValue.TradingHistoryService.Db.LogsConnString));
+                
+                aggregateLogger.AddLog(sqlLogger);
+            }
 
             return aggregateLogger;
         }

@@ -7,11 +7,11 @@ namespace MarginTrading.TradingHistory.Core.Domain
     public enum OrderUpdateType
     {
         Place,
-        Cancel,
         Activate,
+        Change,
+        Cancel,
         Reject,
-        Closing,
-        Close,
-        ChangeOrderLimits,
+        ExecutionStarted,
+        Executed
     }
 }

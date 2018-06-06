@@ -15,60 +15,73 @@ namespace MarginTrading.TradingHistory.Controllers
     [Route("api/positions-history")]
     public class PositionsController : Controller, IPositionsHistoryApi
     {
-        private readonly IOrdersHistoryRepository _ordersHistoryRepository;
+        private readonly IPositionsHistoryRepository _positionsHistoryRepository;
         private readonly IConvertService _convertService;
         
         public PositionsController(
-            IOrdersHistoryRepository ordersHistoryRepository,
+            IPositionsHistoryRepository positionsHistoryRepository,
             IConvertService convertService)
         {
-            _ordersHistoryRepository = ordersHistoryRepository;
+            _positionsHistoryRepository = positionsHistoryRepository;
             _convertService = convertService;
         }
         
         /// <summary> 
         /// Get closed positions with optional filtering 
         /// </summary> 
-        [HttpGet("")] 
+        [HttpGet, Route("")] 
         public async Task<List<PositionContract>> PositionHistory(
             [FromQuery] string accountId, [FromQuery] string instrument)
         {
-            var orders = await _ordersHistoryRepository.GetHistoryAsync(x =>
-                x.OrderUpdateType == OrderUpdateType.Close &&
-                (string.IsNullOrEmpty(accountId) || x.AccountId == accountId)
-                && (string.IsNullOrEmpty(instrument) || x.Instrument == instrument));
-            
-            return orders.Select(Convert).ToList();
+            var orders = await _positionsHistoryRepository.GetAsync(accountId, instrument);
+
+            return orders.Select(Convert).Where(d => d != null).ToList();
         }
 
-        private PositionContract Convert(IOrderHistory orderHistory)
+        /// <summary>
+        /// Get closed position by Id
+        /// </summary>
+        /// <param name="positionId">Deal ID!</param>
+        /// <returns></returns>
+        [HttpGet, Route("{positionId}")]
+        public async Task<PositionContract> PositionById(string positionId)
         {
+            if (string.IsNullOrWhiteSpace(positionId))
+            {
+                throw new ArgumentException("Position id must be set", nameof(positionId));
+            }
+
+            var position = await _positionsHistoryRepository.GetAsync(positionId);
+
+            return Convert(position);
+        }
+
+        private PositionContract Convert(IPositionHistory positionHistory)
+        {
+            if (positionHistory == null || positionHistory.DealInfo == null)
+                return null;
+
             return new PositionContract
             {
-                Id = orderHistory.Id,
-                AccountId = orderHistory.AccountId,
-                Instrument = orderHistory.Instrument,
-                Timestamp = orderHistory.CloseDate ?? orderHistory.CreateDate,
-                Direction = ConvertDirection(orderHistory.Type),
-                Price = orderHistory.ClosePrice == default ? orderHistory.OpenPrice : orderHistory.ClosePrice,
-                Volume = -orderHistory.Volume,
-                PnL = orderHistory.PnL,
-                FxRate = orderHistory.QuoteRate,
-                Margin = orderHistory.MarginMaintenance,
-                TradeId = orderHistory.Id, //TODO need to be fixed
-                RelatedOrders = new List<string>(),//TODO need to be fixed
+                Id = positionHistory.DealId, //TODO: temp, think about it )
+                DealId = positionHistory.DealId,
+                AccountId = positionHistory.AccountId,
+                Instrument = positionHistory.AssetPairId,
+                Timestamp = positionHistory.DealInfo.Created,
+                Direction = positionHistory.Direction.ToType<PositionDirectionContract>(),
+                Price = positionHistory.DealInfo.ClosePrice,
+                Volume = positionHistory.DealInfo.Volume,
+                PnL = positionHistory.DealInfo.Fpl,
+                FxRate = positionHistory.DealInfo.CloseFxPrice,
+                Margin = 0,
+                TradeId = positionHistory.Id,
+                RelatedOrders = positionHistory.RelatedOrders.Select(o => o.Id).ToList(),
+                RelatedOrderInfos = positionHistory.RelatedOrders.Select(o =>
+                    new RelatedOrderInfoContract {Id = o.Id, Type = o.Type.ToType<OrderTypeContract>()}).ToList(),
+                AdditionalInfo = positionHistory.DealInfo.AdditionalInfo,
+                Originator = positionHistory.CloseOriginator?.ToType<OriginatorTypeContract>() ??
+                             OriginatorTypeContract.Investor
             };
-        }
-
-        private PositionDirection ConvertDirection(OrderDirection type)
-        {
-            switch (type)
-            {
-                case OrderDirection.Buy: return PositionDirection.Long;
-                case OrderDirection.Sell: return PositionDirection.Short;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
         }
     }
 }

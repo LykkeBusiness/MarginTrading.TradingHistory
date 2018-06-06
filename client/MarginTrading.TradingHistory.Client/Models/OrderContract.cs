@@ -78,15 +78,20 @@ namespace MarginTrading.TradingHistory.Client.Models
         
         /// <summary>
         /// Execution trades ids. Filled for executed orders only.
-        /// If the order execution affected multiple positions - there will be multiple trades.
         /// </summary>
         [CanBeNull]
-        public List<string> TradesIds { get; set; }
+        public string TradesId { get; set; }
 
         /// <summary>
         /// The related orders
         /// </summary>
+        [Obsolete]
         public List<string> RelatedOrders { get; set; }
+        
+        /// <summary>
+        /// Related orders
+        /// </summary>
+        public List<RelatedOrderInfoContract> RelatedOrderInfos { get; set; }
 
         /// <summary>
         /// Force open a sepatate position, ignoring any exising ones
@@ -107,5 +112,10 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// Last modification date and time
         /// </summary>
         public DateTime ModifiedTimestamp { get; set; }
+        
+        /// <summary>
+        /// Additional request info
+        /// </summary>
+        public string AdditionalInfo { get; set; }
     }
 }

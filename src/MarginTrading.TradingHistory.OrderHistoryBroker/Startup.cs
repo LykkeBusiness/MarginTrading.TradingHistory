@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using Autofac;
+﻿using Autofac;
 using Common.Log;
 using Lykke.SettingsReader;
 using MarginTrading.TradingHistory.AzureRepositories;
 using MarginTrading.TradingHistory.BrokerBase;
 using MarginTrading.TradingHistory.BrokerBase.Settings;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Services;
 using Microsoft.AspNetCore.Hosting;
@@ -20,26 +20,22 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
 
         protected override string ApplicationName => "OrderHistoryBroker";
 
-        protected override void RegisterCustomServices(IServiceCollection services, ContainerBuilder builder, IReloadingManager<Settings> settings, ILog log, bool isLive)
+        protected override void RegisterCustomServices(IServiceCollection services, ContainerBuilder builder, IReloadingManager<Settings> settings, ILog log)
         {
             builder.RegisterType<Application>().As<IBrokerApplication>().SingleInstance();
             
-            var repositories = new List<IOrdersHistoryRepository>();
-            if (settings.CurrentValue.Db.HistoryConnString != null)
+            if (settings.CurrentValue.Db.StorageMode == StorageMode.Azure)
             {
-                repositories.Add(
-                    AzureRepoFactories.MarginTrading.CreateOrdersHistoryRepository(
-                        settings.Nested(s => s.Db.HistoryConnString), log, new ConvertService()));
-            }
+                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateOrdersHistoryRepository(
+                        settings.Nested(s => s.Db.HistoryConnString), log, new ConvertService()))
+                    .As<IOrdersHistoryRepository>();
 
-            if (settings.CurrentValue.Db.ReportsSqlConnString != null)
+            }else if (settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
             {
-                repositories.Add(
-                    new SqlRepositories.OrdersHistorySqlRepository(settings.CurrentValue.Db.ReportsSqlConnString,
-                        log));
+                builder.RegisterInstance(new SqlRepositories.OrdersHistorySqlRepository(
+                        settings.CurrentValue.Db.ReportsSqlConnString, log))
+                    .As<IOrdersHistoryRepository>();
             }
-            
-            builder.RegisterInstance(new RepositoryAggregator(repositories)).As<IOrdersHistoryRepository>(); 
         }
     }
 }
