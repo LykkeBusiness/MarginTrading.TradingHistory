@@ -12,8 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MarginTrading.TradingHistory.Controllers
 {
-    [Route("api/positions")]
-    public class PositionsController : Controller, IPositionsApi
+    [Route("api/positions-history")]
+    public class PositionsController : Controller, IPositionsHistoryApi
     {
         private readonly IOrdersHistoryRepository _ordersHistoryRepository;
         private readonly IConvertService _convertService;
@@ -33,11 +33,10 @@ namespace MarginTrading.TradingHistory.Controllers
         public async Task<List<PositionContract>> PositionHistory(
             [FromQuery] string accountId, [FromQuery] string instrument)
         {
-            var orders = string.IsNullOrEmpty(accountId) && string.IsNullOrEmpty(instrument) 
-                ? await _ordersHistoryRepository.GetHistoryAsync()
-                : await _ordersHistoryRepository.GetHistoryAsync(x => 
-                    (string.IsNullOrEmpty(accountId) || x.AccountId == accountId)
-                    && (string.IsNullOrEmpty(instrument) || x.Instrument == instrument));
+            var orders = await _ordersHistoryRepository.GetHistoryAsync(x =>
+                x.OrderUpdateType == OrderUpdateType.Close &&
+                (string.IsNullOrEmpty(accountId) || x.AccountId == accountId)
+                && (string.IsNullOrEmpty(instrument) || x.Instrument == instrument));
             
             return orders.Select(Convert).ToList();
         }
@@ -47,14 +46,14 @@ namespace MarginTrading.TradingHistory.Controllers
             return new PositionContract
             {
                 Id = orderHistory.Id,
-                AccountId = orderHistory.AccountAssetId,
+                AccountId = orderHistory.AccountId,
                 Instrument = orderHistory.Instrument,
-                Timestamp = orderHistory.UpdateTimestamp,
+                Timestamp = orderHistory.OpenDate ?? orderHistory.CreateDate,
                 Direction = ConvertDirection(orderHistory.Type),
                 Price = orderHistory.ClosePrice == default ? orderHistory.OpenPrice : orderHistory.ClosePrice,
                 Volume = orderHistory.Volume,
                 PnL = orderHistory.PnL,
-                TradeId = "", //TODO need to be fixed
+                TradeId = orderHistory.Id, //TODO need to be fixed
                 RelatedOrders = new List<string>(),//TODO need to be fixed
             };
         }

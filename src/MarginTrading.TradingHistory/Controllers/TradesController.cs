@@ -33,9 +33,11 @@ namespace MarginTrading.TradingHistory.Controllers
         /// Get a trade by id  
         /// </summary> 
         [HttpGet, Route("{tradeId}")] 
-        public async Task<TradeContract> Get(string tradeId) 
-        { 
-            return Convert(await _tradesRepository.GetAsync(tradeId)); 
+        public async Task<TradeContract> Get(string tradeId)
+        {
+            var trade = await _tradesRepository.GetAsync(tradeId);
+            
+            return trade != null ? Convert(trade) : null; 
         } 
         
         /// <summary>

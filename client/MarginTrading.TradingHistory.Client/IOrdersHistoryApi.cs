@@ -6,13 +6,16 @@ using Refit;
 
 namespace MarginTrading.TradingHistory.Client
 {
+    /// <summary>
+    /// Getting of orders history
+    /// </summary>
     [PublicAPI]
-    public interface IOrdersApi
+    public interface IOrdersHistoryApi
     {
         /// <summary>
         /// Get executed orders with optional filtering
         /// </summary>
-        [Get("/api/orderHistory")]
+        [Get("/api/orders-history")]
         Task<List<OrderContract>> OrderHistory(
             [Query, CanBeNull] string accountId = null,
             [Query, CanBeNull] string assetPairId = null);

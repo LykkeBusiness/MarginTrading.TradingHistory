@@ -16,8 +16,8 @@ namespace MarginTrading.TradingHistory.Controllers
     /// <summary>
     /// Provides order history
     /// </summary>
-    [Route("api/orders")]
-    public class OrdersController : Controller, IOrdersApi
+    [Route("api/orders-history")]
+    public class OrdersController : Controller, IOrdersHistoryApi
     {
         private readonly IOrdersHistoryRepository _ordersHistoryRepository;
         private readonly IConvertService _convertService;
@@ -35,7 +35,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// <summary>
         /// Get executed orders with optional filtering
         /// </summary>
-        [HttpGet, Route("orderHistory")]
+        [HttpGet, Route("")]
         public async Task<List<OrderContract>> OrderHistory(
             [FromQuery] string accountId = null, [FromQuery] string assetPairId = null)
         {
@@ -66,10 +66,7 @@ namespace MarginTrading.TradingHistory.Controllers
         
         private static IEnumerable<OrderContract> MakeOrderContractsFromHistory(IOrderHistory r)
         {
-            yield return Convert(r, false);
-
-            if (r.Status == OrderStatus.Closed)
-                yield return Convert(r, true);
+            yield return Convert(r, r.Status == OrderStatus.Closed);
         }
         
         private static List<string> GetTrades(string orderId, OrderStatus status, OrderDirection orderDirection)
@@ -93,9 +90,9 @@ namespace MarginTrading.TradingHistory.Controllers
                 ExecutionPrice = history.OpenPrice,
                 ExpectedOpenPrice = history.ExpectedOpenPrice,
                 ForceOpen = true,
-                ModifiedTimestamp = history.UpdateTimestamp,
+                ModifiedTimestamp = history.CloseDate ?? history.OpenDate ?? history.CreateDate, //history.UpdateTimestamp,
                 Originator = OriginatorTypeContract.Investor,
-                ParentOrderId = history.ParentOrderId,
+                ParentOrderId = "",//history.ParentOrderId,
                 PositionId = history.Id,
                 RelatedOrders = new List<string>(),
                 Status = Convert(history.Status),
