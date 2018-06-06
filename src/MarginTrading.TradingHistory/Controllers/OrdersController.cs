@@ -46,7 +46,7 @@ namespace MarginTrading.TradingHistory.Controllers
             if (!string.IsNullOrWhiteSpace(assetPairId))
                 history = history.Where(o => o.Instrument == assetPairId);
 
-            return history.Where(CheckOrderUpdateType).SelectMany(MakeOrderContractsFromHistory).ToList();
+            return history.Where(CheckOrderUpdateType).Select(MakeOrderContractFromHistory).ToList();
         }
 
         private bool CheckOrderUpdateType(IOrderHistory orderHistory)
@@ -63,12 +63,30 @@ namespace MarginTrading.TradingHistory.Controllers
             return !isCloseOrder ? openDirection :
                 openDirection == OrderDirection.Buy ? OrderDirection.Sell : OrderDirection.Buy;
         }
-        
-        private static IEnumerable<OrderContract> MakeOrderContractsFromHistory(IOrderHistory r)
+
+        private static OrderContract MakeOrderContractFromHistory(IOrderHistory r)
         {
-            yield return Convert(r, r.Status == OrderStatus.Closed);
+            var baseOrder = Convert(r, r.Status == OrderStatus.Closed);
+
+            if (r.StopLoss != null && r.Status == OrderStatus.Closed)
+            {
+                var slOrder = CreateSlTpOrder(r, true);
+
+                if (slOrder.Status == OrderStatusContract.Executed)
+                    return slOrder;
+            }
+
+            if (r.TakeProfit != null && r.Status == OrderStatus.Closed)
+            {
+                var tpOrder = CreateSlTpOrder(r, false);
+
+                if (tpOrder.Status == OrderStatusContract.Executed)
+                    return tpOrder;
+            }
+
+            return baseOrder;
         }
-        
+
         private static List<string> GetTrades(string orderId, OrderStatus status, OrderDirection orderDirection)
         {
             if (status == OrderStatus.WaitingForExecution)
@@ -85,24 +103,45 @@ namespace MarginTrading.TradingHistory.Controllers
                 Id = history.Id + (isCloseOrder ? CloseSuffix : ""),
                 AccountId = history.AccountId,
                 AssetPairId = history.Instrument,
-                CreatedTimestamp = history.CreateDate,
-                Direction = history.Type.ToType<OrderDirectionContract>(),
-                ExecutionPrice = history.OpenPrice,
-                ExpectedOpenPrice = history.ExpectedOpenPrice,
+                CreatedTimestamp = isCloseOrder ? history.CloseDate.Value : history.CreateDate,
+                Direction = Convert(history.Type, isCloseOrder),
+                ExecutionPrice = isCloseOrder ? history.ClosePrice : history.OpenPrice,
+                ExpectedOpenPrice = isCloseOrder ? null : history.ExpectedOpenPrice,
+                FxRate = history.QuoteRate > 0 ? history.QuoteRate : 1,
                 ForceOpen = true,
-                ModifiedTimestamp = history.CloseDate ?? history.OpenDate ?? history.CreateDate, //history.UpdateTimestamp,
-                Originator = OriginatorTypeContract.Investor,
-                ParentOrderId = "",//history.ParentOrderId,
+                ModifiedTimestamp =
+                    history.CloseDate ?? history.OpenDate ?? history.CreateDate, //history.UpdateTimestamp,
+                Originator =
+                    history.CloseReason == OrderCloseReason.CanceledByBroker ||
+                    history.CloseReason == OrderCloseReason.CanceledBySystem ||
+                    history.CloseReason == OrderCloseReason.ClosedByBroker ||
+                    history.CloseReason == OrderCloseReason.StopOut
+                        ? OriginatorTypeContract.System
+                        : OriginatorTypeContract.Investor,
+                ParentOrderId = "", //history.ParentOrderId,
                 PositionId = history.Id,
                 RelatedOrders = new List<string>(),
                 Status = Convert(history.Status),
                 TradesIds = GetTrades(history.Id, history.Status, orderDirection),
-                Type = history.ExpectedOpenPrice == null ? OrderTypeContract.Market : OrderTypeContract.Limit,
+                Type = GetOrderType(history, isCloseOrder),
                 ValidityTime = null,
-                Volume = history.Volume,
+                Volume = isCloseOrder ? -history.Volume : history.Volume,
             };
         }
-        
+
+        private static OrderTypeContract GetOrderType(IOrderHistory history, bool isCloseOrder)
+        {
+            if (isCloseOrder && history.CloseReason == OrderCloseReason.StopLoss)
+                return OrderTypeContract.StopLoss;
+            
+            if (isCloseOrder && history.CloseReason == OrderCloseReason.TakeProfit)
+                return OrderTypeContract.TakeProfit;
+            
+            return history.ExpectedOpenPrice == null || isCloseOrder
+                ? OrderTypeContract.Market
+                : OrderTypeContract.Limit;
+        }
+
         private static OrderStatusContract Convert(OrderStatus orderStatus)
         {
             switch (orderStatus)
@@ -120,6 +159,52 @@ namespace MarginTrading.TradingHistory.Controllers
                 default:
                     throw new ArgumentOutOfRangeException(nameof(orderStatus), orderStatus, null);
             }
+        }
+
+        private static OrderDirectionContract Convert(OrderDirection direction, bool isCloseOrder)
+        {
+            if (!isCloseOrder)
+            {
+                return direction.ToType<OrderDirectionContract>();
+            }
+
+            if (direction == OrderDirection.Buy)
+                return OrderDirectionContract.Sell;
+
+            if (direction == OrderDirection.Sell)
+                return OrderDirectionContract.Buy;
+
+            throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
+        }
+
+        private static OrderContract CreateSlTpOrder(IOrderHistory history, bool isSlOrTp)
+        {
+            var result = Convert(history, history.Status == OrderStatus.Closed);
+
+            OrderStatusContract GetStatus(bool isAnySlTp)
+            {
+                return isAnySlTp
+                    ? OrderStatusContract.Executed
+                    : OrderStatusContract.Canceled;
+            }
+
+            var isAnyOfSlTp = isSlOrTp
+                ? history.CloseReason == OrderCloseReason.StopLoss
+                : history.CloseReason == OrderCloseReason.TakeProfit;
+            result.Status = GetStatus(isAnyOfSlTp);
+            result.Type = isSlOrTp ? OrderTypeContract.StopLoss : OrderTypeContract.TakeProfit;
+            result.ParentOrderId = result.PositionId;
+            result.Id = result.PositionId + (isSlOrTp ? "_StopLoss" : "_TakeProfit");
+            result.TradesIds = new List<string>();
+            result.ExpectedOpenPrice = isSlOrTp ? history.StopLoss : history.TakeProfit;
+            if (isAnyOfSlTp)
+            {
+                result.ExecutionPrice = history.CloseReason == OrderCloseReason.StopLoss 
+                    ? history.StopLoss
+                    : history.TakeProfit;
+            }
+
+            return result;
         }
     }
 }

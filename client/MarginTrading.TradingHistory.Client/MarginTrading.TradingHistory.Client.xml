@@ -99,6 +99,11 @@
             Execution open price in base asset units. Filled for executed orders only.
             </summary>
         </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.FxRate">
+            <summary>
+            Current FxRate
+            </summary>
+        </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.TradesIds">
             <summary>
             Execution trades ids. Filled for executed orders only.
@@ -178,6 +183,66 @@
         <member name="F:MarginTrading.TradingHistory.Client.Models.OrderTypeContract.TrailingStop">
             <summary>
             Trailing stop order, related to another parent one
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Id">
+            <summary>
+            Position id
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.AccountId">
+            <summary>
+            Account id
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Instrument">
+            <summary>
+            Asset pair id
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Timestamp">
+            <summary>
+            When the position was changed
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Direction">
+            <summary>
+            The direction of the position
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Price">
+            <summary>
+            Open price
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Volume">
+            <summary>
+            Current position volume in quoting asset units
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.PnL">
+            <summary>
+            Profit and loss of the position in base asset units (without commissions)
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Margin">
+            <summary>
+            Current margin value
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.FxRate">
+            <summary>
+            Current FxRate
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.TradeId">
+            <summary>
+            The trade which opened the position
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.RelatedOrders">
+            <summary>
+            The related orders (sl, tp orders) 
             </summary>
         </member>
         <member name="T:MarginTrading.TradingHistory.Client.Models.TradeContract">

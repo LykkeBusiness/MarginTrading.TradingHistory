@@ -48,11 +48,13 @@ namespace MarginTrading.TradingHistory.Controllers
                 Id = orderHistory.Id,
                 AccountId = orderHistory.AccountId,
                 Instrument = orderHistory.Instrument,
-                Timestamp = orderHistory.OpenDate ?? orderHistory.CreateDate,
+                Timestamp = orderHistory.CloseDate ?? orderHistory.CreateDate,
                 Direction = ConvertDirection(orderHistory.Type),
                 Price = orderHistory.ClosePrice == default ? orderHistory.OpenPrice : orderHistory.ClosePrice,
-                Volume = orderHistory.Volume,
+                Volume = -orderHistory.Volume,
                 PnL = orderHistory.PnL,
+                FxRate = orderHistory.QuoteRate,
+                Margin = orderHistory.MarginMaintenance,
                 TradeId = orderHistory.Id, //TODO need to be fixed
                 RelatedOrders = new List<string>(),//TODO need to be fixed
             };
