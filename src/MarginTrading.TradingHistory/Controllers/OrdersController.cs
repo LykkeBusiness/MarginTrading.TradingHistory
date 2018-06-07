@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using MarginTrading.TradingHistory.Client;
 using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core.Domain;
@@ -22,7 +23,7 @@ namespace MarginTrading.TradingHistory.Controllers
         private readonly IOrdersHistoryRepository _ordersHistoryRepository;
         private readonly IConvertService _convertService;
         
-        private const string CloseSuffix = "_close";
+        internal const string CloseSuffix = "_close";
         
         public OrdersController(
             IOrdersHistoryRepository ordersHistoryRepository,
@@ -47,6 +48,29 @@ namespace MarginTrading.TradingHistory.Controllers
                 history = history.Where(o => o.Instrument == assetPairId);
 
             return history.Where(CheckOrderUpdateType).Select(MakeOrderContractFromHistory).ToList();
+        }
+
+        /// <summary>
+        /// Get executed order by Id
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        [HttpGet, Route("byId/{orderId}")]
+        public async Task<OrderContract> OrderById(string orderId)
+        {
+            if (string.IsNullOrWhiteSpace(orderId))
+            {
+                throw new ArgumentException("Order id must be set", nameof(orderId));
+            }
+
+            var clearId = orderId.Replace(CloseSuffix, "");
+
+            var history = await _ordersHistoryRepository
+                .GetHistoryAsync(x => CheckOrderUpdateType(x)
+                                      && (x.OpenExternalOrderId == clearId
+                                          || x.CloseExternalOrderId == clearId));
+
+            return history.Select(x => Convert(x, x.Status == OrderStatus.Closed)).FirstOrDefault();
         }
 
         private bool CheckOrderUpdateType(IOrderHistory orderHistory)

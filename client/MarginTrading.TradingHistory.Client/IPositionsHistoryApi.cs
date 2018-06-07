@@ -19,6 +19,12 @@ namespace MarginTrading.TradingHistory.Client
         Task<List<PositionContract>> PositionHistory( 
             [Query, CanBeNull] string accountId, 
             [Query, CanBeNull] string instrument); 
-        //TODO create from closed orders 
+        //TODO create from closed orders
+        
+        /// <summary>
+        /// Get closed position by Id
+        /// </summary>
+        [Get("/api/positions-history/byId/{positionId}")]
+        Task<PositionContract> PositionById([NotNull] string positionId);
     }
 }
