@@ -55,9 +55,7 @@ namespace MarginTrading.TradingHistory.Controllers
             }
             
             var orders = await _ordersHistoryRepository.GetHistoryAsync(x =>
-                x.OrderUpdateType == OrderUpdateType.Close &&
-                (x.OpenExternalOrderId == positionId
-                 || x.CloseExternalOrderId == positionId));
+                x.OrderUpdateType == OrderUpdateType.Close && x.Id == positionId);
             
             return orders.Select(Convert).FirstOrDefault();
         }
