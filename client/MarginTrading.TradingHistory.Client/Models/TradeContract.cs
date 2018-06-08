@@ -20,7 +20,7 @@ namespace MarginTrading.TradingHistory.Client.Models
         public string AccountId { get; set; }
 
         /// <summary>
-        /// Order id
+        /// Order which triggered the trade
         /// </summary>
         public string OrderId { get; set; }
 
@@ -30,16 +30,35 @@ namespace MarginTrading.TradingHistory.Client.Models
         public string PositionId { get; set; }
 
         /// <summary>
-        /// Trade timestamp
+        /// Trade execution timestamp
         /// </summary>
         public DateTime Timestamp { get; set; }
         
         //todo add other fields: volume and price
         
+        /// <summary>
+        /// Initiating client
+        /// </summary>
         public string ClientId { get; set; }
+
+        /// <summary>
+        /// Instrument id (e.g."BTCUSD", where BTC - base asset unit, USD - quoting unit)
+        /// </summary>
         public string AssetPairId { get; set; }
+
+        /// <summary>
+        /// Trade direction from investors perspective (Buy or Sell)
+        /// </summary>
         public TradeTypeContract Type { get; set; }
+
+        /// <summary>
+        /// Trade execution VWAP price (in quoting asset units per one base unit)
+        /// </summary>
         public decimal Price { get; set; }
+
+        /// <summary>
+        /// Order volume in base asset units
+        /// </summary>
         public decimal Volume { get; set; }
     }
 }
