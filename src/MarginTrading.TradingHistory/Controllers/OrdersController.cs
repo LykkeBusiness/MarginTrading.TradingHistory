@@ -66,9 +66,7 @@ namespace MarginTrading.TradingHistory.Controllers
             var clearId = orderId.Replace(CloseSuffix, "");
 
             var history = await _ordersHistoryRepository
-                .GetHistoryAsync(x => CheckOrderUpdateType(x)
-                                      && (x.OpenExternalOrderId == clearId
-                                          || x.CloseExternalOrderId == clearId));
+                .GetHistoryAsync(x => CheckOrderUpdateType(x) && x.Id == clearId);
 
             return history.Select(x => Convert(x, x.Status == OrderStatus.Closed)).FirstOrDefault();
         }
