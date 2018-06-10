@@ -24,7 +24,7 @@ namespace MarginTrading.TradingHistory.Client
         /// <summary>
         /// Get closed position by Id
         /// </summary>
-        [Get("/api/positions-history/byId/{positionId}")]
+        [Get("/api/positions-history/{positionId}")]
         Task<PositionContract> PositionById([NotNull] string positionId);
     }
 }
