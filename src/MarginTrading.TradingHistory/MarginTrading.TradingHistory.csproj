@@ -5,16 +5,15 @@
     <Version>1.0.1</Version>
     <AssemblyName>MarginTrading.TradingHistory</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory</RootNamespace>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netcoreapp2.0\MarginTrading.TradingHistory.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netcoreapp2.0\settings.CurrentValue.SlackNotifications.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Update="Dockerfile">

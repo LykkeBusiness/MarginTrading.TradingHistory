@@ -55,7 +55,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        [HttpGet, Route("byId/{orderId}")]
+        [HttpGet, Route("{orderId}")]
         public async Task<OrderContract> OrderById(string orderId)
         {
             if (string.IsNullOrWhiteSpace(orderId))

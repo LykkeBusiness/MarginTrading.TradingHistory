@@ -46,7 +46,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// </summary>
         /// <param name="positionId"></param>
         /// <returns></returns>
-        [HttpGet, Route("byId/{positionId}")]
+        [HttpGet, Route("{positionId}")]
         public async Task<PositionContract> PositionById(string positionId)
         {
             if (string.IsNullOrWhiteSpace(positionId))

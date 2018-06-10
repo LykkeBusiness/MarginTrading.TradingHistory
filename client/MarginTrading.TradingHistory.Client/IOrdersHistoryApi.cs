@@ -23,7 +23,7 @@ namespace MarginTrading.TradingHistory.Client
         /// <summary>
         /// Get executed order by Id
         /// </summary>
-        [Get("/api/orders-history/byId/{orderId}")]
+        [Get("/api/orders-history/{orderId}")]
         Task<OrderContract> OrderById([NotNull] string orderId);
     }
 }
