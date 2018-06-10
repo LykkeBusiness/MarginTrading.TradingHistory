@@ -29,7 +29,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// <summary> 
         /// Get closed positions with optional filtering 
         /// </summary> 
-        [HttpGet("")] 
+        [HttpGet, Route("")] 
         public async Task<List<PositionContract>> PositionHistory(
             [FromQuery] string accountId, [FromQuery] string instrument)
         {
@@ -39,6 +39,25 @@ namespace MarginTrading.TradingHistory.Controllers
                 && (string.IsNullOrEmpty(instrument) || x.Instrument == instrument));
             
             return orders.Select(Convert).ToList();
+        }
+
+        /// <summary>
+        /// Get closed position by Id
+        /// </summary>
+        /// <param name="positionId"></param>
+        /// <returns></returns>
+        [HttpGet, Route("{positionId}")]
+        public async Task<PositionContract> PositionById(string positionId)
+        {
+            if (string.IsNullOrWhiteSpace(positionId))
+            {
+                throw new ArgumentException("Position id must be set", nameof(positionId));
+            }
+            
+            var orders = await _ordersHistoryRepository.GetHistoryAsync(x =>
+                x.OrderUpdateType == OrderUpdateType.Close && x.Id == positionId);
+            
+            return orders.Select(Convert).FirstOrDefault();
         }
 
         private PositionContract Convert(IOrderHistory orderHistory)

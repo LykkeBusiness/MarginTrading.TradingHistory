@@ -19,5 +19,11 @@ namespace MarginTrading.TradingHistory.Client
         Task<List<OrderContract>> OrderHistory(
             [Query, CanBeNull] string accountId = null,
             [Query, CanBeNull] string assetPairId = null);
+
+        /// <summary>
+        /// Get executed order by Id
+        /// </summary>
+        [Get("/api/orders-history/{orderId}")]
+        Task<OrderContract> OrderById([NotNull] string orderId);
     }
 }
