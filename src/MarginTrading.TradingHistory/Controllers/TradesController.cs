@@ -36,9 +36,7 @@ namespace MarginTrading.TradingHistory.Controllers
         [HttpGet, Route("{tradeId}")] 
         public async Task<TradeContract> Get(string tradeId)
         {
-            var clearId = ClearId(tradeId);
-            
-            var trade = await _tradesRepository.GetAsync(clearId);
+            var trade = await _tradesRepository.GetAsync(tradeId);
             
             return trade != null ? Convert(trade) : null; 
         } 
@@ -49,28 +47,10 @@ namespace MarginTrading.TradingHistory.Controllers
         [HttpGet, Route("")]
         public async Task<List<TradeContract>> List([FromQuery] string orderId, [FromQuery] string positionId)
         {
-            //TODO WTF is this ???
-            if (orderId == null && positionId == null)
-                throw new ArgumentException($"{nameof(orderId)} or {nameof(positionId)} should be passed");
-
-            if (orderId != null && positionId != null && orderId != positionId)
-                throw new ArgumentException(
-                    $"{nameof(orderId)} and {nameof(positionId)} should be equal if both passed, separation is not yet supported");
-
-            var clearId = ClearId(orderId ?? positionId);
-            
-            var entity = await _tradesRepository.GetAsync(clearId);
+            var entity = await _tradesRepository.GetAsync(orderId);
             return entity == null ? new List<TradeContract>() : new List<TradeContract>() {Convert(entity)};
         }
 
-        private string ClearId(string id)
-        {
-            return Enum.GetNames(typeof(TradeTypeContract))
-                .Select(x => $"_{x}")
-                .Append(OrdersController.CloseSuffix)
-                .Aggregate(id, (current, postfix) => current.Replace(postfix, ""));
-        }
-        
         private TradeContract Convert(ITrade tradeEntity)
         {
             return new TradeContract

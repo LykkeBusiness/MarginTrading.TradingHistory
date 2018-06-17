@@ -114,10 +114,9 @@
             Current FxRate
             </summary>
         </member>
-        <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.TradesIds">
+        <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.TradesId">
             <summary>
             Execution trades ids. Filled for executed orders only.
-            If the order execution affected multiple positions - there will be multiple trades.
             </summary>
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.RelatedOrders">

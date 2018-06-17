@@ -33,12 +33,13 @@ namespace MarginTrading.TradingHistory.Controllers
         public async Task<List<PositionContract>> PositionHistory(
             [FromQuery] string accountId, [FromQuery] string instrument)
         {
-            var orders = await _ordersHistoryRepository.GetHistoryAsync(x =>
-                x.OrderUpdateType == OrderUpdateType.Close &&
-                (string.IsNullOrEmpty(accountId) || x.AccountId == accountId)
-                && (string.IsNullOrEmpty(instrument) || x.Instrument == instrument));
-            
-            return orders.Select(Convert).ToList();
+//            var orders = await _ordersHistoryRepository.GetHistoryAsync(x =>
+//                x.OrderUpdateType == OrderUpdateType.Close &&
+//                (string.IsNullOrEmpty(accountId) || x.AccountId == accountId)
+//                && (string.IsNullOrEmpty(instrument) || x.Instrument == instrument));
+//            
+//            return orders.Select(Convert).ToList();
+            return new List<PositionContract>();
         }
 
         /// <summary>
@@ -49,45 +50,46 @@ namespace MarginTrading.TradingHistory.Controllers
         [HttpGet, Route("{positionId}")]
         public async Task<PositionContract> PositionById(string positionId)
         {
-            if (string.IsNullOrWhiteSpace(positionId))
-            {
-                throw new ArgumentException("Position id must be set", nameof(positionId));
-            }
-            
-            var orders = await _ordersHistoryRepository.GetHistoryAsync(x =>
-                x.OrderUpdateType == OrderUpdateType.Close && x.Id == positionId);
-            
-            return orders.Select(Convert).FirstOrDefault();
+//            if (string.IsNullOrWhiteSpace(positionId))
+//            {
+//                throw new ArgumentException("Position id must be set", nameof(positionId));
+//            }
+//            
+//            var orders = await _ordersHistoryRepository.GetHistoryAsync(x =>
+//                x.OrderUpdateType == OrderUpdateType.Close && x.Id == positionId);
+//            
+//            return orders.Select(Convert).FirstOrDefault();
+            return null;
         }
 
-        private PositionContract Convert(IOrderHistory orderHistory)
-        {
-            return new PositionContract
-            {
-                Id = orderHistory.Id,
-                AccountId = orderHistory.AccountId,
-                Instrument = orderHistory.Instrument,
-                Timestamp = orderHistory.CloseDate ?? orderHistory.CreateDate,
-                Direction = ConvertDirection(orderHistory.Type),
-                Price = orderHistory.ClosePrice == default ? orderHistory.OpenPrice : orderHistory.ClosePrice,
-                Volume = -orderHistory.Volume,
-                PnL = orderHistory.PnL,
-                FxRate = orderHistory.QuoteRate,
-                Margin = orderHistory.MarginMaintenance,
-                TradeId = orderHistory.Id, //TODO need to be fixed
-                RelatedOrders = new List<string>(),//TODO need to be fixed
-            };
-        }
-
-        private PositionDirection ConvertDirection(OrderDirection type)
-        {
-            switch (type)
-            {
-                case OrderDirection.Buy: return PositionDirection.Long;
-                case OrderDirection.Sell: return PositionDirection.Short;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
-        }
+//        private PositionContract Convert(IOrderHistory orderHistory)
+//        {
+//            return new PositionContract
+//            {
+//                Id = orderHistory.Id,
+//                AccountId = orderHistory.AccountId,
+//                Instrument = orderHistory.Instrument,
+//                Timestamp = orderHistory.CloseDate ?? orderHistory.CreateDate,
+//                Direction = ConvertDirection(orderHistory.Type),
+//                Price = orderHistory.ClosePrice == default ? orderHistory.OpenPrice : orderHistory.ClosePrice,
+//                Volume = -orderHistory.Volume,
+//                PnL = orderHistory.PnL,
+//                FxRate = orderHistory.QuoteRate,
+//                Margin = orderHistory.MarginMaintenance,
+//                TradeId = orderHistory.Id, //TODO need to be fixed
+//                RelatedOrders = new List<string>(),//TODO need to be fixed
+//            };
+//        }
+//
+//        private PositionDirection ConvertDirection(OrderDirection type)
+//        {
+//            switch (type)
+//            {
+//                case OrderDirection.Buy: return PositionDirection.Long;
+//                case OrderDirection.Sell: return PositionDirection.Short;
+//                default:
+//                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+//            }
+//        }
     }
 }

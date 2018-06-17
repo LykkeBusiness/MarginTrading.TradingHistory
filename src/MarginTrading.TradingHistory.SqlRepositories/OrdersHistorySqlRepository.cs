@@ -13,76 +13,66 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 {
     public class OrdersHistorySqlRepository : IOrdersHistoryRepository
     {
-        private const string TableName = "OrdersChangeHistory";
+        private const string TableName = "OrdersHistory";
 
         private const string CreateTableScript = "CREATE TABLE [{0}](" +
                                                  @"[OID] [int] NOT NULL IDENTITY (1,1) PRIMARY KEY,
 [Id] [nvarchar](64) NOT NULL,
 [Code] [bigint] NULL,
-[ClientId] [nvarchar] (64) NOT NULL,
-[TradingConditionId] [nvarchar] (64) NOT NULL,
-[AccountAssetId] [nvarchar] (64) NULL,
-[Instrument] [nvarchar] (64) NOT NULL,
-[Type] [nvarchar] (64) NOT NULL,
-[CreateDate] [datetime] NOT NULL,
-[OpenDate] [datetime] NULL,
-[CloseDate] [datetime] NULL,
-[ExpectedOpenPrice] [float] NULL,
-[OpenPrice] [float] NULL,
-[ClosePrice] [float] NULL,
-[QuoteRate] [float] NULL,
-[Volume] [float] NULL,
-[TakeProfit] [float] NULL,
-[StopLoss] [float] NULL,
-[CommissionLot] [float] NULL,
-[OpenCommission] [float] NULL,
-[CloseCommission] [float] NULL,
-[SwapCommission] [float] NULL,
-[EquivalentAsset] [nvarchar] (64) NULL,
-[OpenPriceEquivalent] [float] NULL,
-[ClosePriceEquivalent] [float] NULL,
-[StartClosingDate] [datetime] NULL,
+[AccountId] [nvarchar] (64) NULL,
+[AssetPairId] [nvarchar] (64) NULL,
+[ParentOrderId] [nvarchar] (64) NULL,
+[PositionId] [nvarchar] (64) NULL,
+[Direction] [nvarchar] (64) NULL,
+[Type] [nvarchar] (64) NULL,
 [Status] [nvarchar] (64) NULL,
-[CloseReason] [nvarchar] (64) NULL,
-[FillType] [nvarchar] (64) NULL,
+[Originator] [nvarchar] (64) NULL,
+[Volume] [float] NULL,
+[ExpectedOpenPrice] [float] NULL,
+[ExecutionPrice] [float] NULL,
+[FxRate] [float] NULL,
+[ForceOpen] [bit] NULL,
+[ValidityTime] [datetime] NULL,
+[CreatedTimestamp] [datetime] NULL,
+[ModifiedTimestamp] [datetime] NULL,
+[ActivatedTimestamp] [datetime] NULL,
+[ExecutionStartedTimestamp] [datetime] NULL,
+[ExecutedTimestamp] [datetime] NULL,
+[CanceledTimestamp] [datetime] NULL,
+[Rejected] [datetime] NULL,
+[TradingConditionId] [nvarchar] (64) NULL,
+[AccountAssetId] [nvarchar] (64) NULL,
+[EquivalentAsset] [nvarchar] (64) NULL,
+[EquivalentRate] [float] NULL,
 [RejectReason] [nvarchar] (64) NULL,
-[RejectReasonText] [nvarchar] (255) NULL,
-[Comment] [nvarchar] (255) NULL,
-[MatchedVolume] [float] NULL,
-[MatchedCloseVolume] [float] NULL,
-[Fpl] [float] NULL,
-[PnL] [float] NULL,
-[InterestRateSwap] [float] NULL,
-[MarginInit] [float] NULL,
-[MarginMaintenance] [float] NULL,
-[OrderUpdateType] [nvarchar] (64) NULL,
-[OpenExternalOrderId] [nvarchar] (64) NULL,
-[OpenExternalProviderId] [nvarchar] (64) NULL,
-[CloseExternalOrderId] [nvarchar] (64) NULL,
-[CloseExternalProviderId] [nvarchar] (64) NULL,
-[MatchingEngineMode] [nvarchar] (64) NULL,
-[LegalEntity] [nvarchar] (64) NULL),
-[ParentPositionId] [nvarchar](64) NULL,
-[ParentOrderId] [nvarchar](64) NULL;";
+[RejectReasonText] [nvarchar] (64) NULL,
+[Comment] [nvarchar] (64) NULL,
+[ExternalOrderId] [nvarchar] (64) NULL,
+[ExternalProviderId] [nvarchar] (64) NULL,
+[MatchingEngineId] [nvarchar] (64) NULL,
+[LegalEntity] [nvarchar] (64) NULL,
+[UpdateType] [nvarchar] (64) NULL,
+[MatchedOrders] [nvarchar](MAX) NULL,
+[RelatedOrderInfos] [nvarchar](MAX) NULL);";
 
-        private readonly string _reportsSqlConnString;
+        private readonly string _connectionString;
         private readonly ILog _log;
 
         private static readonly string GetColumns =
-            string.Join(",", typeof(IOrderHistory).GetProperties().Select(x => x.Name));
+            string.Join(",", typeof(OrderHistoryEntity).GetProperties().Select(x => x.Name));
 
         private static readonly string GetFields =
-            string.Join(",", typeof(IOrderHistory).GetProperties().Select(x => "@" + x.Name));
+            string.Join(",", typeof(OrderHistoryEntity).GetProperties().Select(x => "@" + x.Name));
 
         private static readonly string GetUpdateClause = string.Join(",",
             typeof(IOrderHistory).GetProperties().Select(x => "[" + x.Name + "]=@" + x.Name));
 
-        public OrdersHistorySqlRepository(string reportsSqlConnString, ILog log)
+        public OrdersHistorySqlRepository(string connectionString, ILog log)
         {
-            _reportsSqlConnString = reportsSqlConnString;
+            _connectionString = connectionString;
             _log = log;
             
-            using (var conn = new SqlConnection(reportsSqlConnString))
+            using (var conn = new SqlConnection(connectionString))
             {
                 try { conn.CreateTableIfDoesntExists(CreateTableScript, TableName); }
                 catch (Exception ex)
@@ -93,9 +83,9 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public async Task AddAsync(OrderHistory order)
+        public async Task AddAsync(IOrderHistory order)
         {
-            using (var conn = new SqlConnection(_reportsSqlConnString))
+            using (var conn = new SqlConnection(_connectionString))
             {
                 try
                 {
@@ -116,19 +106,37 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public Task<IEnumerable<OrderHistory>> GetHistoryAsync()
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync()
         {
-            throw new NotImplementedException();
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                var query = $"SELECT * FROM {TableName}";
+                var objects = await conn.QueryAsync<OrderHistoryEntity>(query);
+                
+                return objects;
+            }
         }
 
-        public Task<IReadOnlyList<OrderHistory>> GetHistoryAsync(string[] accountIds, DateTime? @from, DateTime? to)
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId)
         {
-            throw new NotImplementedException();
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                var query = $"SELECT * FROM {TableName} Where AccountId = @accountId";
+                var objects = await conn.QueryAsync<OrderHistoryEntity>(query, new {accountId});
+                
+                return objects;
+            }
         }
 
-        public async Task<IEnumerable<OrderHistory>> GetHistoryAsync(Func<OrderHistory, bool> predicate)
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(Func<IOrderHistory, bool> predicate)
         {
-            throw new NotImplementedException();
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                var query = $"SELECT * FROM {TableName}";
+                var objects = await conn.QueryAsync<OrderHistoryEntity>(query);
+
+                return objects.Where(predicate);
+            }
         }
     }
 }

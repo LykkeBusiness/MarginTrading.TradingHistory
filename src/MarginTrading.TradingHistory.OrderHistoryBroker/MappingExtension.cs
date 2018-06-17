@@ -1,4 +1,8 @@
-﻿using MarginTrading.Contract.BackendContracts;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MarginTrading.Backend.Contracts.Events;
+using MarginTrading.Backend.Contracts.Orders;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 
@@ -7,73 +11,62 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
     public static class MappingExtension
     {
         
-        public static OrderHistory ToOrderHistoryDomain(this OrderFullContract src)
+        public static OrderHistory ToOrderHistoryDomain(this OrderContract order, OrderHistoryTypeContract historyType)
         {
             var orderContract = new OrderHistory
             {
-                Id = src.Id,
-                Code = src.Code,
-                ClientId = src.ClientId,
-                AccountId = src.AccountId,
-                TradingConditionId = src.TradingConditionId,
-                AccountAssetId = src.AccountAssetId,
-                Instrument = src.Instrument,
-                Type = src.Type.ToType<OrderDirection>(),
-                CreateDate = src.CreateDate,
-                OpenDate = src.OpenDate,
-                CloseDate = src.CloseDate,
-                ExpectedOpenPrice = src.ExpectedOpenPrice,
-                OpenPrice = src.OpenPrice,
-                ClosePrice = src.ClosePrice,
-                QuoteRate = src.QuoteRate,
-                AssetAccuracy = src.AssetAccuracy,
-                Volume = src.Volume,
-                TakeProfit = src.TakeProfit,
-                StopLoss = src.StopLoss,
-                CommissionLot = src.CommissionLot,
-                OpenCommission = src.OpenCommission,
-                CloseCommission = src.CloseCommission,
-                SwapCommission = src.SwapCommission,
-                StartClosingDate = src.StartClosingDate,
-                Status = src.Status.ToType<OrderStatus>(),
-                CloseReason = src.CloseReason.ToType<OrderCloseReason>(),
-                FillType = src.FillType.ToType<OrderFillType>(),
-                RejectReason = src.RejectReason.ToType<OrderRejectReason>(),
-                RejectReasonText = src.RejectReasonText,
-                Comment = src.Comment,
-                MatchedVolume = src.MatchedVolume,
-                MatchedCloseVolume = src.MatchedCloseVolume,
-                Fpl = src.Fpl,
-                PnL = src.PnL,
-                InterestRateSwap = src.InterestRateSwap,
-                MarginInit = src.MarginInit,
-                MarginMaintenance = src.MarginMaintenance,
-                EquivalentAsset = src.EquivalentAsset,
-                OpenPriceEquivalent = src.OpenPriceEquivalent,
-                ClosePriceEquivalent = src.ClosePriceEquivalent,
-                OrderUpdateType = src.OrderUpdateType.ToType<OrderUpdateType>(),
-                OpenExternalOrderId = src.OpenExternalOrderId,
-                OpenExternalProviderId = src.OpenExternalProviderId,
-                CloseExternalOrderId = src.CloseExternalOrderId,
-                CloseExternalProviderId = src.CloseExternalProviderId,
-                MatchingEngineMode = src.MatchingEngineMode.ToType<MatchingEngineMode>(),
-                LegalEntity = src.LegalEntity
+                Id = order.Id,
+                AccountId = order.AccountId,
+                AssetPairId = order.AssetPairId,
+                CreatedTimestamp = order.CreatedTimestamp,
+                Direction = order.Direction.ToType<OrderDirection>(),
+                ExecutionPrice = order.ExecutionPrice,
+                FxRate = order.FxRate,
+                ExpectedOpenPrice = order.ExpectedOpenPrice,
+                ForceOpen = order.ForceOpen,
+                ModifiedTimestamp = order.ModifiedTimestamp,
+                Originator = order.Originator.ToType<OriginatorType>(),
+                ParentOrderId = order.ParentOrderId,
+                PositionId = order.PositionId,
+                Status = order.Status.ToType<OrderStatus>(),
+                Type = order.Type.ToType<OrderType>(),
+                ValidityTime = order.ValidityTime,
+                Volume = order.Volume,
+                //------
+                AccountAssetId = order.AccountAssetId,
+                EquivalentAsset = order.EquivalentAsset,
+                ActivatedTimestamp = order.ActivatedTimestamp == default(DateTime)
+                    ? (DateTime?) null
+                    : order.ActivatedTimestamp,
+                CanceledTimestamp = order.CanceledTimestamp,
+                Code = order.Code,
+                Comment = order.Comment,
+                EquivalentRate = order.EquivalentRate,
+                ExecutedTimestamp = order.ExecutedTimestamp,
+                ExecutionStartedTimestamp = order.ExecutionStartedTimestamp,
+                ExternalOrderId = order.ExternalOrderId,
+                ExternalProviderId = order.ExternalProviderId,
+                LegalEntity = order.LegalEntity,
+                MatchingEngineId = order.MatchingEngineId,
+                Rejected = order.Rejected,
+                RejectReason = order.RejectReason.ToType<OrderRejectReason>(),
+                RejectReasonText = order.RejectReasonText,
+                RelatedOrderInfos = order.RelatedOrderInfos.Select(o =>
+                    new RelatedOrderInfo {Id = o.Id, Type = o.Type.ToType<OrderType>()}).ToList(),
+                TradingConditionId = order.TradingConditionId,
+                UpdateType = historyType.ToType<OrderUpdateType>(),
+                MatchedOrders = new List<MatchedOrder>()
             };
 
-            foreach (var order in src.MatchedOrders)
+            foreach (var mo in order.MatchedOrders)
             {
-                orderContract.MatchedOrders.Add(order.ToDomain());
-            }
-
-            foreach (var order in src.MatchedCloseOrders)
-            {
-                orderContract.MatchedCloseOrders.Add(order.ToDomain());
+                orderContract.MatchedOrders.Add(mo.ToDomain());
             }
 
             return orderContract;
         }
         
-        public static MatchedOrder ToDomain(this MatchedOrderBackendContract src)
+        public static MatchedOrder ToDomain(this MatchedOrderContract src)
         {
             return new MatchedOrder
             {
@@ -82,7 +75,8 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                 LimitOrderLeftToMatch = src.LimitOrderLeftToMatch,
                 Volume = src.Volume,
                 Price = src.Price,
-                MatchedDate = src.MatchedDate
+                MatchedDate = src.MatchedDate,
+                IsExternal = src.IsExternal
             };
         }
     }

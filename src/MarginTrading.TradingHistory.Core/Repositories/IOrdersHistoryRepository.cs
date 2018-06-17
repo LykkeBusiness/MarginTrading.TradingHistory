@@ -7,9 +7,9 @@ namespace MarginTrading.TradingHistory.Core.Repositories
 {
     public interface IOrdersHistoryRepository
     {
-        Task AddAsync(OrderHistory order);
-        Task<IEnumerable<OrderHistory>> GetHistoryAsync();
-        Task<IReadOnlyList<OrderHistory>> GetHistoryAsync(string[] accountIds, DateTime? from, DateTime? to);
-        Task<IEnumerable<OrderHistory>> GetHistoryAsync(Func<OrderHistory, bool> predicate);
+        Task AddAsync(IOrderHistory order);
+        Task<IEnumerable<IOrderHistory>> GetHistoryAsync();
+        Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId);
+        Task<IEnumerable<IOrderHistory>> GetHistoryAsync(Func<IOrderHistory, bool> predicate);
     }
 }

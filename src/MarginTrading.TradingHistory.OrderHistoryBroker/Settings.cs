@@ -12,6 +12,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
     
     public class Db
     {
+        public StorageMode StorageMode { get; set; }
         [Optional, CanBeNull]
         public string HistoryConnString { get; set; }
         [Optional, CanBeNull] 

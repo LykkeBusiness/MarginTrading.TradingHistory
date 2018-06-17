@@ -17,6 +17,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
         InvalidStoploss,
         InvalidInstrument,
         InvalidAccount,
+        InvalidParent,
         TradingConditionError,
         TechnicalError
     }
