@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using Lykke.SettingsReader.Attributes;
 using MarginTrading.TradingHistory.BrokerBase.Settings;
+using MarginTrading.TradingHistory.Core;
 
 namespace MarginTrading.TradingHistory.TradeHistoryBroker
 {
@@ -12,6 +13,7 @@ namespace MarginTrading.TradingHistory.TradeHistoryBroker
     
     public class Db
     {
+        public StorageMode StorageMode { get; set; }
         [Optional, CanBeNull]
         public string HistoryConnString { get; set; }
         [Optional, CanBeNull] 
@@ -20,6 +22,6 @@ namespace MarginTrading.TradingHistory.TradeHistoryBroker
     
     public class RabbitMqQueues
     {
-        public RabbitMqQueueSettings Trades { get; set; }
+        public RabbitMqQueueSettings PositionsHistory { get; set; }
     }
 }

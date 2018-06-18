@@ -78,10 +78,9 @@ namespace MarginTrading.TradingHistory.Client.Models
         
         /// <summary>
         /// Execution trades ids. Filled for executed orders only.
-        /// If the order execution affected multiple positions - there will be multiple trades.
         /// </summary>
         [CanBeNull]
-        public List<string> TradesIds { get; set; }
+        public string TradesId { get; set; }
 
         /// <summary>
         /// The related orders

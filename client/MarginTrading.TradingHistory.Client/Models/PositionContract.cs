@@ -28,8 +28,8 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// <summary>
         /// The direction of the position (Long or Short)
         /// </summary>
-        public PositionDirection Direction { get; set; }
-
+        public PositionDirectionContract Direction { get; set; }
+        
         /// <summary>
         /// Open price (in quoting asset units per one base unit)
         /// Close price (in quoting asset units per one base unit)

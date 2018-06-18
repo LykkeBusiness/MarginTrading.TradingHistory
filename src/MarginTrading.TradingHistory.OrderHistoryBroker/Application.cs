@@ -1,14 +1,15 @@
 ﻿using System.Threading.Tasks;
 using Common.Log;
 using Lykke.SlackNotifications;
-using MarginTrading.Contract.BackendContracts;
+using MarginTrading.Backend.Contracts.Events;
+using MarginTrading.Backend.Contracts.Orders;
 using MarginTrading.TradingHistory.BrokerBase;
 using MarginTrading.TradingHistory.BrokerBase.Settings;
 using MarginTrading.TradingHistory.Core.Repositories;
 
 namespace MarginTrading.TradingHistory.OrderHistoryBroker
 {
-    public class Application : BrokerApplicationBase<OrderFullContract>
+    public class Application : BrokerApplicationBase<OrderHistoryEvent>
     {
         private readonly IOrdersHistoryRepository[] _ordersHistoryRepositories;
         private readonly Settings _settings;
@@ -25,9 +26,9 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         protected override BrokerSettingsBase Settings => _settings;
         protected override string ExchangeName => _settings.RabbitMqQueues.OrderHistory.ExchangeName;
 
-        protected override async Task HandleMessage(OrderFullContract order)
+        protected override async Task HandleMessage(OrderHistoryEvent historyEvent)
         {
-            var orderHistory = order.ToOrderHistoryDomain();
+            var orderHistory = historyEvent.OrderSnapshot.ToOrderHistoryDomain(historyEvent.Type);
 
             foreach (var ordersHistoryRepository in _ordersHistoryRepositories)
             {

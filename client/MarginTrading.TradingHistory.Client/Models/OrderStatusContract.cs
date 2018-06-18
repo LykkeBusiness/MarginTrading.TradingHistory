@@ -6,11 +6,13 @@ namespace MarginTrading.TradingHistory.Client.Models
     [JsonConverter(typeof(StringEnumConverter))]
     public enum OrderStatusContract
     {
-        Active = 1,
-        Inactive = 2,
-        Executed = 3,
-        Canceled = 4,
-        Rejected = 5,
-        Expired = 6
+        Placed = 0,
+        Inactive = 1,
+        Active = 2,
+        ExecutionStarted = 3,
+        Executed = 4,
+        Canceled = 5,
+        Rejected = 6,
+        Expired = 7
     }
 }

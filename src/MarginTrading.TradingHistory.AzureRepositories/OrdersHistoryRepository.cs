@@ -23,7 +23,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             _convertService = convertService;
         }
 
-        public Task AddAsync(OrderHistory order)
+        public Task AddAsync(IOrderHistory order)
         {
             var entity = OrderHistoryEntity.Create(order);
             // ReSharper disable once RedundantArgumentDefaultValue
@@ -32,30 +32,24 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 DateTime.UtcNow, RowKeyDateTimeFormat.Iso);
         }
 
-        public async Task<IReadOnlyList<OrderHistory>> GetHistoryAsync(string[] accountIds,
-            DateTime? from, DateTime? to)
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId)
         {
-            var entities = (await _tableStorage.WhereAsync(accountIds,
-                    from ?? DateTime.MinValue, to?.Date.AddDays(1) ?? DateTime.MaxValue, ToIntervalOption.IncludeTo));
-            
-            return entities.Select(_convertService.Convert<OrderHistoryEntity, OrderHistory>)
-                .OrderByDescending(entity => entity.CloseDate ?? entity.OpenDate ?? entity.CreateDate).ToList();
+            var entities = await _tableStorage.GetDataAsync(accountId);
+
+            return entities.OrderByDescending(entity => entity.ModifiedTimestamp);
         }
 
-        public async Task<IEnumerable<OrderHistory>> GetHistoryAsync()
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync()
         {
             var entities = await _tableStorage.GetDataAsync();
-            return entities.OrderByDescending(item => item.Timestamp)
-                .Select(_convertService.Convert<OrderHistoryEntity, OrderHistory>);
+            return entities.OrderByDescending(item => item.Timestamp);
 
         }
 
-        public async Task<IEnumerable<OrderHistory>> GetHistoryAsync(Func<OrderHistory, bool> predicate)
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(Func<IOrderHistory, bool> predicate)
         {
-            var entities = await _tableStorage.GetDataAsync(x =>
-                predicate(_convertService.Convert<OrderHistoryEntity, OrderHistory>(x)));
-            return entities.OrderByDescending(item => item.Timestamp)
-                .Select(_convertService.Convert<OrderHistoryEntity, OrderHistory>);
+            var entities = await _tableStorage.GetDataAsync(predicate);
+            return entities.OrderByDescending(item => item.Timestamp);
         }
     }
 }
