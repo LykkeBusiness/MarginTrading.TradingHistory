@@ -7,10 +7,10 @@ namespace MarginTrading.TradingHistory.Settings.ServiceSettings
     {
         public StorageMode StorageMode { get; set; }
         
-        [AzureTableCheck]
+        //[AzureTableCheck]
         public string LogsConnString { get; set; }
         
-        [AzureTableCheck]
+        //[AzureTableCheck]
         public string HistoryConnString { get; set; }
     }
 }

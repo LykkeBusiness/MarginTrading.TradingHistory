@@ -62,10 +62,9 @@ namespace MarginTrading.TradingHistory.Modules
                     .As<IOrdersHistoryRepository>()
                     .SingleInstance();
             
-//                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateTradesRepository(
-//                        _settings.Nested(s => s.Db.HistoryConnString), _log, convertService))
-//                    .As<ITradesRepository>()
-//                    .SingleInstance();
+                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateTradesRepository(
+                        _settings.Nested(s => s.Db.HistoryConnString), _log, new ConvertService()))
+                    .As<IPositionsHistoryRepository>().SingleInstance();
             }
             else if (_settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
             {
@@ -73,9 +72,12 @@ namespace MarginTrading.TradingHistory.Modules
                         _settings.CurrentValue.Db.HistoryConnString, _log))
                     .As<IOrdersHistoryRepository>()
                     .SingleInstance();
+                
+                builder.RegisterInstance(new PositionsHistorySqlRepository(
+                        _settings.CurrentValue.Db.HistoryConnString, _log))
+                    .As<IPositionsHistoryRepository>();
             }
             
-
             builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();
 
             builder.Populate(_services);

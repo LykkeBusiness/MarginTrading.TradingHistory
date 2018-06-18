@@ -1,8 +1,12 @@
-﻿namespace MarginTrading.TradingHistory.Core.Domain
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace MarginTrading.TradingHistory.Core.Domain
 {
     /// <summary>
     /// The type of order
     /// </summary>
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum OrderType
     {
         /// <summary>

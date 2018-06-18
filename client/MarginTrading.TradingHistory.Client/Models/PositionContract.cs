@@ -28,7 +28,7 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// <summary>
         /// The direction of the position
         /// </summary>
-        public PositionDirection Direction { get; set; }
+        public PositionDirectionContract Direction { get; set; }
         
         /// <summary>
         /// Open price
