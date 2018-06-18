@@ -1,4 +1,6 @@
-﻿namespace MarginTrading.TradingHistory.BrokerBase.Settings
+﻿using System;
+
+namespace MarginTrading.TradingHistory.BrokerBase.Settings
 {
     public class CurrentApplicationInfo
     {
@@ -6,10 +8,12 @@
         {
             ApplicationVersion = applicationVersion;
             ApplicationName = applicationName;
+            EnvInfo = Environment.GetEnvironmentVariable("ENV_INFO");
         }
 
         public string ApplicationVersion { get; }
         public string ApplicationName { get; }
+        public string EnvInfo { get; }
 
         public string ApplicationFullName => $"{ApplicationName}:{ApplicationVersion}";
     }

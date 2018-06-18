@@ -11,6 +11,7 @@ using MarginTrading.TradingHistory.BrokerBase.Settings;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Services;
+using MarginTrading.TradingHistory.SqlRepositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -92,7 +93,7 @@ namespace MarginTrading.TradingHistory.BrokerBase
                     application.Run();
                 }
                 
-                await Log.WriteMonitorAsync("", "", $"{Configuration.ServerType()} Started");
+                await Log.WriteMonitorAsync("", "", $"Started");
             });
 
             appLifetime.ApplicationStopping.Register(() =>
@@ -107,7 +108,7 @@ namespace MarginTrading.TradingHistory.BrokerBase
             {
                 if (Log != null)
                 {
-                    await Log.WriteMonitorAsync("", "", $"{Configuration.ServerType()} Terminating");
+                    await Log.WriteMonitorAsync("", "", $"Terminating");
                 }
                 
                 ApplicationContainer.Dispose();
@@ -116,7 +117,8 @@ namespace MarginTrading.TradingHistory.BrokerBase
 
         protected abstract void RegisterCustomServices(IServiceCollection services, ContainerBuilder builder, IReloadingManager<TSettings> settings, ILog log);
 
-        protected virtual ILog CreateLogWithSlack(IServiceCollection services, IReloadingManager<TApplicationSettings> settings)
+        protected virtual ILog CreateLogWithSlack(IServiceCollection services,
+            IReloadingManager<TApplicationSettings> settings, CurrentApplicationInfo applicationInfo)
         {
             var logToConsole = new LogToConsole();
             var aggregateLogger = new AggregateLogger();
@@ -131,7 +133,7 @@ namespace MarginTrading.TradingHistory.BrokerBase
             }
 
             var slackService =
-                new MtSlackNotificationsSender(slackNotificationsSender, ApplicationName, Configuration.ServerType());
+                new MtSlackNotificationsSender(slackNotificationsSender, ApplicationName, applicationInfo.EnvInfo);
 
             services.AddSingleton<ISlackNotificationsSender>(slackService);
 
@@ -140,12 +142,22 @@ namespace MarginTrading.TradingHistory.BrokerBase
             if (!string.IsNullOrEmpty(dbLogConnectionString) &&
                 !(dbLogConnectionString.StartsWith("${") && dbLogConnectionString.EndsWith("}")))
             {
-                var logToAzureStorage = services.UseLogToAzureStorage(
-                    settings.Nested(s => s.MtBrokersLogs.DbConnString), slackService,
-                    ApplicationName + Configuration.ServerType() + "Log",
-                    aggregateLogger);
+                var logTableName = ApplicationName + applicationInfo.EnvInfo + "Log";
+                
+                if (settings.CurrentValue.MtBrokersLogs?.StorageMode == StorageMode.Azure)
+                {
+                    var logToAzureStorage = services.UseLogToAzureStorage(
+                        settings.Nested(s => s.MtBrokersLogs.DbConnString), slackService,
+                        logTableName, aggregateLogger);
 
-                aggregateLogger.AddLog(logToAzureStorage);
+                    aggregateLogger.AddLog(logToAzureStorage);
+                }
+                else if (settings.CurrentValue.MtBrokersLogs?.StorageMode == StorageMode.SqlServer)
+                {
+                    var sqlLogger = new LogToSql(new SqlLogRepository(logTableName, dbLogConnectionString));
+                
+                    aggregateLogger.AddLog(sqlLogger);
+                }
             }
 
             return aggregateLogger;
@@ -155,7 +167,10 @@ namespace MarginTrading.TradingHistory.BrokerBase
         private void RegisterServices(IServiceCollection services, IReloadingManager<TApplicationSettings> applicationSettings,
             ContainerBuilder builder)
         {
-            Log = CreateLogWithSlack(services, applicationSettings);
+            var applicationInfo = new CurrentApplicationInfo(PlatformServices.Default.Application.ApplicationVersion,
+                ApplicationName);
+            builder.RegisterInstance(applicationInfo).AsSelf().SingleInstance();
+            Log = CreateLogWithSlack(services, applicationSettings, applicationInfo);
             builder.RegisterInstance(Log).As<ILog>().SingleInstance();
             builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();
             builder.RegisterInstance(applicationSettings).AsSelf().SingleInstance();
@@ -163,10 +178,6 @@ namespace MarginTrading.TradingHistory.BrokerBase
             var settings = applicationSettings.Nested(s => s.MtBackend.MarginTradingLive);
             builder.RegisterInstance(settings).AsSelf().SingleInstance();
             builder.RegisterInstance(settings.CurrentValue).AsSelf().SingleInstance();
-
-            builder.RegisterInstance(new CurrentApplicationInfo(PlatformServices.Default.Application.ApplicationVersion,
-                ApplicationName
-            )).AsSelf().SingleInstance();
 
             RegisterCustomServices(services, builder, settings, Log);
             builder.Populate(services);

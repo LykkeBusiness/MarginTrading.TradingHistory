@@ -12,11 +12,15 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         public string AssetPairId { get; set; }
         public string ParentOrderId { get; set; }
         public string PositionId { get; set; }
-        public OrderDirection Direction { get; set; }
-        public OrderType Type { get; set; }
-        public OrderStatus Status { get; set; }
-        public OriginatorType Originator { get; set; }
-        public decimal? Volume { get; set; }
+        OrderDirection IOrderHistory.Direction => Direction.ParseEnum<OrderDirection>();
+        public string Direction { get; set; }
+        OrderType IOrderHistory.Type => Type.ParseEnum<OrderType>();
+        public string Type { get; set; }
+        OrderStatus IOrderHistory.Status => Status.ParseEnum<OrderStatus>();
+        public string Status { get; set; }
+        OriginatorType IOrderHistory.Originator => Originator.ParseEnum<OriginatorType>();
+        public string Originator { get; set; }
+        public decimal Volume { get; set; }
         public decimal? ExpectedOpenPrice { get; set; }
         public decimal? ExecutionPrice { get; set; }
         public decimal FxRate { get; set; }
@@ -34,7 +38,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         public string AccountAssetId { get; set; }
         public string EquivalentAsset { get; set; }
         public decimal EquivalentRate { get; set; }
-        public OrderRejectReason RejectReason { get; set; }
+        OrderRejectReason IOrderHistory.RejectReason => RejectReason.ParseEnum<OrderRejectReason>();
+        public string RejectReason { get; set; }
         public string RejectReasonText { get; set; }
         public string Comment { get; set; }
         public string ExternalOrderId { get; set; }
@@ -63,17 +68,17 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 AccountId = order.AccountId,
                 AssetPairId = order.AssetPairId,
                 CreatedTimestamp = order.CreatedTimestamp,
-                Direction = order.Direction,
+                Direction = order.Direction.ToString(),
                 ExecutionPrice = order.ExecutionPrice,
                 FxRate = order.FxRate,
                 ExpectedOpenPrice = order.ExpectedOpenPrice,
                 ForceOpen = order.ForceOpen,
                 ModifiedTimestamp = order.ModifiedTimestamp,
-                Originator = order.Originator,
+                Originator = order.Originator.ToString(),
                 ParentOrderId = order.ParentOrderId,
                 PositionId = order.PositionId,
-                Status = order.Status,
-                Type = order.Type,
+                Status = order.Status.ToString(),
+                Type = order.Type.ToString(),
                 ValidityTime = order.ValidityTime,
                 Volume = order.Volume,
                 //------
@@ -91,7 +96,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 LegalEntity = order.LegalEntity,
                 MatchingEngineId = order.MatchingEngineId,
                 Rejected = order.Rejected,
-                RejectReason = order.RejectReason,
+                RejectReason = order.RejectReason.ToString(),
                 RejectReasonText = order.RejectReasonText,
                 RelatedOrderInfos = order.RelatedOrderInfos.ToJson(),
                 TradingConditionId = order.TradingConditionId,

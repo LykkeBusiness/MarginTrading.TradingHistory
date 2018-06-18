@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using Autofac;
+﻿using Autofac;
 using Common.Log;
 using Lykke.SettingsReader;
 using MarginTrading.TradingHistory.AzureRepositories;
 using MarginTrading.TradingHistory.BrokerBase;
 using MarginTrading.TradingHistory.BrokerBase.Settings;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Services;
 using Microsoft.AspNetCore.Hosting;

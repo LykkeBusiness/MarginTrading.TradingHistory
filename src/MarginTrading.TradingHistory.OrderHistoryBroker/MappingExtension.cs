@@ -31,7 +31,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                 Status = order.Status.ToType<OrderStatus>(),
                 Type = order.Type.ToType<OrderType>(),
                 ValidityTime = order.ValidityTime,
-                Volume = order.Volume,
+                Volume = order.Volume ?? 0,
                 //------
                 AccountAssetId = order.AccountAssetId,
                 EquivalentAsset = order.EquivalentAsset,

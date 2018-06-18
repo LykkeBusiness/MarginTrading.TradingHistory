@@ -14,7 +14,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
         public OrderType Type { get; set; }
         public OrderStatus Status { get; set; }
         public OriginatorType Originator { get; set; }
-        public decimal? Volume { get; set; }
+        public decimal Volume { get; set; }
         public decimal? ExpectedOpenPrice { get; set; }
         public decimal? ExecutionPrice { get; set; }
         public decimal FxRate { get; set; }

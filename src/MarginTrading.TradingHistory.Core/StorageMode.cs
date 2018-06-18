@@ -1,4 +1,4 @@
-﻿namespace MarginTrading.TradingHistory.BrokerBase.Settings
+﻿namespace MarginTrading.TradingHistory.Core
 {
     public enum StorageMode
     {

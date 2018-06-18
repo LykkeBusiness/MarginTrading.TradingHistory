@@ -6,8 +6,11 @@ using MarginTrading.TradingHistory.Settings.ServiceSettings;
 using MarginTrading.TradingHistory.Services;
 using Lykke.SettingsReader;
 using MarginTrading.TradingHistory.AzureRepositories;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
+using MarginTrading.TradingHistory.SqlRepositories;
 using Microsoft.Extensions.DependencyInjection;
+using Polly.Fallback;
 
 namespace MarginTrading.TradingHistory.Modules
 {
@@ -52,15 +55,26 @@ namespace MarginTrading.TradingHistory.Modules
 
             var convertService = new ConvertService();
 
-            builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateOrdersHistoryRepository(
-                    _settings.Nested(s => s.Db.HistoryConnString), _log, convertService))
-                .As<IOrdersHistoryRepository>()
-                .SingleInstance();
+            if (_settings.CurrentValue.Db.StorageMode == StorageMode.Azure)
+            {
+                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateOrdersHistoryRepository(
+                        _settings.Nested(s => s.Db.HistoryConnString), _log, convertService))
+                    .As<IOrdersHistoryRepository>()
+                    .SingleInstance();
             
-            builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateTradesRepository(
-                    _settings.Nested(s => s.Db.HistoryConnString), _log, convertService))
-                .As<ITradesRepository>()
-                .SingleInstance();
+//                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateTradesRepository(
+//                        _settings.Nested(s => s.Db.HistoryConnString), _log, convertService))
+//                    .As<ITradesRepository>()
+//                    .SingleInstance();
+            }
+            else if (_settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
+            {
+                builder.RegisterInstance(new OrdersHistorySqlRepository(
+                        _settings.CurrentValue.Db.HistoryConnString, _log))
+                    .As<IOrdersHistoryRepository>()
+                    .SingleInstance();
+            }
+            
 
             builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();
 

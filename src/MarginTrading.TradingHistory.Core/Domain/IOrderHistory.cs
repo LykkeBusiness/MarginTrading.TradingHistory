@@ -56,7 +56,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
         /// <summary>
         /// Order volume in base asset units. Not filled for related orders (TakeProfit, StopLoss or TrailingStop).
         /// </summary>
-        decimal? Volume { get; }
+        decimal Volume { get; }
 
         /// <summary>
         /// Expected open price (in quoting asset units per one base unit). Not filled for Market orders.
