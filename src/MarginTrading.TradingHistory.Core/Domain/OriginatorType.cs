@@ -4,14 +4,10 @@ using Newtonsoft.Json.Converters;
 namespace MarginTrading.TradingHistory.Core.Domain
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum OrderUpdateType
+    public enum OriginatorType
     {
-        Place,
-        Activate,
-        Change,
-        Cancel,
-        Reject,
-        ExecutionStarted,
-        Executed
+        Investor = 1,
+        System = 2,
+        OnBehalf = 3
     }
 }

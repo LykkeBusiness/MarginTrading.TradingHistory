@@ -16,13 +16,13 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 ILog log, IConvertService convertService)
             {
                 return new OrdersHistoryRepository(AzureTableStorage<OrderHistoryEntity>.Create(connString,
-                    "MarginTradingOrdersHistory", log), convertService);
+                    "OrdersHistory", log), convertService);
             }
 
-            public static ITradesRepository CreateTradesRepository(IReloadingManager<string> connString, ILog log,
+            public static IPositionsHistoryRepository CreateTradesRepository(IReloadingManager<string> connString, ILog log,
                 IConvertService convertService)
             {
-                return new TradesRepository(AzureTableStorage<TradeEntity>.Create(connString, "Trades", log), 
+                return new PositionsHistoryRepository(AzureTableStorage<PositionHistoryEntity>.Create(connString, "PositionsHistory", log), 
                     convertService);
             }
         }

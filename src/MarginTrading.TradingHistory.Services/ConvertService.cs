@@ -21,11 +21,7 @@ namespace MarginTrading.TradingHistory.Services
 
         private static IMapper CreateMapper()
         {
-            return new MapperConfiguration(cfg =>
-            {
-                // todo: specify common conversion rules?
-                cfg.CreateMap<TradeContract, TradeEntity>();
-            }).CreateMapper();
+            return new MapperConfiguration(cfg => { }).CreateMapper();
         }
 
         public TResult Convert<TSource, TResult>(TSource source,

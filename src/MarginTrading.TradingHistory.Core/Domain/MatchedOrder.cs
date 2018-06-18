@@ -11,19 +11,6 @@ namespace MarginTrading.TradingHistory.Core.Domain
         public decimal Price { get; set; }
         public string ClientId { get; set; }
         public DateTime MatchedDate { get; set; }
-
-        public static MatchedOrder Create(MatchedOrder src)
-        {
-            return new MatchedOrder
-            {
-                OrderId = src.OrderId,
-                MarketMakerId = src.MarketMakerId,
-                LimitOrderLeftToMatch = src.LimitOrderLeftToMatch,
-                Volume = src.Volume,
-                Price = src.Price,
-                ClientId = src.ClientId,
-                MatchedDate = src.MatchedDate
-            };
-        }
+        public bool IsExternal { get; set; }
     }
 }

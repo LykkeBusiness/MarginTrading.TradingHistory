@@ -15,14 +15,14 @@ namespace MarginTrading.TradingHistory.Controllers
     [Route("api/positions-history")]
     public class PositionsController : Controller, IPositionsHistoryApi
     {
-        private readonly IOrdersHistoryRepository _ordersHistoryRepository;
+        private readonly IPositionsHistoryRepository _positionsHistoryRepository;
         private readonly IConvertService _convertService;
         
         public PositionsController(
-            IOrdersHistoryRepository ordersHistoryRepository,
+            IPositionsHistoryRepository positionsHistoryRepository,
             IConvertService convertService)
         {
-            _ordersHistoryRepository = ordersHistoryRepository;
+            _positionsHistoryRepository = positionsHistoryRepository;
             _convertService = convertService;
         }
         
@@ -33,10 +33,7 @@ namespace MarginTrading.TradingHistory.Controllers
         public async Task<List<PositionContract>> PositionHistory(
             [FromQuery] string accountId, [FromQuery] string instrument)
         {
-            var orders = await _ordersHistoryRepository.GetHistoryAsync(x =>
-                x.OrderUpdateType == OrderUpdateType.Close &&
-                (string.IsNullOrEmpty(accountId) || x.AccountId == accountId)
-                && (string.IsNullOrEmpty(instrument) || x.Instrument == instrument));
+            var orders = await _positionsHistoryRepository.GetAsync(accountId, instrument);
             
             return orders.Select(Convert).ToList();
         }
@@ -53,41 +50,29 @@ namespace MarginTrading.TradingHistory.Controllers
             {
                 throw new ArgumentException("Position id must be set", nameof(positionId));
             }
-            
-            var orders = await _ordersHistoryRepository.GetHistoryAsync(x =>
-                x.OrderUpdateType == OrderUpdateType.Close && x.Id == positionId);
-            
-            return orders.Select(Convert).FirstOrDefault();
+
+            var position = await _positionsHistoryRepository.GetAsync(positionId);
+
+            return Convert(position);
         }
 
-        private PositionContract Convert(IOrderHistory orderHistory)
+        private PositionContract Convert(IPositionHistory positionHistory)
         {
             return new PositionContract
             {
-                Id = orderHistory.Id,
-                AccountId = orderHistory.AccountId,
-                Instrument = orderHistory.Instrument,
-                Timestamp = orderHistory.CloseDate ?? orderHistory.CreateDate,
-                Direction = ConvertDirection(orderHistory.Type),
-                Price = orderHistory.ClosePrice == default ? orderHistory.OpenPrice : orderHistory.ClosePrice,
-                Volume = -orderHistory.Volume,
-                PnL = orderHistory.PnL,
-                FxRate = orderHistory.QuoteRate,
-                Margin = orderHistory.MarginMaintenance,
-                TradeId = orderHistory.Id, //TODO need to be fixed
-                RelatedOrders = new List<string>(),//TODO need to be fixed
+                Id = positionHistory.Id,
+                AccountId = positionHistory.AccountId,
+                Instrument = positionHistory.AssetPairId,
+                Timestamp = positionHistory.CloseDate ?? positionHistory.OpenDate,
+                Direction = positionHistory.Direction.ToType<PositionDirectionContract>(),
+                Price = positionHistory.ClosePrice == default ? positionHistory.OpenPrice : positionHistory.ClosePrice,
+                Volume = positionHistory.Volume,
+                PnL = positionHistory.TotalPnL,
+                FxRate = positionHistory.CloseFxPrice,
+                Margin = 0,
+                TradeId = positionHistory.Id,
+                RelatedOrders = positionHistory.RelatedOrders.Select(o => o.Id).ToList()
             };
-        }
-
-        private PositionDirection ConvertDirection(OrderDirection type)
-        {
-            switch (type)
-            {
-                case OrderDirection.Buy: return PositionDirection.Long;
-                case OrderDirection.Sell: return PositionDirection.Short;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
         }
     }
 }
