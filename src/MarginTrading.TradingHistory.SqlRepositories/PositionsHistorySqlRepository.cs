@@ -110,7 +110,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                var whereClause = "Where 1 = 1" +
+                var whereClause = "Where HistoryType = 'Close'" +
                                   (string.IsNullOrEmpty(accountId) ? "" : " And AccountId = @accountId") +
                                   (string.IsNullOrEmpty(assetPairId) ? "" : " And AssetPairId = @assetPairId");
 
@@ -125,7 +125,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                var query = $"SELECT * FROM {TableName} Where Id = @id";
+                var query = $"SELECT * FROM {TableName} Where Id = @id And HistoryType = 'Close'";
                 var objects = await conn.QueryAsync<PositionsHistoryEntity>(query, new {id});
                 
                 return objects.SingleOrDefault();

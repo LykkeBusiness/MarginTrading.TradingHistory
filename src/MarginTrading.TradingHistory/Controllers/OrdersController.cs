@@ -69,6 +69,9 @@ namespace MarginTrading.TradingHistory.Controllers
 
         private static OrderContract Convert(IOrderHistory history)
         {
+            if (history == null)
+                return null;
+            
             return new OrderContract
             {
                 Id = history.Id,

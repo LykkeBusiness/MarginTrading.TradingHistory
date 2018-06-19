@@ -58,6 +58,9 @@ namespace MarginTrading.TradingHistory.Controllers
 
         private PositionContract Convert(IPositionHistory positionHistory)
         {
+            if (positionHistory == null)
+                return null;
+            
             return new PositionContract
             {
                 Id = positionHistory.Id,
