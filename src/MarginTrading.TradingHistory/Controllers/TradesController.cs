@@ -68,7 +68,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 OrderId = tradeEntity.Id,
                 PositionId = tradeEntity.Id,
                 AssetPairId = tradeEntity.AssetPairId,
-                Type = tradeEntity.Type.ToType<TradeTypeContract>(),
+                Type = tradeEntity.Direction.ToType<TradeTypeContract>(),
                 Timestamp = tradeEntity.ModifiedTimestamp,
                 Price = tradeEntity.ExecutionPrice.Value,
                 Volume = tradeEntity.Volume
