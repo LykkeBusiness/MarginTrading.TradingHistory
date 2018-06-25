@@ -17,7 +17,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
         private const string CreateTableScript = "CREATE TABLE [{0}](" +
                                                  @"[OID] [int] NOT NULL IDENTITY (1,1) PRIMARY KEY,
-[Id] [nvarchar](64) NOT NULL,
+[Id] [nvarchar](64) NOT NULL
+[DealId] [nvarchar](128) NULL,
 [Code] [bigint] NULL,
 [AssetPairId] [nvarchar] (64) NULL,
 [Direction] [nvarchar] (64) NULL,
@@ -110,7 +111,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                var whereClause = "Where HistoryType = 'Close'" +
+                var whereClause = "Where HistoryType = 'Close' or HistoryType = 'PartiallyClose'" +
                                   (string.IsNullOrEmpty(accountId) ? "" : " And AccountId = @accountId") +
                                   (string.IsNullOrEmpty(assetPairId) ? "" : " And AssetPairId = @assetPairId");
 
@@ -125,7 +126,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                var query = $"SELECT * FROM {TableName} Where Id = @id And HistoryType = 'Close'";
+                var query = $"SELECT * FROM {TableName} Where DealId = @id";
                 var objects = await conn.QueryAsync<PositionsHistoryEntity>(query, new {id});
                 
                 return objects.SingleOrDefault();

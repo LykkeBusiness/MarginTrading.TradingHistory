@@ -60,6 +60,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public List<RelatedOrderInfo> RelatedOrderInfos { get; set; }
 
         public OrderUpdateType UpdateType { get; set; }
+        public string AdditionalInfo { get; set; }
 
         public static OrderHistoryEntity Create(IOrderHistory order)
         {
@@ -102,7 +103,8 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
                 RelatedOrderInfos = order.RelatedOrderInfos,
                 TradingConditionId = order.TradingConditionId,
                 MatchedOrders = order.MatchedOrders,
-                UpdateType = order.UpdateType
+                UpdateType = order.UpdateType,
+                AdditionalInfo = order.AdditionalInfo
             };
         }
     }

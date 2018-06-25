@@ -6,6 +6,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
     public interface IPositionHistory
     {
         string Id { get; }
+        string DealId { get; }
         long Code { get; }
         string AssetPairId { get; }
         PositionDirection Direction { get; }

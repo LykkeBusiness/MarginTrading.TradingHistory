@@ -60,21 +60,25 @@ namespace MarginTrading.TradingHistory.Controllers
         {
             if (positionHistory == null)
                 return null;
-            
+
             return new PositionContract
             {
                 Id = positionHistory.Id,
+                DealId = positionHistory.DealId,
                 AccountId = positionHistory.AccountId,
                 Instrument = positionHistory.AssetPairId,
                 Timestamp = positionHistory.CloseDate ?? positionHistory.OpenDate,
                 Direction = positionHistory.Direction.ToType<PositionDirectionContract>(),
                 Price = positionHistory.ClosePrice == default ? positionHistory.OpenPrice : positionHistory.ClosePrice,
-                Volume = positionHistory.Volume,
-                PnL = positionHistory.TotalPnL,
+                Volume = positionHistory.DealInfo?.Volume ?? positionHistory.Volume,
+                PnL = positionHistory.DealInfo?.Fpl ?? positionHistory.TotalPnL,
                 FxRate = positionHistory.CloseFxPrice,
                 Margin = 0,
                 TradeId = positionHistory.Id,
-                RelatedOrders = positionHistory.RelatedOrders.Select(o => o.Id).ToList()
+                RelatedOrders = positionHistory.RelatedOrders.Select(o => o.Id).ToList(),
+                RelatedOrderInfos = positionHistory.RelatedOrders.Select(o =>
+                    new RelatedOrderInfoContract {Id = o.Id, Type = o.Type.ToType<OrderTypeContract>()}).ToList(),
+                AdditionalInfo = positionHistory.DealInfo?.AdditionalInfo
             };
         }
     }

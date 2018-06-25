@@ -8,6 +8,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
     public class PositionsHistoryEntity : IPositionHistory
     {
         public string Id { get; set; }
+        public string DealId { get; set; }
         public long Code { get; set; }
         public string AssetPairId { get; set; }
         PositionDirection IPositionHistory.Direction => Direction.ParseEnum<PositionDirection>();
@@ -72,6 +73,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         {
             return new PositionsHistoryEntity
             {
+                DealId = history.DealId,
                 AccountAssetId = history.AccountAssetId,
                 AccountId = history.AccountId,
                 AssetPairId = history.AssetPairId,
