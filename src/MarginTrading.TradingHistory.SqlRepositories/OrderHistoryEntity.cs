@@ -56,6 +56,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             : RelatedOrderInfos.DeserializeJson<List<RelatedOrderInfo>>();
 
         public OrderUpdateType UpdateType { get; set; }
+        public string AdditionalInfo { get; set; }
 
         public string MatchedOrders { get; set; }
         public string RelatedOrderInfos { get; set; }
@@ -101,7 +102,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 RelatedOrderInfos = order.RelatedOrderInfos.ToJson(),
                 TradingConditionId = order.TradingConditionId,
                 MatchedOrders = order.MatchedOrders.ToJson(),
-                UpdateType = order.UpdateType
+                UpdateType = order.UpdateType,
+                AdditionalInfo = order.AdditionalInfo
             };
         }
     }

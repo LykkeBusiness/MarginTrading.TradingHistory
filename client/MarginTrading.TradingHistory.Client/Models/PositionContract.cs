@@ -11,6 +11,11 @@ namespace MarginTrading.TradingHistory.Client.Models
         public string Id { get; set; }
         
         /// <summary>
+        /// Deal id
+        /// </summary>
+        public string DealId { get; set; }
+        
+        /// <summary>
         /// Account id
         /// </summary>
         public string AccountId { get; set; }
@@ -64,6 +69,17 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// <summary>
         /// The related orders (sl, tp orders) 
         /// </summary>
+        [Obsolete]
         public List<string> RelatedOrders { get; set; }
+        
+        /// <summary>
+        /// Related orders
+        /// </summary>
+        public List<RelatedOrderInfoContract> RelatedOrderInfos { get; set; }
+        
+        /// <summary>
+        /// Close trade additional info
+        /// </summary>
+        public string AdditionalInfo { get; set; }
     }
 }

@@ -71,7 +71,7 @@ namespace MarginTrading.TradingHistory.Controllers
         {
             if (history == null)
                 return null;
-            
+
             return new OrderContract
             {
                 Id = history.Id,
@@ -88,11 +88,14 @@ namespace MarginTrading.TradingHistory.Controllers
                 ParentOrderId = history.ParentOrderId,
                 PositionId = history.Id,
                 RelatedOrders = history.RelatedOrderInfos.Select(i => i.Id).ToList(),
+                RelatedOrderInfos = history.RelatedOrderInfos.Select(o =>
+                    new RelatedOrderInfoContract {Id = o.Id, Type = o.Type.ToType<OrderTypeContract>()}).ToList(),
                 Status = history.Status.ToType<OrderStatusContract>(),
                 TradesId = history.Id,
                 Type = history.Type.ToType<OrderTypeContract>(),
                 ValidityTime = history.ValidityTime,
-                Volume = history.Volume
+                Volume = history.Volume,
+                AdditionalInfo = history.AdditionalInfo
             };
         }
     }

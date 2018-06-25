@@ -85,7 +85,13 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// <summary>
         /// The related orders
         /// </summary>
+        [Obsolete]
         public List<string> RelatedOrders { get; set; }
+        
+        /// <summary>
+        /// Related orders
+        /// </summary>
+        public List<RelatedOrderInfoContract> RelatedOrderInfos { get; set; }
 
         /// <summary>
         /// Force open separate position for the order, ignoring existing ones
@@ -106,5 +112,10 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// Last modification date and time
         /// </summary>
         public DateTime ModifiedTimestamp { get; set; }
+        
+        /// <summary>
+        /// Additional request info
+        /// </summary>
+        public string AdditionalInfo { get; set; }
     }
 }

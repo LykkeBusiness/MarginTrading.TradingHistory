@@ -28,7 +28,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
         {
             var predicate = new Func<PositionHistoryEntity, bool>(p =>
                 (string.IsNullOrEmpty(assetPairId) || p.AssetPairId == accountId) &&
-                p.HistoryType == PositionHistoryType.Close);
+                p.HistoryType == PositionHistoryType.Close || p.HistoryType == PositionHistoryType.PartiallyClose);
             
             return string.IsNullOrEmpty(accountId)
                 ? await _tableStorage.GetDataAsync(predicate)
@@ -37,7 +37,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
 
         public async Task<IPositionHistory> GetAsync(string id)
         {
-            return (await _tableStorage.GetDataAsync(p => p.Id == id && p.HistoryType == PositionHistoryType.Close))
+            return (await _tableStorage.GetDataAsync(p => p.DealId == id))
                 .SingleOrDefault();
         }
 
