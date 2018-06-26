@@ -111,7 +111,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                var whereClause = "Where HistoryType = 'Close' or HistoryType = 'PartiallyClose'" +
+                var whereClause = "Where (HistoryType = 'Close' or HistoryType = 'PartiallyClose')" +
                                   (string.IsNullOrEmpty(accountId) ? "" : " And AccountId = @accountId") +
                                   (string.IsNullOrEmpty(assetPairId) ? "" : " And AssetPairId = @assetPairId");
 
