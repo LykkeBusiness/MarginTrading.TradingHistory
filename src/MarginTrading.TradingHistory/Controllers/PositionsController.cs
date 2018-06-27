@@ -78,7 +78,8 @@ namespace MarginTrading.TradingHistory.Controllers
                 RelatedOrders = positionHistory.RelatedOrders.Select(o => o.Id).ToList(),
                 RelatedOrderInfos = positionHistory.RelatedOrders.Select(o =>
                     new RelatedOrderInfoContract {Id = o.Id, Type = o.Type.ToType<OrderTypeContract>()}).ToList(),
-                AdditionalInfo = positionHistory.DealInfo?.AdditionalInfo
+                AdditionalInfo = positionHistory.DealInfo?.AdditionalInfo,
+                Originator = positionHistory.CloseOriginator?.ToType<OriginatorTypeContract>()
             };
         }
     }

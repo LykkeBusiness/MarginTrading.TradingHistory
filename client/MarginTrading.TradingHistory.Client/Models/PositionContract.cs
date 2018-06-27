@@ -81,5 +81,10 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// Close trade additional info
         /// </summary>
         public string AdditionalInfo { get; set; }
+        
+        /// <summary>
+        /// Who initiated close of position
+        /// </summary>
+        public OriginatorTypeContract? Originator { get; set; }
     }
 }
