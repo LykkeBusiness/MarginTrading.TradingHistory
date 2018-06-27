@@ -27,6 +27,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [Type] [nvarchar] (64) NULL,
 [Status] [nvarchar] (64) NULL,
 [Originator] [nvarchar] (64) NULL,
+[CancellationOriginator] [nvarchar] (64) NULL,
 [Volume] [float] NULL,
 [ExpectedOpenPrice] [float] NULL,
 [ExecutionPrice] [float] NULL,
