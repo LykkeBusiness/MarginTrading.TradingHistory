@@ -26,6 +26,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                 ForceOpen = order.ForceOpen,
                 ModifiedTimestamp = order.ModifiedTimestamp,
                 Originator = order.Originator.ToType<OriginatorType>(),
+                CancellationOriginator = order.CancellationOriginator?.ToType<OriginatorType>(),
                 ParentOrderId = order.ParentOrderId,
                 PositionId = order.PositionId,
                 Status = order.Status.ToType<OrderStatus>(),
