@@ -60,10 +60,10 @@ namespace MarginTrading.TradingHistory.Controllers
         {
             if (positionHistory == null || positionHistory.DealInfo == null)
                 return null;
-            
+
             return new PositionContract
             {
-                Id = positionHistory.Id,
+                Id = positionHistory.DealId, //TODO: temp, think about it )
                 DealId = positionHistory.DealId,
                 AccountId = positionHistory.AccountId,
                 Instrument = positionHistory.AssetPairId,
@@ -79,7 +79,8 @@ namespace MarginTrading.TradingHistory.Controllers
                 RelatedOrderInfos = positionHistory.RelatedOrders.Select(o =>
                     new RelatedOrderInfoContract {Id = o.Id, Type = o.Type.ToType<OrderTypeContract>()}).ToList(),
                 AdditionalInfo = positionHistory.DealInfo.AdditionalInfo,
-                Originator = positionHistory.CloseOriginator?.ToType<OriginatorTypeContract>()
+                Originator = positionHistory.CloseOriginator?.ToType<OriginatorTypeContract>() ??
+                             OriginatorTypeContract.Investor
             };
         }
     }
