@@ -48,6 +48,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         public string CloseComment { get; set; }
         public DateTime? LastModified { get; set; }
         public decimal TotalPnL { get; set; }
+        public decimal ChargedPnl { get; set; }
         PositionHistoryType IPositionHistory.HistoryType => HistoryType.ParseEnum<PositionHistoryType>();
         public string HistoryType { get; set; }
 
