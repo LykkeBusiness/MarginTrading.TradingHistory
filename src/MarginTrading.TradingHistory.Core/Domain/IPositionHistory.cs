@@ -42,6 +42,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
         List<string> CloseTrades { get; }
         DateTime? LastModified { get; }
         decimal TotalPnL { get; }
+        decimal ChargedPnl { get; }
         PositionHistoryType HistoryType { get; }
         DealInfo DealInfo { get; }
         DateTime HistoryTimestamp { get; }
