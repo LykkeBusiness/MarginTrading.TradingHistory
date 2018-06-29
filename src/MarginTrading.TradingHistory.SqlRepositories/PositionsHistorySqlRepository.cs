@@ -54,6 +54,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [CloseTrades] [nvarchar] (1024) NULL,
 [LastModified] [datetime] NULL,
 [TotalPnL] [float] NULL,
+[ChargedPnl] [float] NULL,
 [HistoryType] [nvarchar] (64) NULL,
 [DealInfo] [nvarchar] (1024) NULL,
 [HistoryTimestamp] [datetime] NULL
