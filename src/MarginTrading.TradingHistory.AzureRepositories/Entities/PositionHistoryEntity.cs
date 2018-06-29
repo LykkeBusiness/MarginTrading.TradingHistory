@@ -58,6 +58,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public List<string> CloseTrades { get; set; }
         public DateTime? LastModified { get; set; }
         public decimal TotalPnL { get; set; }
+        public decimal ChargedPnl { get; set; }
         public PositionHistoryType HistoryType { get; set; }
         [ValueSerializer(typeof(JsonStorageValueSerializer))]
         public DealInfo DealInfo { get; set; }
