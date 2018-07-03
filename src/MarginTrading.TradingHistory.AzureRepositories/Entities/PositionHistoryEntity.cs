@@ -21,6 +21,8 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
             get => RowKey;
             set => RowKey = value;
         }
+
+        public string DealId { get; set; }
         public long Code { get; set; }
         public string AssetPairId { get; set; }
         public PositionDirection Direction { get; set; }

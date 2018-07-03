@@ -55,7 +55,8 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                     new RelatedOrderInfo {Id = o.Id, Type = o.Type.ToType<OrderType>()}).ToList(),
                 TradingConditionId = order.TradingConditionId,
                 UpdateType = historyType.ToType<OrderUpdateType>(),
-                MatchedOrders = new List<MatchedOrder>()
+                MatchedOrders = new List<MatchedOrder>(),
+                AdditionalInfo = order.AdditionalInfo
             };
 
             foreach (var mo in order.MatchedOrders)

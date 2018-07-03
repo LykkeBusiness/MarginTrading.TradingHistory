@@ -190,5 +190,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
         List<RelatedOrderInfo> RelatedOrderInfos { get; }
         
         OrderUpdateType UpdateType { get; }
+        
+        string AdditionalInfo { get; }
     }
 }

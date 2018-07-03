@@ -45,15 +45,17 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [EquivalentAsset] [nvarchar] (64) NULL,
 [EquivalentRate] [float] NULL,
 [RejectReason] [nvarchar] (64) NULL,
-[RejectReasonText] [nvarchar] (64) NULL,
-[Comment] [nvarchar] (64) NULL,
+[RejectReasonText] [nvarchar] (1024) NULL,
+[Comment] [nvarchar] (1024) NULL,
 [ExternalOrderId] [nvarchar] (64) NULL,
 [ExternalProviderId] [nvarchar] (64) NULL,
 [MatchingEngineId] [nvarchar] (64) NULL,
 [LegalEntity] [nvarchar] (64) NULL,
 [UpdateType] [nvarchar] (64) NULL,
 [MatchedOrders] [nvarchar](MAX) NULL,
-[RelatedOrderInfos] [nvarchar](MAX) NULL);";
+[RelatedOrderInfos] [nvarchar](MAX) NULL,
+[AdditionalInfo] [nvarchar](MAX) NULL
+);";
 
         private readonly string _connectionString;
         private readonly ILog _log;

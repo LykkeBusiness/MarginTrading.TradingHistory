@@ -42,5 +42,6 @@ namespace MarginTrading.TradingHistory.Core.Domain
         public List<MatchedOrder> MatchedOrders { get; set; }
         public List<RelatedOrderInfo> RelatedOrderInfos { get; set; }
         public OrderUpdateType UpdateType { get; set; }
+        public string AdditionalInfo { get; set; }
     }
 }
