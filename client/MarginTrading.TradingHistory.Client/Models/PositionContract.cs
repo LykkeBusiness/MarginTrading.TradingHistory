@@ -19,9 +19,9 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// Account id
         /// </summary>
         public string AccountId { get; set; }
-        
+
         /// <summary>
-        /// Asset pair id
+        /// Instrument id (e.g."BTCUSD", where BTC - base asset unit, USD - quoting unit)
         /// </summary>
         public string Instrument { get; set; }
         
@@ -31,27 +31,28 @@ namespace MarginTrading.TradingHistory.Client.Models
         public DateTime Timestamp { get; set; }
 
         /// <summary>
-        /// The direction of the position
+        /// The direction of the position (Long or Short)
         /// </summary>
         public PositionDirectionContract Direction { get; set; }
         
         /// <summary>
-        /// Open price
+        /// Open price (in quoting asset units per one base unit)
+        /// Close price (in quoting asset units per one base unit)
         /// </summary>
-        public decimal Price { get; set; }
-        
+        public decimal Price { get; set; }  // TODO: SPLIT TO 'OpenPrice' & 'ClosePrice'
+
         /// <summary>
-        /// Current position volume in quoting asset units
+        /// Current position volume in base asset units
         /// </summary>
         public decimal Volume { get; set; }
-        
+
         /// <summary>
-        /// Profit and loss of the position in base asset units (without commissions)
+        /// Profit and loss of the position in account asset units (without commissions)
         /// </summary>
         public decimal PnL { get; set; }
-        
+
         /// <summary>
-        /// Current margin value
+        /// Current margin value in account asset units
         /// </summary>
         public decimal Margin { get; set; }
         
