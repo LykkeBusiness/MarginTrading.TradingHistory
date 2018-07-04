@@ -34,14 +34,14 @@ namespace MarginTrading.TradingHistory.Controllers
             [FromQuery] string accountId, [FromQuery] string instrument)
         {
             var orders = await _positionsHistoryRepository.GetAsync(accountId, instrument);
-            
-            return orders.Select(Convert).ToList();
+
+            return orders.Select(Convert).Where(d => d != null).ToList();
         }
 
         /// <summary>
         /// Get closed position by Id
         /// </summary>
-        /// <param name="positionId"></param>
+        /// <param name="positionId">Deal ID!</param>
         /// <returns></returns>
         [HttpGet, Route("{positionId}")]
         public async Task<PositionContract> PositionById(string positionId)
@@ -58,27 +58,29 @@ namespace MarginTrading.TradingHistory.Controllers
 
         private PositionContract Convert(IPositionHistory positionHistory)
         {
-            if (positionHistory == null)
+            if (positionHistory == null || positionHistory.DealInfo == null)
                 return null;
 
             return new PositionContract
             {
-                Id = positionHistory.Id,
+                Id = positionHistory.DealId, //TODO: temp, think about it )
                 DealId = positionHistory.DealId,
                 AccountId = positionHistory.AccountId,
                 Instrument = positionHistory.AssetPairId,
-                Timestamp = positionHistory.CloseDate ?? positionHistory.OpenDate,
+                Timestamp = positionHistory.DealInfo.Created,
                 Direction = positionHistory.Direction.ToType<PositionDirectionContract>(),
-                Price = positionHistory.ClosePrice == default ? positionHistory.OpenPrice : positionHistory.ClosePrice,
-                Volume = positionHistory.DealInfo?.Volume ?? positionHistory.Volume,
-                PnL = positionHistory.DealInfo?.Fpl ?? positionHistory.TotalPnL,
-                FxRate = positionHistory.CloseFxPrice,
+                Price = positionHistory.DealInfo.ClosePrice,
+                Volume = positionHistory.DealInfo.Volume,
+                PnL = positionHistory.DealInfo.Fpl,
+                FxRate = positionHistory.DealInfo.CloseFxPrice,
                 Margin = 0,
                 TradeId = positionHistory.Id,
                 RelatedOrders = positionHistory.RelatedOrders.Select(o => o.Id).ToList(),
                 RelatedOrderInfos = positionHistory.RelatedOrders.Select(o =>
                     new RelatedOrderInfoContract {Id = o.Id, Type = o.Type.ToType<OrderTypeContract>()}).ToList(),
-                AdditionalInfo = positionHistory.DealInfo?.AdditionalInfo
+                AdditionalInfo = positionHistory.DealInfo.AdditionalInfo,
+                Originator = positionHistory.CloseOriginator?.ToType<OriginatorTypeContract>() ??
+                             OriginatorTypeContract.Investor
             };
         }
     }

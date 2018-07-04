@@ -20,6 +20,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         public string Status { get; set; }
         OriginatorType IOrderHistory.Originator => Originator.ParseEnum<OriginatorType>();
         public string Originator { get; set; }
+        OriginatorType? IOrderHistory.CancellationOriginator => Originator?.ParseEnum<OriginatorType>();
+        public string CancellationOriginator { get; set; }
         public decimal Volume { get; set; }
         public decimal? ExpectedOpenPrice { get; set; }
         public decimal? ExecutionPrice { get; set; }
@@ -76,6 +78,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 ForceOpen = order.ForceOpen,
                 ModifiedTimestamp = order.ModifiedTimestamp,
                 Originator = order.Originator.ToString(),
+                CancellationOriginator = order.CancellationOriginator?.ToString(),
                 ParentOrderId = order.ParentOrderId,
                 PositionId = order.PositionId,
                 Status = order.Status.ToString(),

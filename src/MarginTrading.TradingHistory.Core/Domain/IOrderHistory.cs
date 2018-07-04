@@ -54,6 +54,11 @@ namespace MarginTrading.TradingHistory.Core.Domain
         OriginatorType Originator { get; }
 
         /// <summary>
+        /// Who cancelled/rejected the order (Investor, System or OnBehalf)
+        /// </summary>
+        OriginatorType? CancellationOriginator { get; }
+        
+        /// <summary>
         /// Order volume in base asset units. Not filled for related orders (TakeProfit, StopLoss or TrailingStop).
         /// </summary>
         decimal Volume { get; }
