@@ -12,23 +12,22 @@ using MarginTrading.TradingHistory.SqlRepositories.Entities;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
 {
-    public class TradesRepository : ITradesRepository
+    public class TradesSqlRepository : ITradesRepository
     {
         private const string TableName = "Trades";
 
         private const string CreateTableScript = "CREATE TABLE [{0}](" +
                                                  @"[OID] [bigint] NOT NULL IDENTITY (1,1) PRIMARY KEY,
 [Id] [nvarchar](64) NOT NULL,
-[ClientId] [nvarchar](64) NOT NULL,
 [AccountId] [nvarchar](64) NOT NULL,
 [OrderId] [nvarchar](64) NOT NULL,
-[PositionId] [nvarchar] (64) NOT NULL,
+[PositionId] [nvarchar] (64) NULL,
 [AssetPairId] [nvarchar] (64) NOT NULL,
 [Type] [nvarchar] (64) NOT NULL,
 [TradeTimestamp] [datetime] NOT NULL,
 [Price] [float] NULL,
 [Volume] [float] NULL,
-CONSTRAINT IX_DealHistory1 NONCLUSTERED (OrderId, PositionId)
+INDEX IX_DealHistory1 NONCLUSTERED (OrderId, PositionId)
 );";
 
         private readonly string _connectionString;
@@ -43,7 +42,7 @@ CONSTRAINT IX_DealHistory1 NONCLUSTERED (OrderId, PositionId)
         private static readonly string GetUpdateClause = string.Join(",",
             typeof(ITrade).GetProperties().Select(x => "[" + x.Name + "]=@" + x.Name));
 
-        public TradesRepository(string connectionString, ILog log)
+        public TradesSqlRepository(string connectionString, ILog log)
         {
             _connectionString = connectionString;
             _log = log;
@@ -53,7 +52,7 @@ CONSTRAINT IX_DealHistory1 NONCLUSTERED (OrderId, PositionId)
                 try { conn.CreateTableIfDoesntExists(CreateTableScript, TableName); }
                 catch (Exception ex)
                 {
-                    _log?.WriteErrorAsync(nameof(TradesRepository), "CreateTableIfDoesntExists", null, ex);
+                    _log?.WriteErrorAsync(nameof(TradesSqlRepository), "CreateTableIfDoesntExists", null, ex);
                     throw;
                 }
             }
@@ -76,7 +75,7 @@ CONSTRAINT IX_DealHistory1 NONCLUSTERED (OrderId, PositionId)
                               "Entity <ITradeHistory>: \n" +
                               obj.ToJson();
                     
-                    _log?.WriteWarning(nameof(TradesRepository), nameof(AddAsync), msg);
+                    _log?.WriteWarning(nameof(TradesSqlRepository), nameof(AddAsync), msg);
                     
                     throw new Exception(msg);
                 }

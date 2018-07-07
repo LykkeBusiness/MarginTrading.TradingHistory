@@ -12,7 +12,7 @@ using MarginTrading.TradingHistory.SqlRepositories.Entities;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
 {
-    public class OrderHistorySqlRepository : IOrderHistoryRepository
+    public class OrdersHistorySqlRepository : IOrdersHistoryRepository
     {
         private const string TableName = "OrdersHistory";
 
@@ -71,7 +71,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         private static readonly string GetUpdateClause = string.Join(",",
             typeof(IOrderHistory).GetProperties().Select(x => "[" + x.Name + "]=@" + x.Name));
 
-        public OrderHistorySqlRepository(string connectionString, ILog log)
+        public OrdersHistorySqlRepository(string connectionString, ILog log)
         {
             _connectionString = connectionString;
             _log = log;
@@ -110,36 +110,28 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync()
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId, string assetPairId)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                var query = $"SELECT * FROM {TableName}";
-                var objects = await conn.QueryAsync<OrderHistoryEntity>(query);
+                var clause = " WHERE 1=1 "
+                             + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
+                             + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId");
+                var query = $"SELECT * FROM {TableName} {clause}";
+                var objects = await conn.QueryAsync<OrderHistoryEntity>(query, new {accountId, assetPairId});
                 
                 return objects;
             }
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId)
-        {
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                var query = $"SELECT * FROM {TableName} Where AccountId = @accountId";
-                var objects = await conn.QueryAsync<OrderHistoryEntity>(query, new {accountId});
-                
-                return objects;
-            }
-        }
-
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(Func<IOrderHistory, bool> predicate)
+        public async Task<IOrderHistory> GetHistoryAsync(string orderId)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
                 var query = $"SELECT * FROM {TableName}";
                 var objects = await conn.QueryAsync<OrderHistoryEntity>(query);
 
-                return objects.Where(predicate);
+                return objects.SingleOrDefault();
             }
         }
     }

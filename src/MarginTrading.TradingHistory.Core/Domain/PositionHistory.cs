@@ -6,7 +6,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
     public class PositionHistory : IPositionHistory
     {
         public string Id { get; set; }
-        public string DealId => DealInfo != null ? $"{DealInfo.PositionId}_{DealInfo.CloseTradeId}" : null;
+        public string DealId => DealInfo != null ? Deal.GetId(DealInfo.PositionId, DealInfo.CloseTradeId) : null;
         public long Code { get; set; }
         public string AssetPairId { get; set; }
         public PositionDirection Direction { get; set; }

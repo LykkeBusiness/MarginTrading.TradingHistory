@@ -59,23 +59,39 @@ namespace MarginTrading.TradingHistory.Modules
             {
                 builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateOrdersHistoryRepository(
                         _settings.Nested(s => s.Db.HistoryConnString), _log, convertService))
-                    .As<IOrderHistoryRepository>()
+                    .As<IOrdersHistoryRepository>()
                     .SingleInstance();
             
                 builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreatePositionsHistoryRepository(
                         _settings.Nested(s => s.Db.HistoryConnString), _log, new ConvertService()))
                     .As<IPositionsHistoryRepository>().SingleInstance();
+                
+                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateTradesHistoryRepository(
+                        _settings.Nested(s => s.Db.HistoryConnString), _log, new ConvertService()))
+                    .As<ITradesRepository>();
+                
+                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateDealsHistoryRepository(
+                        _settings.Nested(s => s.Db.HistoryConnString), _log, new ConvertService()))
+                    .As<IDealsRepository>().SingleInstance();
             }
             else if (_settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
             {
-                builder.RegisterInstance(new OrderHistorySqlRepository(
+                builder.RegisterInstance(new OrdersHistorySqlRepository(
                         _settings.CurrentValue.Db.HistoryConnString, _log))
-                    .As<IOrderHistoryRepository>()
+                    .As<IOrdersHistoryRepository>()
                     .SingleInstance();
                 
                 builder.RegisterInstance(new PositionsHistorySqlRepository(
                         _settings.CurrentValue.Db.HistoryConnString, _log))
                     .As<IPositionsHistoryRepository>();
+                
+                builder.RegisterInstance(new TradesSqlRepository(
+                        _settings.CurrentValue.Db.HistoryConnString, _log))
+                    .As<ITradesRepository>();
+                
+                builder.RegisterInstance(new DealsSqlRepository(
+                        _settings.CurrentValue.Db.HistoryConnString, _log))
+                    .As<IDealsRepository>();
             }
             
             builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();

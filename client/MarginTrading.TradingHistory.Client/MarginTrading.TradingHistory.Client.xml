@@ -4,9 +4,24 @@
         <name>MarginTrading.TradingHistory.Client</name>
     </assembly>
     <members>
+        <member name="T:MarginTrading.TradingHistory.Client.IDealsApi">
+            <summary>
+            API for the deals
+            </summary>
+        </member>
+        <member name="M:MarginTrading.TradingHistory.Client.IDealsApi.List(System.String,System.String)">
+            <summary> 
+            Get deals with optional filtering 
+            </summary> 
+        </member>
+        <member name="M:MarginTrading.TradingHistory.Client.IDealsApi.ById(System.String)">
+            <summary>
+            Get deal by Id
+            </summary>
+        </member>
         <member name="T:MarginTrading.TradingHistory.Client.IOrdersHistoryApi">
             <summary>
-            Getting of orders history
+            API for orders history
             </summary>
         </member>
         <member name="M:MarginTrading.TradingHistory.Client.IOrdersHistoryApi.OrderHistory(System.String,System.String)">
@@ -21,17 +36,22 @@
         </member>
         <member name="T:MarginTrading.TradingHistory.Client.IPositionsHistoryApi">
             <summary>
-            Getting of positions history
+            API for positions history
             </summary>
         </member>
         <member name="M:MarginTrading.TradingHistory.Client.IPositionsHistoryApi.PositionHistory(System.String,System.String)">
             <summary> 
-            Get closed positions with optional filtering 
+            Get positions with optional filtering 
             </summary> 
         </member>
         <member name="M:MarginTrading.TradingHistory.Client.IPositionsHistoryApi.PositionById(System.String)">
             <summary>
-            Get closed position by Id
+            Get position by Id
+            </summary>
+        </member>
+        <member name="T:MarginTrading.TradingHistory.Client.ITradesApi">
+            <summary>
+            API for the trades
             </summary>
         </member>
         <member name="M:MarginTrading.TradingHistory.Client.ITradesApi.Get(System.String)">
@@ -43,6 +63,76 @@
             <summary>
             Get trades with optional filtering by order or position 
             </summary> 
+        </member>
+        <member name="T:MarginTrading.TradingHistory.Client.Models.DealContract">
+            <summary>
+            Info about completed deal
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.DealContract.DealId">
+            <summary>
+            Deal Id
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.DealContract.Created">
+            <summary>
+            Deal execution timestamp
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.DealContract.AccountId">
+            <summary>
+            Account id
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.DealContract.AssetPairId">
+            <summary>
+            Instrument id
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.DealContract.OpenTradeId">
+            <summary>
+            Id of the opening trade
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.DealContract.CloseTradeId">
+            <summary>
+            Id of the closing trade
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.DealContract.Volume">
+            <summary>
+            Order volume in base asset units 
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.DealContract.OpenPrice">
+            <summary>
+            Opening price in base asset units 
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.DealContract.OpenFxPrice">
+            <summary>
+            Fx opening price in base asset units 
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.DealContract.ClosePrice">
+            <summary>
+            Closing price in base asset units 
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.DealContract.CloseFxPrice">
+            <summary>
+            Fx closing price in base asset units 
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.DealContract.Fpl">
+            <summary>
+            Deal fpl
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.DealContract.AdditionalInfo">
+            <summary>
+            Deal additional info
+            </summary>
         </member>
         <member name="T:MarginTrading.TradingHistory.Client.Models.OrderContract">
             <summary>
@@ -61,7 +151,7 @@
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.AssetPairId">
             <summary>
-            Instrument id
+            Instrument id (e.g."BTCUSD", where BTC - base asset unit, USD - quoting unit)
             </summary>
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.ParentOrderId">
@@ -76,37 +166,37 @@
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.Direction">
             <summary>
-            The order direction (buy or sell)
+            The order direction (Buy or Sell)
             </summary>
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.Type">
             <summary>
-            The order type (Market, Limit, etc.)
+            The order type (Market, Limit, Stop, TakeProfit, StopLoss or TrailingStop)
             </summary>
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.Status">
             <summary>
-            The order status (Active, Executed, etc.)
+            The order status (Active, Inactive, Executed, Canceled, Rejected or Expired)
             </summary>
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.Originator">
             <summary>
-            Who created the order
+            Who created the order (Investor, System or OnBehalf)
             </summary>
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.Volume">
             <summary>
-            Order volume in quoting asset units. Not filled for related orders.
+            Order volume in base asset units. Not filled for related orders.
             </summary>
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.ExpectedOpenPrice">
             <summary>
-            Expected open price in base asset units. Not filled for market orders.
+            Expected open price (in quoting asset units per one base unit). Not filled for market orders.
             </summary>
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.ExecutionPrice">
             <summary>
-            Execution open price in base asset units. Filled for executed orders only.
+            Execution open price (in quoting asset units per one base unit). Filled for executed orders only.
             </summary>
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.FxRate">
@@ -124,9 +214,14 @@
             The related orders
             </summary>
         </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.RelatedOrderInfos">
+            <summary>
+            Related orders
+            </summary>
+        </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.ForceOpen">
             <summary>
-            Force open a sepatate position, ignoring any exising ones
+            Force open separate position for the order, ignoring existing ones
             </summary>
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.ValidityTime">
@@ -142,6 +237,11 @@
         <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.ModifiedTimestamp">
             <summary>
             Last modification date and time
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.OrderContract.AdditionalInfo">
+            <summary>
+            Additional request info
             </summary>
         </member>
         <member name="T:MarginTrading.TradingHistory.Client.Models.OrderDirectionContract">
@@ -194,66 +294,6 @@
             Trailing stop order, related to another parent one
             </summary>
         </member>
-        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Id">
-            <summary>
-            Position id
-            </summary>
-        </member>
-        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.AccountId">
-            <summary>
-            Account id
-            </summary>
-        </member>
-        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Instrument">
-            <summary>
-            Asset pair id
-            </summary>
-        </member>
-        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Timestamp">
-            <summary>
-            When the position was changed
-            </summary>
-        </member>
-        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Direction">
-            <summary>
-            The direction of the position
-            </summary>
-        </member>
-        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Price">
-            <summary>
-            Open price
-            </summary>
-        </member>
-        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Volume">
-            <summary>
-            Current position volume in quoting asset units
-            </summary>
-        </member>
-        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.PnL">
-            <summary>
-            Profit and loss of the position in base asset units (without commissions)
-            </summary>
-        </member>
-        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.Margin">
-            <summary>
-            Current margin value
-            </summary>
-        </member>
-        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.FxRate">
-            <summary>
-            Current FxRate
-            </summary>
-        </member>
-        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.TradeId">
-            <summary>
-            The trade which opened the position
-            </summary>
-        </member>
-        <member name="P:MarginTrading.TradingHistory.Client.Models.PositionContract.RelatedOrders">
-            <summary>
-            The related orders (sl, tp orders) 
-            </summary>
-        </member>
         <member name="T:MarginTrading.TradingHistory.Client.Models.TradeContract">
             <summary>
             Info about a trade
@@ -271,7 +311,7 @@
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.TradeContract.OrderId">
             <summary>
-            Order id
+            Order which triggered the trade
             </summary>
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.TradeContract.PositionId">
@@ -281,8 +321,45 @@
         </member>
         <member name="P:MarginTrading.TradingHistory.Client.Models.TradeContract.Timestamp">
             <summary>
-            Trade timestamp
+            Trade execution timestamp
             </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.TradeContract.ClientId">
+            <summary>
+            Initiating client
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.TradeContract.AssetPairId">
+            <summary>
+            Instrument id (e.g."BTCUSD", where BTC - base asset unit, USD - quoting unit)
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.TradeContract.Type">
+            <summary>
+            Trade direction from investors perspective (Buy or Sell)
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.TradeContract.Price">
+            <summary>
+            Trade execution VWAP price (in quoting asset units per one base unit)
+            </summary>
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.Models.TradeContract.Volume">
+            <summary>
+            Order volume in base asset units
+            </summary>
+        </member>
+        <member name="T:MarginTrading.TradingHistory.Client.AutoGeneratedIDealsApi">
+            <inheritdoc />
+        </member>
+        <member name="P:MarginTrading.TradingHistory.Client.AutoGeneratedIDealsApi.Client">
+            <inheritdoc />
+        </member>
+        <member name="M:MarginTrading.TradingHistory.Client.AutoGeneratedIDealsApi.List(System.String,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:MarginTrading.TradingHistory.Client.AutoGeneratedIDealsApi.ById(System.String)">
+            <inheritdoc />
         </member>
         <member name="T:MarginTrading.TradingHistory.Client.AutoGeneratedIOrdersHistoryApi">
             <inheritdoc />

@@ -5,7 +5,6 @@ namespace MarginTrading.TradingHistory.Core.Domain
     public interface ITrade
     {
         string Id { get; }
-        string ClientId { get; }
         string AccountId { get; }
         string OrderId { get; }
         string PositionId { get; }

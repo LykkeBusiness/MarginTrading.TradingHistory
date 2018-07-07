@@ -61,7 +61,6 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public decimal ChargedPnl { get; set; }
         public PositionHistoryType HistoryType { get; set; }
         [ValueSerializer(typeof(JsonStorageValueSerializer))]
-        public DealInfo DealInfo { get; set; }
         public DateTime HistoryTimestamp { get; set; }
     }
 }

@@ -7,22 +7,21 @@ using Refit;
 namespace MarginTrading.TradingHistory.Client
 {
     /// <summary>
-    /// Getting of positions history
+    /// API for positions history
     /// </summary>
     [PublicAPI] 
     public interface IPositionsHistoryApi 
     { 
         /// <summary> 
-        /// Get closed positions with optional filtering 
+        /// Get positions with optional filtering 
         /// </summary> 
         [Get("/api/positions-history")] 
         Task<List<PositionContract>> PositionHistory( 
             [Query, CanBeNull] string accountId, 
-            [Query, CanBeNull] string instrument); 
-        //TODO create from closed orders
+            [Query, CanBeNull] string instrument);
         
         /// <summary>
-        /// Get closed position by Id
+        /// Get position by Id
         /// </summary>
         [Get("/api/positions-history/{positionId}")]
         Task<PositionContract> PositionById([NotNull] string positionId);

@@ -12,7 +12,7 @@ using MarginTrading.TradingHistory.SqlRepositories.Entities;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
 {
-    public class DealsRepository : IDealsRepository
+    public class DealsSqlRepository : IDealsRepository
     {
         private const string TableName = "Deals";
 
@@ -31,8 +31,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [CloseFxPrice] [float] NULL,
 [Fpl] [float] NULL,
 [AdditionalInfo] [nvarchar](MAX) NULL,
-CONSTRAINT IX_DealHistory1 NONCLUSTERED (OpenTradeId, CloseTradeId),
-CONSTRAINT IX_DealHistory2 NONCLUSTERED (AccountId, AssetPairId)
+INDEX IX_DealHistory1 NONCLUSTERED (OpenTradeId, CloseTradeId),
+INDEX IX_DealHistory2 NONCLUSTERED (AccountId, AssetPairId)
 );";
 
         private readonly string _connectionString;
@@ -47,7 +47,7 @@ CONSTRAINT IX_DealHistory2 NONCLUSTERED (AccountId, AssetPairId)
         private static readonly string GetUpdateClause = string.Join(",",
             typeof(IDeal).GetProperties().Select(x => "[" + x.Name + "]=@" + x.Name));
 
-        public DealsRepository(string connectionString, ILog log)
+        public DealsSqlRepository(string connectionString, ILog log)
         {
             _connectionString = connectionString;
             _log = log;
@@ -57,7 +57,7 @@ CONSTRAINT IX_DealHistory2 NONCLUSTERED (AccountId, AssetPairId)
                 try { conn.CreateTableIfDoesntExists(CreateTableScript, TableName); }
                 catch (Exception ex)
                 {
-                    _log?.WriteErrorAsync(nameof(DealsRepository), "CreateTableIfDoesntExists", null, ex);
+                    _log?.WriteErrorAsync(nameof(DealsSqlRepository), "CreateTableIfDoesntExists", null, ex);
                     throw;
                 }
             }
@@ -79,8 +79,8 @@ CONSTRAINT IX_DealHistory2 NONCLUSTERED (AccountId, AssetPairId)
             using (var conn = new SqlConnection(_connectionString))
             {
                 var clause = "WHERE 1=1 "
-                    + (string.IsNullOrWhiteSpace(accountId) ? "" : " AccountId = @accountId")
-                    + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AssetPairId = @assetPairId");
+                    + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId = @accountId")
+                    + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId = @assetPairId");
                 
                 var query = $"SELECT * FROM {TableName} {clause}";
                 return await conn.QueryAsync<DealEntity>(query, new {accountId, assetPairId});
@@ -103,7 +103,7 @@ CONSTRAINT IX_DealHistory2 NONCLUSTERED (AccountId, AssetPairId)
                               "Entity <IDealHistory>: \n" +
                               obj.ToJson();
                     
-                    _log?.WriteWarning(nameof(DealsRepository), nameof(AddAsync), msg);
+                    _log?.WriteWarning(nameof(DealsSqlRepository), nameof(AddAsync), msg);
                     
                     throw new Exception(msg);
                 }

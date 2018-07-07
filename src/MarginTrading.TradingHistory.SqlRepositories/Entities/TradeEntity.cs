@@ -7,7 +7,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
     public class TradeEntity : ITrade
     {
         public string Id { get; set; }
-        public string ClientId { get; set; }
         public string AccountId { get; set; }
         public string OrderId { get; set; }
         public string PositionId { get; set; }
@@ -23,7 +22,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
             return new TradeEntity
             {
                 Id = obj.Id,
-                ClientId = obj.ClientId,
                 AccountId = obj.AccountId,
                 OrderId = obj.OrderId,
                 PositionId = obj.PositionId,

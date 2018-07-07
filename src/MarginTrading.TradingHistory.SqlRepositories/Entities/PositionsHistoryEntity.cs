@@ -60,11 +60,10 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         
         List<string> IPositionHistory.CloseTrades => string.IsNullOrEmpty(CloseTrades)
             ? new List<string>()
-            : RelatedOrders.DeserializeJson<List<string>>();
+            : CloseTrades.DeserializeJson<List<string>>();
         
         public string RelatedOrders { get; set; }
         public string CloseTrades { get; set; }
-        public string DealInfo { get; set; }
 
         public static PositionsHistoryEntity Create(IPositionHistory history)
         {

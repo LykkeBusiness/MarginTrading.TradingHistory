@@ -7,7 +7,7 @@ using Refit;
 namespace MarginTrading.TradingHistory.Client
 {
     /// <summary>
-    /// Getting of orders history
+    /// API for orders history
     /// </summary>
     [PublicAPI]
     public interface IOrdersHistoryApi
