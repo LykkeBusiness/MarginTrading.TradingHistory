@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using MarginTrading.TradingHistory.Client.Models;
@@ -10,6 +11,7 @@ namespace MarginTrading.TradingHistory.Client
     /// API for positions history
     /// </summary>
     [PublicAPI] 
+    [Obsolete("Will be removed.")]
     public interface IPositionsHistoryApi 
     { 
         /// <summary> 
