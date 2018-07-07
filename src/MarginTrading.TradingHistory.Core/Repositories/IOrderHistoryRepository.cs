@@ -5,7 +5,7 @@ using MarginTrading.TradingHistory.Core.Domain;
 
 namespace MarginTrading.TradingHistory.Core.Repositories
 {
-    public interface IOrdersHistoryRepository
+    public interface IOrderHistoryRepository
     {
         Task AddAsync(IOrderHistory order);
         Task<IEnumerable<IOrderHistory>> GetHistoryAsync();

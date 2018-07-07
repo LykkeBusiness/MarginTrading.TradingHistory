@@ -10,7 +10,7 @@ using MarginTrading.TradingHistory.Core.Services;
 
 namespace MarginTrading.TradingHistory.AzureRepositories
 {
-    public class OrdersHistoryRepository : IOrdersHistoryRepository
+    public class OrdersHistoryRepository : IOrderHistoryRepository
     {
         private readonly INoSQLTableStorage<OrderHistoryEntity> _tableStorage;
         private readonly IConvertService _convertService;

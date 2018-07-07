@@ -27,7 +27,7 @@ namespace MarginTrading.TradingHistory.TradeHistoryBroker
             
             if (settings.CurrentValue.Db.StorageMode == StorageMode.Azure)
             {
-                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateTradesRepository(
+                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreatePositionsHistoryRepository(
                         settings.Nested(s => s.Db.HistoryConnString), log, new ConvertService()))
                     .As<IPositionsHistoryRepository>().SingleInstance();
 

@@ -11,15 +11,15 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
 {
     public class Application : BrokerApplicationBase<OrderHistoryEvent>
     {
-        private readonly IOrdersHistoryRepository[] _ordersHistoryRepositories;
+        private readonly IOrderHistoryRepository[] _orderHistoryRepositories;
         private readonly Settings _settings;
 
-        public Application(IOrdersHistoryRepository[] ordersHistoryRepositories, ILog logger,
+        public Application(IOrderHistoryRepository[] orderHistoryRepositories, ILog logger,
             Settings settings, CurrentApplicationInfo applicationInfo,
             ISlackNotificationsSender slackNotificationsSender) : base(logger, slackNotificationsSender,
             applicationInfo)
         {
-            _ordersHistoryRepositories = ordersHistoryRepositories;
+            _orderHistoryRepositories = orderHistoryRepositories;
             _settings = settings;
         }
 
@@ -30,7 +30,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         {
             var orderHistory = historyEvent.OrderSnapshot.ToOrderHistoryDomain(historyEvent.Type);
 
-            foreach (var ordersHistoryRepository in _ordersHistoryRepositories)
+            foreach (var ordersHistoryRepository in _orderHistoryRepositories)
             {
                 await ordersHistoryRepository.AddAsync(orderHistory);
             }

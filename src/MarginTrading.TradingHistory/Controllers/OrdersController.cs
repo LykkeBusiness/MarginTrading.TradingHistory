@@ -20,14 +20,14 @@ namespace MarginTrading.TradingHistory.Controllers
     [Route("api/orders-history")]
     public class OrdersController : Controller, IOrdersHistoryApi
     {
-        private readonly IOrdersHistoryRepository _ordersHistoryRepository;
+        private readonly IOrderHistoryRepository _orderHistoryRepository;
         private readonly IConvertService _convertService;
         
         public OrdersController(
-            IOrdersHistoryRepository ordersHistoryRepository,
+            IOrderHistoryRepository orderHistoryRepository,
             IConvertService convertService)
         {
-            _ordersHistoryRepository = ordersHistoryRepository;
+            _orderHistoryRepository = orderHistoryRepository;
             _convertService = convertService;
         }
 
@@ -39,8 +39,8 @@ namespace MarginTrading.TradingHistory.Controllers
             [FromQuery] string accountId = null, [FromQuery] string assetPairId = null)
         {
             var history = !string.IsNullOrWhiteSpace(accountId)
-                ? await _ordersHistoryRepository.GetHistoryAsync(accountId)
-                : await _ordersHistoryRepository.GetHistoryAsync();
+                ? await _orderHistoryRepository.GetHistoryAsync(accountId)
+                : await _orderHistoryRepository.GetHistoryAsync();
 
             if (!string.IsNullOrWhiteSpace(assetPairId))
                 history = history.Where(o => o.AssetPairId == assetPairId);
@@ -61,7 +61,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 throw new ArgumentException("Order id must be set", nameof(orderId));
             }
 
-            var history = await _ordersHistoryRepository
+            var history = await _orderHistoryRepository
                 .GetHistoryAsync(x => x.UpdateType == OrderUpdateType.Executed && x.Id == orderId);
 
             return history.Select(Convert).FirstOrDefault();

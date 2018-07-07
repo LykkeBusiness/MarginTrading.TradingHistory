@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Common;
 using MarginTrading.TradingHistory.Core.Domain;
 
-namespace MarginTrading.TradingHistory.SqlRepositories
+namespace MarginTrading.TradingHistory.SqlRepositories.Entities
 {
     public class OrderHistoryEntity : IOrderHistory
     {

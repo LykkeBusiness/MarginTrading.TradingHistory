@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Common;
 using MarginTrading.TradingHistory.Core.Domain;
 
-namespace MarginTrading.TradingHistory.SqlRepositories
+namespace MarginTrading.TradingHistory.SqlRepositories.Entities
 {
     public class PositionsHistoryEntity : IPositionHistory
     {
@@ -51,10 +51,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         public decimal ChargedPnl { get; set; }
         PositionHistoryType IPositionHistory.HistoryType => HistoryType.ParseEnum<PositionHistoryType>();
         public string HistoryType { get; set; }
-
-        DealInfo IPositionHistory.DealInfo => string.IsNullOrEmpty(DealInfo)
-            ? null
-            : DealInfo.DeserializeJson<DealInfo>();
 
         public DateTime HistoryTimestamp { get; set; }
 
@@ -112,7 +108,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 TotalPnL = history.TotalPnL,
                 TradingConditionId = history.TradingConditionId,
                 Volume = history.Volume,
-                DealInfo = history.DealInfo.ToJson(),
                 HistoryTimestamp = history.HistoryTimestamp
             };
         }

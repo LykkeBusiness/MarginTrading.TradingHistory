@@ -19,14 +19,14 @@ namespace MarginTrading.TradingHistory.Controllers
     [Route("api/trades/")]
     public class TradesController : Controller, ITradesApi
     {
-        private readonly IOrdersHistoryRepository _ordersHistoryRepository;
+        private readonly IOrderHistoryRepository _orderHistoryRepository;
         private readonly IConvertService _convertService;
 
         public TradesController(
-            IOrdersHistoryRepository ordersHistoryRepository,
+            IOrderHistoryRepository orderHistoryRepository,
             IConvertService convertService)
         {
-            _ordersHistoryRepository = ordersHistoryRepository;
+            _orderHistoryRepository = orderHistoryRepository;
             _convertService = convertService;
         }
         
@@ -41,7 +41,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 throw new ArgumentException("Trade id must be set", nameof(tradeId));
             }
 
-            var history = await _ordersHistoryRepository
+            var history = await _orderHistoryRepository
                 .GetHistoryAsync(x => x.UpdateType == OrderUpdateType.Executed && x.Id == tradeId);
 
             return history.Select(Convert).FirstOrDefault();
@@ -52,8 +52,8 @@ namespace MarginTrading.TradingHistory.Controllers
         /// </summary>
         [HttpGet, Route("")]
         public async Task<List<TradeContract>> List([FromQuery] string orderId, [FromQuery] string positionId)
-        {
-            var history = await _ordersHistoryRepository
+        {//TODO params not used
+            var history = await _orderHistoryRepository
                 .GetHistoryAsync(x => x.UpdateType == OrderUpdateType.Executed);
 
             return history.Select(Convert).ToList();

@@ -28,13 +28,13 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
             {
                 builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateOrdersHistoryRepository(
                         settings.Nested(s => s.Db.HistoryConnString), log, new ConvertService()))
-                    .As<IOrdersHistoryRepository>();
+                    .As<IOrderHistoryRepository>();
 
             }else if (settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
             {
-                builder.RegisterInstance(new SqlRepositories.OrdersHistorySqlRepository(
+                builder.RegisterInstance(new SqlRepositories.OrderHistorySqlRepository(
                         settings.CurrentValue.Db.ReportsSqlConnString, log))
-                    .As<IOrdersHistoryRepository>();
+                    .As<IOrderHistoryRepository>();
             }
         }
     }

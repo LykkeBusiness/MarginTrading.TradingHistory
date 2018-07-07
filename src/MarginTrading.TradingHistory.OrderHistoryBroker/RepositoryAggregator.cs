@@ -6,13 +6,13 @@ using MarginTrading.TradingHistory.Core.Repositories;
 
 namespace MarginTrading.TradingHistory.OrderHistoryBroker
 {
-    internal class RepositoryAggregator : IOrdersHistoryRepository
+    internal class RepositoryAggregator : IOrderHistoryRepository
     {
-        private readonly List<IOrdersHistoryRepository> _repositories;
+        private readonly List<IOrderHistoryRepository> _repositories;
 
-        public RepositoryAggregator(IEnumerable<IOrdersHistoryRepository> repositories)
+        public RepositoryAggregator(IEnumerable<IOrderHistoryRepository> repositories)
         {
-            _repositories = new List<IOrdersHistoryRepository>();
+            _repositories = new List<IOrderHistoryRepository>();
             _repositories.AddRange(repositories);
         }
 

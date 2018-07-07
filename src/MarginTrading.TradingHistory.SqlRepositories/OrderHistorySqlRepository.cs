@@ -8,15 +8,16 @@ using Common.Log;
 using Dapper;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
+using MarginTrading.TradingHistory.SqlRepositories.Entities;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
 {
-    public class OrdersHistorySqlRepository : IOrdersHistoryRepository
+    public class OrderHistorySqlRepository : IOrderHistoryRepository
     {
         private const string TableName = "OrdersHistory";
 
         private const string CreateTableScript = "CREATE TABLE [{0}](" +
-                                                 @"[OID] [int] NOT NULL IDENTITY (1,1) PRIMARY KEY,
+                                                 @"[OID] [bigint] NOT NULL IDENTITY (1,1) PRIMARY KEY,
 [Id] [nvarchar](64) NOT NULL,
 [Code] [bigint] NULL,
 [AccountId] [nvarchar] (64) NULL,
@@ -70,7 +71,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         private static readonly string GetUpdateClause = string.Join(",",
             typeof(IOrderHistory).GetProperties().Select(x => "[" + x.Name + "]=@" + x.Name));
 
-        public OrdersHistorySqlRepository(string connectionString, ILog log)
+        public OrderHistorySqlRepository(string connectionString, ILog log)
         {
             _connectionString = connectionString;
             _log = log;
