@@ -37,7 +37,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistory.BrokerBase", "src\MarginTrading.TradingHistory.BrokerBase\MarginTrading.TradingHistory.BrokerBase.csproj", "{3E7D6405-273B-4200-87D6-E89C1159082F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistory.TradeHistoryBroker", "src\MarginTrading.TradingHistory.TradeHistoryBroker\MarginTrading.TradingHistory.TradeHistoryBroker.csproj", "{EB67E9DA-D29F-4FA1-9F12-3D758DCA98F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistory.PositionHistoryBroker", "src\MarginTrading.TradingHistory.PositionHistoryBroker\MarginTrading.TradingHistory.PositionHistoryBroker.csproj", "{EB67E9DA-D29F-4FA1-9F12-3D758DCA98F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -38,14 +38,9 @@ namespace MarginTrading.TradingHistory.Controllers
         public async Task<List<OrderContract>> OrderHistory(
             [FromQuery] string accountId = null, [FromQuery] string assetPairId = null)
         {
-            var history = !string.IsNullOrWhiteSpace(accountId)
-                ? await _ordersHistoryRepository.GetHistoryAsync(accountId)
-                : await _ordersHistoryRepository.GetHistoryAsync();
+            var history = await _ordersHistoryRepository.GetHistoryAsync(accountId, assetPairId);
 
-            if (!string.IsNullOrWhiteSpace(assetPairId))
-                history = history.Where(o => o.AssetPairId == assetPairId);
-
-            return history.Where(x => x.UpdateType == OrderUpdateType.Executed).Select(Convert).ToList();
+            return history.Select(Convert).ToList();
         }
 
         /// <summary>
@@ -61,10 +56,9 @@ namespace MarginTrading.TradingHistory.Controllers
                 throw new ArgumentException("Order id must be set", nameof(orderId));
             }
 
-            var history = await _ordersHistoryRepository
-                .GetHistoryAsync(x => x.UpdateType == OrderUpdateType.Executed && x.Id == orderId);
+            var history = await _ordersHistoryRepository.GetHistoryAsync(orderId);
 
-            return history.Select(Convert).FirstOrDefault();
+            return history == null ? null : Convert(history);
         }
 
         private static OrderContract Convert(IOrderHistory history)

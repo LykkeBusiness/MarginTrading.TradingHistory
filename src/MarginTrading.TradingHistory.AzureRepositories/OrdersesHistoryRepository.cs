@@ -10,12 +10,12 @@ using MarginTrading.TradingHistory.Core.Services;
 
 namespace MarginTrading.TradingHistory.AzureRepositories
 {
-    public class OrdersHistoryRepository : IOrdersHistoryRepository
+    public class OrdersesHistoryRepository : IOrdersHistoryRepository
     {
         private readonly INoSQLTableStorage<OrderHistoryEntity> _tableStorage;
         private readonly IConvertService _convertService;
 
-        public OrdersHistoryRepository(
+        public OrdersesHistoryRepository(
             INoSQLTableStorage<OrderHistoryEntity> tableStorage,
             IConvertService convertService)
         {
@@ -32,7 +32,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 DateTime.UtcNow, RowKeyDateTimeFormat.Iso);
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId)
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId, string assetPairId)
         {
             var entities = await _tableStorage.GetDataAsync(accountId);
 
@@ -46,10 +46,10 @@ namespace MarginTrading.TradingHistory.AzureRepositories
 
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(Func<IOrderHistory, bool> predicate)
+        public async Task<IOrderHistory> GetHistoryAsync(string orderId)
         {
-            var entities = await _tableStorage.GetDataAsync(predicate);
-            return entities.OrderByDescending(item => item.Timestamp);
+            var entity = await _tableStorage.GetDataAsync(x => x.Id == orderId);
+            return entity.SingleOrDefault();
         }
     }
 }

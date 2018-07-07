@@ -8,6 +8,7 @@ using Common.Log;
 using Dapper;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
+using MarginTrading.TradingHistory.SqlRepositories.Entities;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
 {
@@ -16,7 +17,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         private const string TableName = "PositionsHistory";
 
         private const string CreateTableScript = "CREATE TABLE [{0}](" +
-                                                 @"[OID] [int] NOT NULL IDENTITY (1,1) PRIMARY KEY,
+                                                 @"[OID] [bigint] NOT NULL IDENTITY (1,1) PRIMARY KEY,
 [Id] [nvarchar](64) NOT NULL
 [DealId] [nvarchar](128) NULL,
 [Code] [bigint] NULL,
@@ -54,6 +55,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [CloseTrades] [nvarchar] (1024) NULL,
 [LastModified] [datetime] NULL,
 [TotalPnL] [float] NULL,
+[ChargedPnl] [float] NULL,
 [HistoryType] [nvarchar] (64) NULL,
 [DealInfo] [nvarchar] (1024) NULL,
 [HistoryTimestamp] [datetime] NULL
@@ -111,7 +113,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                var whereClause = "Where (HistoryType = 'Close' or HistoryType = 'PartiallyClose')" +
+                var whereClause = "Where 1=1 " +
                                   (string.IsNullOrEmpty(accountId) ? "" : " And AccountId = @accountId") +
                                   (string.IsNullOrEmpty(assetPairId) ? "" : " And AssetPairId = @assetPairId");
 
@@ -126,7 +128,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                var query = $"SELECT * FROM {TableName} Where DealId = @id";
+                var query = $"SELECT * FROM {TableName} Where Id = @id";
                 var objects = await conn.QueryAsync<PositionsHistoryEntity>(query, new {id});
                 
                 return objects.SingleOrDefault();

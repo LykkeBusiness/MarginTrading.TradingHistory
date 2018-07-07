@@ -7,6 +7,9 @@ using Refit;
 
 namespace MarginTrading.TradingHistory.Client
 {
+    /// <summary>
+    /// API for the trades
+    /// </summary>
     [PublicAPI]
     public interface ITradesApi
     {
