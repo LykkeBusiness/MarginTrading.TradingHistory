@@ -110,13 +110,15 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId, string assetPairId)
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId, string assetPairId,
+            bool withRelated = false)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
                 var clause = " WHERE 1=1 "
                              + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
-                             + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId");
+                             + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
+                             + (withRelated ? "" : " AND ParentOrderId IS NULL" );
                 var query = $"SELECT * FROM {TableName} {clause}";
                 var objects = await conn.QueryAsync<OrderHistoryEntity>(query, new {accountId, assetPairId});
                 
@@ -124,14 +126,16 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public async Task<IOrderHistory> GetHistoryAsync(string orderId)
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string orderId, bool withRelated = false)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                var query = $"SELECT * FROM {TableName}";
-                var objects = await conn.QueryAsync<OrderHistoryEntity>(query);
+                var clause = "WHERE Id=@orderId "
+                             + (withRelated ? " OR ParentOrderId=@orderId" : "");
+                var query = $"SELECT * FROM {TableName} {clause}";
+                var objects = await conn.QueryAsync<OrderHistoryEntity>(query, new {orderId});
 
-                return objects.SingleOrDefault();
+                return objects;
             }
         }
     }
