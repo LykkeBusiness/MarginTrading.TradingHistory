@@ -12,11 +12,11 @@ namespace MarginTrading.TradingHistory.AzureRepositories
         public static class MarginTrading
         {
 
-            public static OrdersesHistoryRepository CreateOrdersHistoryRepository(IReloadingManager<string> connString, 
+            public static OrdersHistoryRepository CreateOrdersHistoryRepository(IReloadingManager<string> connString, 
                 ILog log, IConvertService convertService)
             {
-                return new OrdersesHistoryRepository(AzureTableStorage<OrderHistoryEntity>.Create(connString,
-                    "OrdersHistory", log), convertService);
+                return new OrdersHistoryRepository(AzureTableStorage<OrderHistoryEntity>.Create(connString,
+                    "OrdersHistory", log));
             }
 
             public static IPositionsHistoryRepository CreatePositionsHistoryRepository(IReloadingManager<string> connString, ILog log,

@@ -15,9 +15,10 @@ using MarginTrading.TradingHistory.Core;
 namespace MarginTrading.TradingHistory.Controllers
 {
     /// <summary>
-    /// Provides order history
+    /// Provides executed order history
     /// </summary>
     [Route("api/orders-history")]
+    [Obsolete("Will be removed.")]
     public class OrdersController : Controller, IOrdersHistoryApi
     {
         private readonly IOrdersHistoryRepository _ordersHistoryRepository;
@@ -40,7 +41,7 @@ namespace MarginTrading.TradingHistory.Controllers
         {
             var history = await _ordersHistoryRepository.GetHistoryAsync(accountId, assetPairId);
 
-            return history.Select(Convert).ToList();
+            return history.Where(x => x.UpdateType == OrderUpdateType.Executed).Select(Convert).ToList();
         }
 
         /// <summary>
@@ -58,7 +59,7 @@ namespace MarginTrading.TradingHistory.Controllers
 
             var history = await _ordersHistoryRepository.GetHistoryAsync(orderId);
 
-            return history == null ? null : Convert(history);
+            return history.Where(x => x.UpdateType == OrderUpdateType.Executed).Select(Convert).FirstOrDefault();
         }
 
         private static OrderContract Convert(IOrderHistory history)
