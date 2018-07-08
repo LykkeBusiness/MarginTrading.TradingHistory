@@ -7,20 +7,17 @@ using MarginTrading.TradingHistory.AzureRepositories.Entities;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
+using MoreLinq;
 
 namespace MarginTrading.TradingHistory.AzureRepositories
 {
     public class OrdersHistoryRepository : IOrdersHistoryRepository
     {
         private readonly INoSQLTableStorage<OrderHistoryEntity> _tableStorage;
-        private readonly IConvertService _convertService;
 
-        public OrdersHistoryRepository(
-            INoSQLTableStorage<OrderHistoryEntity> tableStorage,
-            IConvertService convertService)
+        public OrdersHistoryRepository(INoSQLTableStorage<OrderHistoryEntity> tableStorage)
         {
             _tableStorage = tableStorage;
-            _convertService = convertService;
         }
 
         public Task AddAsync(IOrderHistory order)
@@ -32,24 +29,24 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 DateTime.UtcNow, RowKeyDateTimeFormat.Iso);
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId)
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId, string assetPairId,
+            bool withRelated = false)
         {
-            var entities = await _tableStorage.GetDataAsync(accountId);
+            var entities = await _tableStorage.GetDataAsync(x =>
+                (string.IsNullOrWhiteSpace(accountId) || x.AccountId == accountId)
+                || (string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId));
 
-            return entities.OrderByDescending(entity => entity.ModifiedTimestamp);
+            var related = await _tableStorage.GetDataAsync(x => entities.Select(e => e.Id).Contains(x.ParentOrderId));
+
+            return entities.Concat(related).OrderByDescending(entity => entity.ModifiedTimestamp);
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync()
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string orderId, bool withRelated = false)
         {
-            var entities = await _tableStorage.GetDataAsync();
-            return entities.OrderByDescending(item => item.Timestamp);
+            var entities = await _tableStorage.GetDataAsync(x => x.Id == orderId
+                                                                 || (withRelated && x.ParentOrderId == orderId));
 
-        }
-
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(Func<IOrderHistory, bool> predicate)
-        {
-            var entities = await _tableStorage.GetDataAsync(predicate);
-            return entities.OrderByDescending(item => item.Timestamp);
+            return entities;
         }
     }
 }

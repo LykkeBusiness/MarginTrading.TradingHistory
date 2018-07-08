@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using MarginTrading.TradingHistory.Client.Models;
@@ -7,9 +8,10 @@ using Refit;
 namespace MarginTrading.TradingHistory.Client
 {
     /// <summary>
-    /// Getting of orders history
+    /// API for executed orders history
     /// </summary>
     [PublicAPI]
+    [Obsolete("Will be removed.")]
     public interface IOrdersHistoryApi
     {
         /// <summary>

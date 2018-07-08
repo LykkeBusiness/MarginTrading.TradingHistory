@@ -27,8 +27,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
         public async Task<IEnumerable<IPositionHistory>> GetAsync(string accountId, string assetPairId)
         {
             var predicate = new Func<PositionHistoryEntity, bool>(p =>
-                (string.IsNullOrEmpty(assetPairId) || p.AssetPairId == accountId) &&
-                p.HistoryType == PositionHistoryType.Close || p.HistoryType == PositionHistoryType.PartiallyClose);
+                (string.IsNullOrEmpty(assetPairId) || p.AssetPairId == accountId));
             
             return string.IsNullOrEmpty(accountId)
                 ? await _tableStorage.GetDataAsync(predicate)

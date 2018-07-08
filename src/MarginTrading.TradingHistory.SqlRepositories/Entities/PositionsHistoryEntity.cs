@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Common;
 using MarginTrading.TradingHistory.Core.Domain;
 
-namespace MarginTrading.TradingHistory.SqlRepositories
+namespace MarginTrading.TradingHistory.SqlRepositories.Entities
 {
     public class PositionsHistoryEntity : IPositionHistory
     {
@@ -52,10 +52,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         PositionHistoryType IPositionHistory.HistoryType => HistoryType.ParseEnum<PositionHistoryType>();
         public string HistoryType { get; set; }
 
-        DealInfo IPositionHistory.DealInfo => string.IsNullOrEmpty(DealInfo)
-            ? null
-            : DealInfo.DeserializeJson<DealInfo>();
-
         public DateTime HistoryTimestamp { get; set; }
 
         List<RelatedOrderInfo> IPositionHistory.RelatedOrders => string.IsNullOrEmpty(RelatedOrders)
@@ -64,11 +60,10 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         
         List<string> IPositionHistory.CloseTrades => string.IsNullOrEmpty(CloseTrades)
             ? new List<string>()
-            : RelatedOrders.DeserializeJson<List<string>>();
+            : CloseTrades.DeserializeJson<List<string>>();
         
         public string RelatedOrders { get; set; }
         public string CloseTrades { get; set; }
-        public string DealInfo { get; set; }
 
         public static PositionsHistoryEntity Create(IPositionHistory history)
         {
@@ -112,7 +107,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 TotalPnL = history.TotalPnL,
                 TradingConditionId = history.TradingConditionId,
                 Volume = history.Volume,
-                DealInfo = history.DealInfo.ToJson(),
                 HistoryTimestamp = history.HistoryTimestamp
             };
         }

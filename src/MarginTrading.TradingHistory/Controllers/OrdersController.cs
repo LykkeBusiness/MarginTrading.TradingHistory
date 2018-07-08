@@ -15,9 +15,10 @@ using MarginTrading.TradingHistory.Core;
 namespace MarginTrading.TradingHistory.Controllers
 {
     /// <summary>
-    /// Provides order history
+    /// Provides executed order history
     /// </summary>
     [Route("api/orders-history")]
+    [Obsolete("Will be removed.")]
     public class OrdersController : Controller, IOrdersHistoryApi
     {
         private readonly IOrdersHistoryRepository _ordersHistoryRepository;
@@ -38,12 +39,7 @@ namespace MarginTrading.TradingHistory.Controllers
         public async Task<List<OrderContract>> OrderHistory(
             [FromQuery] string accountId = null, [FromQuery] string assetPairId = null)
         {
-            var history = !string.IsNullOrWhiteSpace(accountId)
-                ? await _ordersHistoryRepository.GetHistoryAsync(accountId)
-                : await _ordersHistoryRepository.GetHistoryAsync();
-
-            if (!string.IsNullOrWhiteSpace(assetPairId))
-                history = history.Where(o => o.AssetPairId == assetPairId);
+            var history = await _ordersHistoryRepository.GetHistoryAsync(accountId, assetPairId);
 
             return history.Where(x => x.UpdateType == OrderUpdateType.Executed).Select(Convert).ToList();
         }
@@ -61,10 +57,9 @@ namespace MarginTrading.TradingHistory.Controllers
                 throw new ArgumentException("Order id must be set", nameof(orderId));
             }
 
-            var history = await _ordersHistoryRepository
-                .GetHistoryAsync(x => x.UpdateType == OrderUpdateType.Executed && x.Id == orderId);
+            var history = await _ordersHistoryRepository.GetHistoryAsync(orderId);
 
-            return history.Select(Convert).FirstOrDefault();
+            return history.Where(x => x.UpdateType == OrderUpdateType.Executed).Select(Convert).FirstOrDefault();
         }
 
         private static OrderContract Convert(IOrderHistory history)

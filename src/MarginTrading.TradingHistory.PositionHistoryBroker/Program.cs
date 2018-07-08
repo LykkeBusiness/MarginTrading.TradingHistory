@@ -1,6 +1,6 @@
 ﻿using MarginTrading.TradingHistory.BrokerBase;
 
-namespace MarginTrading.TradingHistory.TradeHistoryBroker
+namespace MarginTrading.TradingHistory.PositionHistoryBroker
 {
     public class Program: WebAppProgramBase<Startup>
     {
