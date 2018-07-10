@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MarginTrading.TradingHistory.Client;
 using MarginTrading.TradingHistory.Client.Models;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
@@ -58,7 +59,8 @@ namespace MarginTrading.TradingHistory.Controllers
 
         private DealContract Convert(IDeal deal)
         {
-            return _convertService.Convert<IDeal, DealContract>(deal);
+            return _convertService.Convert<IDeal, DealContract>(deal, opts => opts.ConfigureMap()
+                .ForMember(x => x.Direction, o => o.ResolveUsing(z => z.Direction.ToType<PositionDirectionContract>())));
         }
     }
 }

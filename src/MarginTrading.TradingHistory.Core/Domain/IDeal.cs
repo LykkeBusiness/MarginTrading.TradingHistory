@@ -11,6 +11,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
         string AssetPairId { get; }
         string OpenTradeId { get; }
         string CloseTradeId { get; }
+        PositionDirection Direction { get; }
         decimal Volume { get; }
         decimal OpenPrice { get; }
         decimal OpenFxPrice { get; }
