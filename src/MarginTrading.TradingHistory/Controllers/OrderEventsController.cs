@@ -31,9 +31,13 @@ namespace MarginTrading.TradingHistory.Controllers
         [HttpGet, Route("")]
         public async Task<List<OrderEventContract>> OrderHistory(
             [FromQuery] string accountId = null, [FromQuery] string assetPairId = null,
-            [FromQuery] bool withRelated = true)
+            [FromQuery] OrderStatusContract? status = null, [FromQuery] bool withRelated = true)
         {
-            var history = await _ordersHistoryRepository.GetHistoryAsync(accountId, assetPairId, withRelated);
+            var history = await _ordersHistoryRepository.GetHistoryAsync(
+                accountId: accountId, 
+                assetPairId: assetPairId,
+                status: status?.ToType<OrderStatus>(),
+                withRelated: withRelated);
 
             return history.Select(Convert).ToList();
         }
@@ -45,14 +49,15 @@ namespace MarginTrading.TradingHistory.Controllers
         /// <param name="withRelated"></param>
         /// <returns></returns>
         [HttpGet, Route("{orderId}")]
-        public async Task<List<OrderEventContract>> OrderById(string orderId, [FromQuery] bool withRelated = true)
+        public async Task<List<OrderEventContract>> OrderById(string orderId, 
+            [FromQuery] OrderStatusContract? status = null, [FromQuery] bool withRelated = true)
         {
             if (string.IsNullOrWhiteSpace(orderId))
             {
                 throw new ArgumentException("Order id must be set", nameof(orderId));
             }
 
-            var history = await _ordersHistoryRepository.GetHistoryAsync(orderId, withRelated);
+            var history = await _ordersHistoryRepository.GetHistoryAsync(orderId, status?.ToType<OrderStatus>(), withRelated);
 
             return history.Select(Convert).ToList();
         }

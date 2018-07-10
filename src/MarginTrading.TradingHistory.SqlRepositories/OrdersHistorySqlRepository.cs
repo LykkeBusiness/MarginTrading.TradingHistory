@@ -111,29 +111,41 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         }
 
         public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId, string assetPairId,
-            bool withRelated = false)
+            OrderStatus? status = null, bool withRelated = false)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
                 var clause = " WHERE 1=1 "
                              + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
+                             + (status == null ? "" : " AND Status=@status")
                              + (withRelated ? "" : " AND ParentOrderId IS NULL" );
                 var query = $"SELECT * FROM {TableName} {clause}";
-                var objects = await conn.QueryAsync<OrderHistoryEntity>(query, new {accountId, assetPairId});
+                var objects = await conn.QueryAsync<OrderHistoryEntity>(query, new
+                {
+                    accountId, 
+                    assetPairId, 
+                    status = status?.ToString(),
+                });
                 
                 return objects;
             }
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string orderId, bool withRelated = false)
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string orderId, 
+            OrderStatus? status = null, bool withRelated = false)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                var clause = "WHERE Id=@orderId "
-                             + (withRelated ? " OR ParentOrderId=@orderId" : "");
+                var clause = "WHERE (Id=@orderId "
+                             + (withRelated ? " OR ParentOrderId=@orderId" : "") + ")"
+                             + (status == null ? "" : " AND Status=@status");
                 var query = $"SELECT * FROM {TableName} {clause}";
-                var objects = await conn.QueryAsync<OrderHistoryEntity>(query, new {orderId});
+                var objects = await conn.QueryAsync<OrderHistoryEntity>(query, new
+                {
+                    orderId,
+                    status = status?.ToString(),
+                });
 
                 return objects;
             }

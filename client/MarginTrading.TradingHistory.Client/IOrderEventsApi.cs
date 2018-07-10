@@ -19,13 +19,16 @@ namespace MarginTrading.TradingHistory.Client
         Task<List<OrderEventContract>> OrderHistory(
             [Query, CanBeNull] string accountId = null,
             [Query, CanBeNull] string assetPairId = null,
+            [Query, CanBeNull] OrderStatusContract? status = null,
             [Query] bool withRelated = true);
 
         /// <summary>
         /// Get order by Id, optionally including related orders.
         /// </summary>
         [Get("/api/order-events/{orderId}")]
-        Task<List<OrderEventContract>> OrderById([NotNull] string orderId,
+        Task<List<OrderEventContract>> OrderById(
+            [NotNull] string orderId,
+            [Query, CanBeNull] OrderStatusContract? status = null,
             [Query] bool withRelated = true);
     }
 }

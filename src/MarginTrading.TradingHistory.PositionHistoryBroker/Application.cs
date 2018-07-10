@@ -59,6 +59,7 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                     positionHistoryEvent.PositionSnapshot.AssetPairId,
                     positionHistoryEvent.Deal.OpenTradeId,
                     positionHistoryEvent.Deal.CloseTradeId,
+                    positionHistoryEvent.PositionSnapshot.Direction.ToType<PositionDirection>(),
                     positionHistoryEvent.Deal.Volume,
                     positionHistoryEvent.Deal.OpenPrice,
                     positionHistoryEvent.Deal.OpenFxPrice,

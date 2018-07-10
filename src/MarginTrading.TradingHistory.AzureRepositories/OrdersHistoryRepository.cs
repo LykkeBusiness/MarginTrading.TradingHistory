@@ -30,21 +30,26 @@ namespace MarginTrading.TradingHistory.AzureRepositories
         }
 
         public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId, string assetPairId,
-            bool withRelated = false)
+            OrderStatus? status = null, bool withRelated = false)
         {
             var entities = await _tableStorage.GetDataAsync(x =>
                 (string.IsNullOrWhiteSpace(accountId) || x.AccountId == accountId)
-                || (string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId));
+                || (string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId)
+                || (status == null || x.Status == status));
 
-            var related = await _tableStorage.GetDataAsync(x => entities.Select(e => e.Id).Contains(x.ParentOrderId));
+            var related = withRelated
+                ? await _tableStorage.GetDataAsync(x => entities.Select(e => e.Id).Contains(x.ParentOrderId))
+                : new List<OrderHistoryEntity>();
 
             return entities.Concat(related).OrderByDescending(entity => entity.ModifiedTimestamp);
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string orderId, bool withRelated = false)
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string orderId, 
+            OrderStatus? status = null, bool withRelated = false)
         {
             var entities = await _tableStorage.GetDataAsync(x => x.Id == orderId
-                                                                 || (withRelated && x.ParentOrderId == orderId));
+                                                                 || (withRelated && x.ParentOrderId == orderId)
+                                                                 || (status == null || x.Status == status));
 
             return entities;
         }

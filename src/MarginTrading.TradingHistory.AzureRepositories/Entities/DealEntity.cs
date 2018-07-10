@@ -13,7 +13,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
             set => PartitionKey = value;
         }
         public string CloseTradeId { get; set; }
-        
+
         public string DealId 
         {
             get => RowKey;
@@ -23,6 +23,8 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public DateTime Created { get; set; }
         public string AccountId { get; set; }
         public string AssetPairId { get; set; }
+        PositionDirection IDeal.Direction => Enum.Parse<PositionDirection>(Direction);        
+        public string Direction { get; set; }
         public decimal Volume { get; set; }
         public decimal OpenPrice { get; set; }
         public decimal OpenFxPrice { get; set; }
