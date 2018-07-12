@@ -10,6 +10,6 @@ namespace MarginTrading.TradingHistory.Core.Repositories
     {
         Task AddAsync(ITrade obj);
         Task<ITrade> GetAsync(string tradeId);
-        Task<IEnumerable<ITrade>> GetAsync([CanBeNull] string orderId, [CanBeNull] string positionId);
+        Task<IEnumerable<ITrade>> GetByAccountAsync([NotNull] string accountId, [CanBeNull] string assetPairId = null);
     }
 }

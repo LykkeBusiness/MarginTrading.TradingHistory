@@ -14,10 +14,7 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
     public class Db
     {
         public StorageMode StorageMode { get; set; }
-        [Optional, CanBeNull]
-        public string HistoryConnString { get; set; }
-        [Optional, CanBeNull] 
-        public string ReportsSqlConnString { get; set; }
+        public string ConnString { get; set; }
     }
     
     public class RabbitMqQueues

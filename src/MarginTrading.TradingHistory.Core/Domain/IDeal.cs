@@ -13,6 +13,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
         string CloseTradeId { get; }
         PositionDirection Direction { get; }
         decimal Volume { get; }
+        OriginatorType Originator { get; }
         decimal OpenPrice { get; }
         decimal OpenFxPrice { get; }
         decimal ClosePrice { get; }

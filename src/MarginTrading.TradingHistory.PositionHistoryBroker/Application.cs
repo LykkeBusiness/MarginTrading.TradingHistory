@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Common.Log;
@@ -19,18 +21,21 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
         private readonly IPositionsHistoryRepository _positionsHistoryRepository;
         private readonly IDealsRepository _dealsRepository;
         private readonly IConvertService _convertService;
+        private readonly ILog _log;
         private readonly Settings _settings;
 
         public Application(IPositionsHistoryRepository positionsHistoryRepository, 
             IDealsRepository dealsRepository,
             ILog logger,
             IConvertService convertService,
-            Settings settings, CurrentApplicationInfo applicationInfo,
+            Settings settings, 
+            CurrentApplicationInfo applicationInfo,
             ISlackNotificationsSender slackNotificationsSender)
             : base(logger, slackNotificationsSender, applicationInfo)
         {
             _positionsHistoryRepository = positionsHistoryRepository;
             _dealsRepository = dealsRepository;
+            _log = logger;
             _settings = settings;
             _convertService = convertService;
         }
@@ -61,6 +66,7 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                     positionHistoryEvent.Deal.CloseTradeId,
                     positionHistoryEvent.PositionSnapshot.Direction.ToType<PositionDirection>(),
                     positionHistoryEvent.Deal.Volume,
+                    positionHistoryEvent.Deal.Originator.ToType<OriginatorType>(),
                     positionHistoryEvent.Deal.OpenPrice,
                     positionHistoryEvent.Deal.OpenFxPrice,
                     positionHistoryEvent.Deal.ClosePrice,
@@ -70,7 +76,17 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                 tasks.Add(_dealsRepository.AddAsync(deal));
             }
 
-            return Task.WhenAll(tasks);
+            return Task.WhenAll(tasks.Select(t => Task.Run(async () =>
+            {
+                try
+                {
+                    await t;
+                }
+                catch (Exception ex)
+                {
+                    await _log.WriteErrorAsync(nameof(HandleMessage), "SwitchThread", "", ex);
+                }
+            })));
         }
     }
 }

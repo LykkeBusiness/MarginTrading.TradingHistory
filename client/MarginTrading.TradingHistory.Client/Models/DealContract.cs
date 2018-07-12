@@ -50,6 +50,11 @@ namespace MarginTrading.TradingHistory.Client.Models
         public decimal Volume { get; set; }
         
         /// <summary>
+        /// Originator of close trade/order
+        /// </summary>
+        public OriginatorTypeContract Originator { get; set; }
+        
+        /// <summary>
         /// Opening price in base asset units 
         /// </summary>
         public decimal OpenPrice { get; set; }

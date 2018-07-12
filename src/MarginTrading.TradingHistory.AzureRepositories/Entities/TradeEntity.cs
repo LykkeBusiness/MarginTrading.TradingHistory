@@ -19,11 +19,15 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         }
         
         public string OrderId { get; set; }
-        public string PositionId { get; set; }
         public string AssetPairId { get; set; }
+        public DateTime OrderCreatedDate { get; set; }
+        public OrderType OrderType { get; set; }
         public TradeType Type { get; set; }
+        public OriginatorType Originator { get; set; }
         public DateTime TradeTimestamp { get; set; }
         public decimal Price { get; set; }
         public decimal Volume { get; set; }
+        public decimal? OrderExpectedPrice { get; set; }
+        public decimal FxRate { get; set; }
     }
 }

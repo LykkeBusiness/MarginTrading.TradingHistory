@@ -29,14 +29,14 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             public static IDealsRepository CreateDealsHistoryRepository(IReloadingManager<string> connString, ILog log,
                 IConvertService convertService)
             {
-                return new DealsRepository(AzureTableStorage<DealEntity>.Create(connString, "DealsHistory", log), 
+                return new DealsRepository(AzureTableStorage<DealEntity>.Create(connString, "Deals", log), 
                     convertService);
             }
 
             public static ITradesRepository CreateTradesHistoryRepository(IReloadingManager<string> connString, ILog log,
                 IConvertService convertService)
             {
-                return new TradesRepository(AzureTableStorage<TradeEntity>.Create(connString, "TradesHistory", log), 
+                return new TradesRepository(AzureTableStorage<TradeEntity>.Create(connString, "Trades", log), 
                     convertService);
             }
         }

@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using AzureStorage;
 using MarginTrading.TradingHistory.AzureRepositories.Entities;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
@@ -32,9 +34,12 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             return (await _tableStorage.GetDataAsync(x => x.Id == tradeId)).SingleOrDefault();
         }
 
-        public async Task<IEnumerable<ITrade>> GetAsync(string orderId, string positionId)
+        public async Task<IEnumerable<ITrade>> GetByAccountAsync(string accountId, string assetPairId = null)
         {
-            return await _tableStorage.GetDataAsync(x => x.OrderId == orderId && x.PositionId == positionId);
+            accountId.RequiredNotNullOrWhiteSpace(nameof(accountId));
+
+            return await _tableStorage.GetDataAsync(accountId, x =>
+                string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId);
         }
     }
 }

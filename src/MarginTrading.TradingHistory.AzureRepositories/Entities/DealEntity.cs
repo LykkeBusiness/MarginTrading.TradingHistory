@@ -7,12 +7,11 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
 {
     public class DealEntity : AzureTableEntity, IDeal
     {
-        public string OpenTradeId
+        public string AccountId
         {
             get => PartitionKey;
             set => PartitionKey = value;
         }
-        public string CloseTradeId { get; set; }
 
         public string DealId 
         {
@@ -21,11 +20,14 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         }
         
         public DateTime Created { get; set; }
-        public string AccountId { get; set; }
         public string AssetPairId { get; set; }
+        public string OpenTradeId { get; set; }
+        public string CloseTradeId { get; set; }
         PositionDirection IDeal.Direction => Enum.Parse<PositionDirection>(Direction);        
         public string Direction { get; set; }
         public decimal Volume { get; set; }
+        OriginatorType IDeal.Originator => Enum.Parse<OriginatorType>(Originator);
+        public string Originator { get; set; }
         public decimal OpenPrice { get; set; }
         public decimal OpenFxPrice { get; set; }
         public decimal ClosePrice { get; set; }
