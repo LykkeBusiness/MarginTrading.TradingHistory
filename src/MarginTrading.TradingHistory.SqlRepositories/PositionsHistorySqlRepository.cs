@@ -17,7 +17,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
         private const string CreateTableScript = "CREATE TABLE [{0}](" +
                                                  @"[OID] [int] NOT NULL IDENTITY (1,1) PRIMARY KEY,
-[Id] [nvarchar](64) NOT NULL
+[Id] [nvarchar](64) NOT NULL,
 [DealId] [nvarchar](128) NULL,
 [Code] [bigint] NULL,
 [AssetPairId] [nvarchar] (64) NULL,
