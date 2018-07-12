@@ -26,13 +26,13 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [CloseTradeId] [nvarchar] (64) NULL,
 [Direction] [nvarchar] (64) NOT NULL,
 [Volume] [float] NULL,
+[Originator] [nvarchar] (64) NOT NULL,
 [OpenPrice] [float] NULL,
 [OpenFxPrice] [float] NULL,
 [ClosePrice] [float] NULL,
 [CloseFxPrice] [float] NULL,
 [Fpl] [float] NULL,
 [AdditionalInfo] [nvarchar](MAX) NULL,
-INDEX IX_DealHistory1 NONCLUSTERED (OpenTradeId, CloseTradeId),
 INDEX IX_DealHistory2 NONCLUSTERED (AccountId, AssetPairId)
 );";
 

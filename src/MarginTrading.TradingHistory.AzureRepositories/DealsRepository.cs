@@ -29,9 +29,11 @@ namespace MarginTrading.TradingHistory.AzureRepositories
 
         public async Task<IEnumerable<IDeal>> GetAsync(string accountId, string assetPairId)
         {
-            return await _tableStorage.GetDataAsync(x =>
-                (string.IsNullOrWhiteSpace(accountId) || x.AccountId == accountId)
-                && (string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId));
+            return string.IsNullOrWhiteSpace(accountId)
+                ? await _tableStorage.GetDataAsync(x =>
+                    (string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId))
+                : await _tableStorage.GetDataAsync(accountId, x => 
+                    (string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId));
         }
 
         public Task AddAsync(IDeal obj)

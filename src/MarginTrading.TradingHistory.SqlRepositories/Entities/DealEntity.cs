@@ -14,6 +14,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         PositionDirection IDeal.Direction => Enum.Parse<PositionDirection>(Direction); 
         public string Direction { get; set; }
         public decimal Volume { get; set; }
+        OriginatorType IDeal.Originator => Enum.Parse<OriginatorType>(Originator);
+        public string Originator { get; set; }
         public decimal OpenPrice { get; set; }
         public decimal OpenFxPrice { get; set; }
         public decimal ClosePrice { get; set; }
@@ -33,6 +35,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 CloseTradeId = deal.CloseTradeId,
                 Direction = deal.Direction.ToString(),
                 Volume = deal.Volume,
+                Originator = deal.Originator.ToString(),
                 OpenPrice = deal.OpenPrice,
                 OpenFxPrice = deal.OpenFxPrice,
                 ClosePrice = deal.ClosePrice,

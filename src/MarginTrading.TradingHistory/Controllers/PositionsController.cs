@@ -34,6 +34,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// Get closed positions with optional filtering 
         /// </summary> 
         [HttpGet, Route("")] 
+        [Obsolete("Will be removed.")]
         public async Task<List<PositionContract>> PositionHistory(
             [FromQuery] string accountId, [FromQuery] string instrument)
         {
@@ -52,6 +53,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// <param name="positionId">Deal ID!</param>
         /// <returns></returns>
         [HttpGet, Route("{positionId}")]
+        [Obsolete("Will be removed.")]
         public async Task<PositionContract> PositionById(string positionId)
         {
             if (string.IsNullOrWhiteSpace(positionId))

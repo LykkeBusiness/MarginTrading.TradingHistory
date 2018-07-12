@@ -31,7 +31,7 @@ namespace MarginTrading.TradingHistory.Controllers
         }
         
         /// <summary>
-        /// Get a trade by id  
+        /// Get a trade by <param name="tradeId"/>  
         /// </summary> 
         [HttpGet, Route("{tradeId}")] 
         public async Task<TradeContract> Get(string tradeId)
@@ -47,12 +47,14 @@ namespace MarginTrading.TradingHistory.Controllers
         } 
         
         /// <summary>
-        /// Get trades with optional filtering by order or position 
+        /// Get trades by <param name="accountId"/> with optional filtering by <param name="assetPairId"/> 
         /// </summary>
         [HttpGet, Route("")]
-        public async Task<List<TradeContract>> List([FromQuery] string orderId, [FromQuery] string positionId)
+        public async Task<List<TradeContract>> List([FromQuery] string accountId, [FromQuery] string assetPairId = null)
         {
-            var history = await _tradesRepository.GetAsync(orderId, positionId);
+            accountId.RequiredNotNullOrWhiteSpace(nameof(accountId));
+            
+            var history = await _tradesRepository.GetByAccountAsync(accountId, assetPairId);
 
             return history.Select(Convert).ToList();
         }

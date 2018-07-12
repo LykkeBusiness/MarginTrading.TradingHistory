@@ -28,20 +28,20 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
             if (settings.CurrentValue.Db.StorageMode == StorageMode.Azure)
             {
                 builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreatePositionsHistoryRepository(
-                        settings.Nested(s => s.Db.HistoryConnString), log, new ConvertService()))
+                        settings.Nested(s => s.Db.ConnString), log, new ConvertService()))
                     .As<IPositionsHistoryRepository>().SingleInstance();
                 builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateDealsHistoryRepository(
-                        settings.Nested(s => s.Db.HistoryConnString), log, new ConvertService()))
+                        settings.Nested(s => s.Db.ConnString), log, new ConvertService()))
                     .As<IDealsRepository>().SingleInstance();
 
             }
             else if (settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
             {
                 builder.RegisterInstance(new PositionsHistorySqlRepository(
-                        settings.CurrentValue.Db.ReportsSqlConnString, log))
+                        settings.CurrentValue.Db.ConnString, log))
                     .As<IPositionsHistoryRepository>();
                 builder.RegisterInstance(new DealsSqlRepository(
-                        settings.CurrentValue.Db.ReportsSqlConnString, log))
+                        settings.CurrentValue.Db.ConnString, log))
                     .As<IDealsRepository>();
             }
         }

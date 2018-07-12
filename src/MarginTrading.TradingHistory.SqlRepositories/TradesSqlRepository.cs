@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Dapper;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
@@ -21,13 +22,17 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [Id] [nvarchar](64) NOT NULL,
 [AccountId] [nvarchar](64) NOT NULL,
 [OrderId] [nvarchar](64) NOT NULL,
-[PositionId] [nvarchar] (64) NULL,
 [AssetPairId] [nvarchar] (64) NOT NULL,
+[OrderCreatedDate] [datetime] NOT NULL,
+[OrderType] [nvarchar] (64) NOT NULL,
 [Type] [nvarchar] (64) NOT NULL,
+[Originator] [nvarchar] (64) NOT NULL,
 [TradeTimestamp] [datetime] NOT NULL,
 [Price] [float] NULL,
 [Volume] [float] NULL,
-INDEX IX_DealHistory1 NONCLUSTERED (OrderId, PositionId)
+[OrderExpectedPrice] [float] NULL,
+[FxRate] [float] NULL,
+INDEX IX_DealHistory1 NONCLUSTERED (AccountId, AssetPairId)
 );";
 
         private readonly string _connectionString;
@@ -93,16 +98,18 @@ INDEX IX_DealHistory1 NONCLUSTERED (OrderId, PositionId)
             }
         }
 
-        public async Task<IEnumerable<ITrade>> GetAsync(string orderId, string positionId)
+        public async Task<IEnumerable<ITrade>> GetByAccountAsync(string accountId, string assetPairId = null)
         {
+            accountId.RequiredNotNullOrWhiteSpace(nameof(accountId));
+            
             using (var conn = new SqlConnection(_connectionString))
             {
                 var clause = "WHERE 1=1 "
-                             + (string.IsNullOrWhiteSpace(orderId) ? "" : " OrderId = @orderId")
-                             + (string.IsNullOrWhiteSpace(positionId) ? "" : " PositionId = @positionId");
+                             + $" AND AccountId = @{nameof(accountId)}"
+                             + (string.IsNullOrWhiteSpace(assetPairId) ? "" : $" AND AssetPairId = @{nameof(assetPairId)}");
                 
                 var query = $"SELECT * FROM {TableName} {clause}";
-                return await conn.QueryAsync<TradeEntity>(query, new {orderId, positionId});
+                return await conn.QueryAsync<TradeEntity>(query, new {accountId, assetPairId});
             }
         }
     }
