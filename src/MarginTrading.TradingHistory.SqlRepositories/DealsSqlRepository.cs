@@ -24,6 +24,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [AssetPairId] [nvarchar](64) NOT NULL,
 [OpenTradeId] [nvarchar] (64) NOT NULL,
 [CloseTradeId] [nvarchar] (64) NULL,
+[Direction] [nvarchar] (64) NOT NULL,
 [Volume] [float] NULL,
 [OpenPrice] [float] NULL,
 [OpenFxPrice] [float] NULL,

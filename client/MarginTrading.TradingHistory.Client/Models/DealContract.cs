@@ -40,6 +40,11 @@ namespace MarginTrading.TradingHistory.Client.Models
         public string CloseTradeId { get; set; }
         
         /// <summary>
+        /// The direction of a position
+        /// </summary>
+        public PositionDirectionContract Direction { get; set; }
+        
+        /// <summary>
         /// Order volume in base asset units 
         /// </summary>
         public decimal Volume { get; set; }

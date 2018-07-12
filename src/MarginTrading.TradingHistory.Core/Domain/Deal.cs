@@ -11,6 +11,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
         [NotNull] public string AssetPairId { get; }
         [NotNull] public string OpenTradeId { get; }
         [NotNull] public string CloseTradeId { get; }
+        public PositionDirection Direction { get; }
         public decimal Volume { get; }
         public decimal OpenPrice { get; }
         public decimal OpenFxPrice { get; }
@@ -20,8 +21,8 @@ namespace MarginTrading.TradingHistory.Core.Domain
         [NotNull] public string AdditionalInfo { get; }
 
         public Deal([NotNull] string dealId, DateTime created, [NotNull] string accountId,
-            [NotNull] string assetPairId, [NotNull] string openTradeId,
-            string closeTradeId, decimal volume, decimal openPrice, decimal openFxPrice, decimal closePrice,
+            [NotNull] string assetPairId, [NotNull] string openTradeId, string closeTradeId, 
+            PositionDirection direction, decimal volume, decimal openPrice, decimal openFxPrice, decimal closePrice,
             decimal closeFxPrice, decimal fpl, string additionalInfo)
         {
             DealId = dealId ?? throw new ArgumentNullException(nameof(dealId));
@@ -30,6 +31,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
             AssetPairId = assetPairId ?? throw new ArgumentNullException(nameof(assetPairId));
             OpenTradeId = openTradeId ?? throw new ArgumentNullException(nameof(openTradeId));
             CloseTradeId = closeTradeId;
+            Direction = direction;
             Volume = volume;
             OpenPrice = openPrice;
             OpenFxPrice = openFxPrice;
