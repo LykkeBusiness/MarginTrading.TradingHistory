@@ -15,7 +15,7 @@ namespace MarginTrading.TradingHistory.Client
     public interface IPositionsHistoryApi 
     { 
         /// <summary> 
-        /// Get positions with optional filtering 
+        /// Get closed positions with optional filtering 
         /// </summary> 
         [Get("/api/positions-history")] 
         Task<List<PositionContract>> PositionHistory( 
@@ -23,7 +23,7 @@ namespace MarginTrading.TradingHistory.Client
             [Query, CanBeNull] string instrument);
         
         /// <summary>
-        /// Get position by Id
+        /// Get closed position by Id
         /// </summary>
         [Get("/api/positions-history/{positionId}")]
         Task<PositionContract> PositionById([NotNull] string positionId);

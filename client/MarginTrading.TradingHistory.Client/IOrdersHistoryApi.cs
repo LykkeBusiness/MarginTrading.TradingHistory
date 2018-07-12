@@ -18,6 +18,7 @@ namespace MarginTrading.TradingHistory.Client
         /// Get executed orders with optional filtering
         /// </summary>
         [Get("/api/orders-history")]
+        [Obsolete("Will be removed.")]
         Task<List<OrderContract>> OrderHistory(
             [Query, CanBeNull] string accountId = null,
             [Query, CanBeNull] string assetPairId = null);
@@ -26,6 +27,7 @@ namespace MarginTrading.TradingHistory.Client
         /// Get executed order by Id
         /// </summary>
         [Get("/api/orders-history/{orderId}")]
+        [Obsolete("Will be removed.")]
         Task<OrderContract> OrderById([NotNull] string orderId);
     }
 }

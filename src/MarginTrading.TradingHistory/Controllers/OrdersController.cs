@@ -36,6 +36,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// Get executed orders with optional filtering
         /// </summary>
         [HttpGet, Route("")]
+        [Obsolete("Will be removed.")]
         public async Task<List<OrderContract>> OrderHistory(
             [FromQuery] string accountId = null, [FromQuery] string assetPairId = null)
         {
@@ -50,6 +51,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// <param name="orderId"></param>
         /// <returns></returns>
         [HttpGet, Route("{orderId}")]
+        [Obsolete("Will be removed.")]
         public async Task<OrderContract> OrderById(string orderId)
         {
             if (string.IsNullOrWhiteSpace(orderId))
