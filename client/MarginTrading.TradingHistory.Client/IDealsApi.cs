@@ -23,7 +23,7 @@ namespace MarginTrading.TradingHistory.Client
         /// <summary>
         /// Get deal by Id
         /// </summary>
-        [Get("/api/deals/{tradeId}")]
+        [Get("/api/deals/{dealId}")]
         Task<DealContract> ById([NotNull] string dealId);
     }
 }
