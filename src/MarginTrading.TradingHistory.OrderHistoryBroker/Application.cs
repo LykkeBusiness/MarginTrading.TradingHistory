@@ -58,7 +58,8 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                     historyEvent.OrderSnapshot.ExecutionPrice.Value,
                     historyEvent.OrderSnapshot.Volume.Value,
                     historyEvent.OrderSnapshot.ExpectedOpenPrice,
-                    historyEvent.OrderSnapshot.FxRate
+                    historyEvent.OrderSnapshot.FxRate,
+                    historyEvent.OrderSnapshot.AdditionalInfo
                     );
                 tasks.Add(_tradesRepository.AddAsync(trade));
             }

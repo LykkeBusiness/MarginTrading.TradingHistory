@@ -29,5 +29,6 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public decimal Volume { get; set; }
         public decimal? OrderExpectedPrice { get; set; }
         public decimal FxRate { get; set; }
+        public string AdditionalInfo { get; set; }
     }
 }

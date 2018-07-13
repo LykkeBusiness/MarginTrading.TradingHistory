@@ -17,5 +17,6 @@ namespace MarginTrading.TradingHistory.Core.Domain
         decimal Volume { get; }
         decimal? OrderExpectedPrice { get; }
         decimal FxRate { get; }
+        string AdditionalInfo { get; }
     }
 }
