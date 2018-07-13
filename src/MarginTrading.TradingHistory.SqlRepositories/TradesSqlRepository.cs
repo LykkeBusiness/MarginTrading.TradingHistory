@@ -32,6 +32,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [Volume] [float] NULL,
 [OrderExpectedPrice] [float] NULL,
 [FxRate] [float] NULL,
+[AdditionalInfo] [nvarchar] (MAX) NULL,
 INDEX IX_DealHistory1 NONCLUSTERED (AccountId, AssetPairId)
 );";
 
