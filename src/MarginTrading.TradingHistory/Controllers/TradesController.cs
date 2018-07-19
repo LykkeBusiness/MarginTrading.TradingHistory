@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using MarginTrading.TradingHistory.Client;
+using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
@@ -57,6 +58,27 @@ namespace MarginTrading.TradingHistory.Controllers
             var history = await _tradesRepository.GetByAccountAsync(accountId, assetPairId);
 
             return history.Select(Convert).ToList();
+        }
+
+        /// <summary>
+        /// Get trades by <param name="accountId"/> with optional filtering by <param name="assetPairId"/> and pagination
+        /// </summary>
+        [HttpGet, Route("by-pages")]
+        public async Task<PaginatedResponseContract<TradeContract>> ListByPages([FromQuery] string accountId, 
+            [FromQuery] string assetPairId = null, [FromQuery] int? skip = null, [FromQuery] int? take = null)
+        {
+            accountId.RequiredNotNullOrWhiteSpace(nameof(accountId));
+            
+            ApiValidationHelper.ValidatePagingParams(skip, take);
+            
+            var data = await _tradesRepository.GetByPagesAsync(accountId, assetPairId, skip, take);
+
+            return new PaginatedResponseContract<TradeContract>(
+                contents: data.Contents.Select(Convert).ToList(),
+                start: data.Start,
+                size: data.Size,
+                totalSize: data.TotalSize
+            );
         }
 
         private TradeContract Convert(ITrade tradeEntity)

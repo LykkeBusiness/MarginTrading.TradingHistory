@@ -113,5 +113,40 @@ INDEX IX_DealHistory1 NONCLUSTERED (AccountId, AssetPairId)
                 return await conn.QueryAsync<TradeEntity>(query, new {accountId, assetPairId});
             }
         }
+
+        public async Task<PaginatedResponse<ITrade>> GetByPagesAsync(string accountId, string assetPairId, 
+            int? skip = null, int? take = null)
+        {
+            var whereClause = "WHERE 1=1 "
+                              + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
+                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId");
+            
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                List<TradeEntity> trades;
+                var totalCount = 0;
+                if (!take.HasValue)
+                {
+                    trades = (await conn.QueryAsync<TradeEntity>(
+                        $"SELECT * FROM {TableName} {whereClause}", new {accountId, assetPairId})).ToList();
+                }
+                else
+                {
+                    var paginationClause = $" ORDER BY [Oid] OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+                    var gridReader = await conn.QueryMultipleAsync(
+                        $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName}",
+                        new {accountId, assetPairId});
+                    trades = (await gridReader.ReadAsync<TradeEntity>()).ToList();
+                    totalCount = await gridReader.ReadSingleAsync<int>();
+                }
+
+                return new PaginatedResponse<ITrade>(
+                    contents: trades, 
+                    start: skip ?? 0, 
+                    size: trades.Count, 
+                    totalSize: !take.HasValue ? trades.Count : totalCount
+                );
+            }
+        }
     }
 }

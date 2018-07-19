@@ -34,6 +34,23 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 : await _tableStorage.GetDataAsync(accountId, predicate);
         }
 
+        public async Task<PaginatedResponse<IPositionHistory>> GetByPagesAsync(string accountId, string assetPairId, 
+            int? skip = null, int? take = null)
+        {
+            var allData = await GetAsync(accountId, assetPairId);
+
+            //TODO refactor before using azure impl
+            var data = allData.OrderBy(x => x.HistoryTimestamp).ToList();
+            var filtered = take.HasValue ? data.Skip(skip.Value).Take(take.Value).ToList() : data;
+            
+            return new PaginatedResponse<IPositionHistory>(
+                contents: filtered,
+                start: skip ?? 0,
+                size: filtered.Count,
+                totalSize: data.Count
+            );
+        }
+
         public async Task<IPositionHistory> GetAsync(string id)
         {
             return (await _tableStorage.GetDataAsync(p => p.DealId == id))

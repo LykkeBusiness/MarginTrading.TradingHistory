@@ -75,6 +75,41 @@ INDEX IX_DealHistory2 NONCLUSTERED (AccountId, AssetPairId)
             }
         }
 
+        public async Task<PaginatedResponse<IDeal>> GetByPagesAsync(string accountId, string assetPairId, 
+            int? skip = null, int? take = null)
+        {
+            var whereClause = "WHERE 1=1 "
+                              + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND LegalEntity=@accountId")
+                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND MatchingEngineMode=@assetPairId");
+            
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                List<DealEntity> deals;
+                var totalCount = 0;
+                if (!take.HasValue)
+                {
+                    deals = (await conn.QueryAsync<DealEntity>(
+                        $"SELECT * FROM {TableName} {whereClause}", new {accountId, assetPairId})).ToList();
+                }
+                else
+                {
+                    var paginationClause = $" ORDER BY [Oid] OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+                    var gridReader = await conn.QueryMultipleAsync(
+                        $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName}",
+                        new {accountId, assetPairId});
+                    deals = (await gridReader.ReadAsync<DealEntity>()).ToList();
+                    totalCount = await gridReader.ReadSingleAsync<int>();
+                }
+
+                return new PaginatedResponse<IDeal>(
+                    contents: deals, 
+                    start: skip ?? 0, 
+                    size: deals.Count, 
+                    totalSize: !take.HasValue ? deals.Count : totalCount
+                );
+            }
+        }
+
         public async Task<IEnumerable<IDeal>> GetAsync(string accountId, string assetPairId)
         {
             using (var conn = new SqlConnection(_connectionString))
