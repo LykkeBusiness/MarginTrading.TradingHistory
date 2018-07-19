@@ -124,6 +124,41 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
+        public async Task<PaginatedResponse<IPositionHistory>> GetByPagesAsync(string accountId, string assetPairId, 
+            int? skip = null, int? take = null)
+        {
+            var whereClause = " WHERE 1=1 "
+                              + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
+                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId");
+            
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                List<PositionsHistoryEntity> positionsHistoryEntities;
+                var totalCount = 0;
+                if (!take.HasValue)
+                {
+                    positionsHistoryEntities = (await conn.QueryAsync<PositionsHistoryEntity>(
+                        $"SELECT * FROM {TableName} {whereClause}", new {accountId, assetPairId})).ToList();
+                }
+                else
+                {
+                    var paginationClause = $" ORDER BY [Oid] OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
+                    var gridReader = await conn.QueryMultipleAsync(
+                        $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName}",
+                        new {accountId,  assetPairId});
+                    positionsHistoryEntities = (await gridReader.ReadAsync<PositionsHistoryEntity>()).ToList();
+                    totalCount = await gridReader.ReadSingleAsync<int>();
+                }
+
+                return new PaginatedResponse<IPositionHistory>(
+                    contents: positionsHistoryEntities, 
+                    start: skip ?? 0, 
+                    size: positionsHistoryEntities.Count, 
+                    totalSize: !take.HasValue ? positionsHistoryEntities.Count : totalCount
+                );
+            }
+        }
+
         public async Task<IPositionHistory> GetAsync(string id)
         {
             using (var conn = new SqlConnection(_connectionString))
