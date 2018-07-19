@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Common;
 using MarginTrading.TradingHistory.Core.Domain;
 
-namespace MarginTrading.TradingHistory.SqlRepositories
+namespace MarginTrading.TradingHistory.SqlRepositories.Entities
 {
     public class OrderHistoryEntity : IOrderHistory
     {
@@ -57,7 +57,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             ? new List<RelatedOrderInfo>()
             : RelatedOrderInfos.DeserializeJson<List<RelatedOrderInfo>>();
 
-        public OrderUpdateType UpdateType { get; set; }
+        OrderUpdateType IOrderHistory.UpdateType => UpdateType.ParseEnum<OrderUpdateType>();
+        public string UpdateType { get; set; }
         public string AdditionalInfo { get; set; }
 
         public string MatchedOrders { get; set; }
@@ -105,7 +106,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 RelatedOrderInfos = order.RelatedOrderInfos.ToJson(),
                 TradingConditionId = order.TradingConditionId,
                 MatchedOrders = order.MatchedOrders.ToJson(),
-                UpdateType = order.UpdateType,
+                UpdateType = order.UpdateType.ToString(),
                 AdditionalInfo = order.AdditionalInfo
             };
         }

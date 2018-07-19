@@ -19,19 +19,19 @@ namespace MarginTrading.TradingHistory.Controllers
     [Route("api/trades/")]
     public class TradesController : Controller, ITradesApi
     {
-        private readonly IOrdersHistoryRepository _ordersHistoryRepository;
+        private readonly ITradesRepository _tradesRepository;
         private readonly IConvertService _convertService;
 
         public TradesController(
-            IOrdersHistoryRepository ordersHistoryRepository,
+            ITradesRepository tradesRepository,
             IConvertService convertService)
         {
-            _ordersHistoryRepository = ordersHistoryRepository;
+            _tradesRepository = tradesRepository;
             _convertService = convertService;
         }
         
         /// <summary>
-        /// Get a trade by id  
+        /// Get a trade by <param name="tradeId"/>  
         /// </summary> 
         [HttpGet, Route("{tradeId}")] 
         public async Task<TradeContract> Get(string tradeId)
@@ -41,25 +41,25 @@ namespace MarginTrading.TradingHistory.Controllers
                 throw new ArgumentException("Trade id must be set", nameof(tradeId));
             }
 
-            var history = await _ordersHistoryRepository
-                .GetHistoryAsync(x => x.UpdateType == OrderUpdateType.Executed && x.Id == tradeId);
+            var trade = await _tradesRepository.GetAsync(tradeId);
 
-            return history.Select(Convert).FirstOrDefault();
+            return Convert(trade);
         } 
         
         /// <summary>
-        /// Get trades with optional filtering by order or position 
+        /// Get trades by <param name="accountId"/> with optional filtering by <param name="assetPairId"/> 
         /// </summary>
         [HttpGet, Route("")]
-        public async Task<List<TradeContract>> List([FromQuery] string orderId, [FromQuery] string positionId)
+        public async Task<List<TradeContract>> List([FromQuery] string accountId, [FromQuery] string assetPairId = null)
         {
-            var history = await _ordersHistoryRepository
-                .GetHistoryAsync(x => x.UpdateType == OrderUpdateType.Executed);
+            accountId.RequiredNotNullOrWhiteSpace(nameof(accountId));
+            
+            var history = await _tradesRepository.GetByAccountAsync(accountId, assetPairId);
 
             return history.Select(Convert).ToList();
         }
 
-        private TradeContract Convert(IOrderHistory tradeEntity)
+        private TradeContract Convert(ITrade tradeEntity)
         {
             return new TradeContract
             {
@@ -68,9 +68,9 @@ namespace MarginTrading.TradingHistory.Controllers
                 OrderId = tradeEntity.Id,
                 PositionId = tradeEntity.Id,
                 AssetPairId = tradeEntity.AssetPairId,
-                Type = tradeEntity.Direction.ToType<TradeTypeContract>(),
-                Timestamp = tradeEntity.ModifiedTimestamp,
-                Price = tradeEntity.ExecutionPrice.Value,
+                Type = tradeEntity.Type.ToType<TradeTypeContract>(),
+                Timestamp = tradeEntity.TradeTimestamp,
+                Price = tradeEntity.Price,
                 Volume = tradeEntity.Volume
             };
         }

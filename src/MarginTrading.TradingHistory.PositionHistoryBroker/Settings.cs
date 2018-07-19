@@ -3,7 +3,7 @@ using Lykke.SettingsReader.Attributes;
 using MarginTrading.TradingHistory.BrokerBase.Settings;
 using MarginTrading.TradingHistory.Core;
 
-namespace MarginTrading.TradingHistory.TradeHistoryBroker
+namespace MarginTrading.TradingHistory.PositionHistoryBroker
 {
     public class Settings : BrokerSettingsBase
     {
@@ -14,10 +14,7 @@ namespace MarginTrading.TradingHistory.TradeHistoryBroker
     public class Db
     {
         public StorageMode StorageMode { get; set; }
-        [Optional, CanBeNull]
-        public string HistoryConnString { get; set; }
-        [Optional, CanBeNull] 
-        public string ReportsSqlConnString { get; set; }
+        public string ConnString { get; set; }
     }
     
     public class RabbitMqQueues

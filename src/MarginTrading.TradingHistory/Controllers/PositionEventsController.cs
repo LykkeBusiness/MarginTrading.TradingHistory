@@ -1,0 +1,115 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using MarginTrading.TradingHistory.Client;
+using MarginTrading.TradingHistory.Client.Models;
+using MarginTrading.TradingHistory.Core;
+using MarginTrading.TradingHistory.Core.Domain;
+using MarginTrading.TradingHistory.Core.Repositories;
+using MarginTrading.TradingHistory.Core.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace MarginTrading.TradingHistory.Controllers
+{
+    [Route("api/position-events")]
+    public class PositionEventsController : Controller
+    {
+        private readonly IPositionsHistoryRepository _positionsHistoryRepository;
+        private readonly IConvertService _convertService;
+        
+        public PositionEventsController(
+            IPositionsHistoryRepository positionsHistoryRepository,
+            IConvertService convertService)
+        {
+            _positionsHistoryRepository = positionsHistoryRepository;
+            _convertService = convertService;
+        }
+        
+        /// <summary> 
+        /// Get positions with optional filtering 
+        /// </summary> 
+        [HttpGet, Route("")] 
+        public async Task<List<PositionEventContract>> PositionHistory(
+            [FromQuery] string accountId, [FromQuery] string instrument)
+        {
+            var orders = await _positionsHistoryRepository.GetAsync(accountId, instrument);
+
+            return orders.Select(Convert).Where(d => d != null).ToList();
+        }
+
+        /// <summary>
+        /// Get position by Id
+        /// </summary>
+        /// <param name="positionId"></param>
+        /// <returns></returns>
+        [HttpGet, Route("{positionId}")]
+        public async Task<PositionEventContract> PositionById(string positionId)
+        {
+            if (string.IsNullOrWhiteSpace(positionId))
+            {
+                throw new ArgumentException("Position id must be set", nameof(positionId));
+            }
+
+            var position = await _positionsHistoryRepository.GetAsync(positionId);
+
+            return position == null ? null : Convert(position);
+        }
+
+        private PositionEventContract Convert(IPositionHistory positionHistory)
+        {
+            if (positionHistory == null)
+                return null;
+
+            return new PositionEventContract
+            {
+                Id = positionHistory.Id,
+                Code = positionHistory.Code,
+                AssetPairId = positionHistory.AssetPairId,
+                Direction = positionHistory.Direction.ToType<PositionDirectionContract>(),
+                Volume = positionHistory.Volume,
+                AccountId = positionHistory.AccountId,
+                TradingConditionId = positionHistory.TradingConditionId,
+                AccountAssetId = positionHistory.AccountAssetId,
+                ExpectedOpenPrice = positionHistory.ExpectedOpenPrice,
+                OpenMatchingEngineId = positionHistory.OpenMatchingEngineId,
+                OpenDate = positionHistory.OpenDate,
+                OpenTradeId = positionHistory.OpenTradeId,
+                OpenPrice = positionHistory.OpenPrice,
+                OpenFxPrice = positionHistory.OpenFxPrice,
+                EquivalentAsset = positionHistory.EquivalentAsset,
+                OpenPriceEquivalent = positionHistory.OpenPriceEquivalent,
+                RelatedOrders = positionHistory.RelatedOrders.Select(Convert).ToList(),
+                LegalEntity = positionHistory.LegalEntity,
+                OpenOriginator = positionHistory.OpenOriginator.ToType<OriginatorTypeContract>(),
+                ExternalProviderId = positionHistory.ExternalProviderId,
+                SwapCommissionRate = positionHistory.SwapCommissionRate,
+                OpenCommissionRate = positionHistory.OpenCommissionRate,
+                CloseCommissionRate = positionHistory.CloseCommissionRate,
+                CommissionLot = positionHistory.CommissionLot,
+                CloseMatchingEngineId = positionHistory.CloseMatchingEngineId,
+                ClosePrice = positionHistory.ClosePrice,
+                CloseFxPrice = positionHistory.CloseFxPrice,
+                ClosePriceEquivalent = positionHistory.ClosePriceEquivalent,
+                StartClosingDate = positionHistory.StartClosingDate,
+                CloseDate = positionHistory.CloseDate,
+                CloseOriginator = positionHistory.CloseOriginator?.ToType<OriginatorTypeContract>(),
+                CloseReason = positionHistory.CloseReason.ToType<PositionCloseReasonContract>(),
+                CloseComment = positionHistory.CloseComment,
+                CloseTrades = positionHistory.CloseTrades,
+                LastModified = positionHistory.LastModified,
+                TotalPnL = positionHistory.TotalPnL,
+                ChargedPnl = positionHistory.ChargedPnl,
+            };
+        }
+
+        private RelatedOrderInfoContract Convert(RelatedOrderInfo relatedOrderInfo)
+        {
+            return new RelatedOrderInfoContract
+            {
+                Id = relatedOrderInfo.Id,
+                Type = relatedOrderInfo.Type.ToType<OrderTypeContract>()
+            };
+        }
+    }
+}

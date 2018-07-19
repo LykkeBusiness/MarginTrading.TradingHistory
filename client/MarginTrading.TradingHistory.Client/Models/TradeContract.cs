@@ -34,8 +34,6 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// </summary>
         public DateTime Timestamp { get; set; }
         
-        //todo add other fields: volume and price
-        
         /// <summary>
         /// Initiating client
         /// </summary>

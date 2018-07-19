@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MarginTrading.TradingHistory.Core.Domain
 {
     public class PositionHistory : IPositionHistory
     {
         public string Id { get; set; }
-        public string DealId => DealInfo != null ? $"{DealInfo.PositionId}_{DealInfo.CloseTradeId}" : null;
+        public string DealId => CloseTrades.Any() ? Deal.GetId(Id, CloseTrades.Last()) : null;
         public long Code { get; set; }
         public string AssetPairId { get; set; }
         public PositionDirection Direction { get; set; }
@@ -45,6 +46,5 @@ namespace MarginTrading.TradingHistory.Core.Domain
         public decimal ChargedPnl { get; set; }
         public PositionHistoryType HistoryType { get; set; }
         public DateTime HistoryTimestamp { get; set; }
-        public DealInfo DealInfo { get; set; }
     }
 }

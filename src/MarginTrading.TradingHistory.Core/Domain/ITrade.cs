@@ -5,14 +5,18 @@ namespace MarginTrading.TradingHistory.Core.Domain
     public interface ITrade
     {
         string Id { get; }
-        string ClientId { get; }
         string AccountId { get; }
         string OrderId { get; }
-        string PositionId { get; }
         string AssetPairId { get; }
+        DateTime OrderCreatedDate { get; }
+        OrderType OrderType { get; }
         TradeType Type { get; }
+        OriginatorType Originator { get; }
         DateTime TradeTimestamp { get; }
         decimal Price { get; }
         decimal Volume { get; }
+        decimal? OrderExpectedPrice { get; }
+        decimal FxRate { get; }
+        string AdditionalInfo { get; }
     }
 }

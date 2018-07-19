@@ -7,19 +7,22 @@ using Refit;
 
 namespace MarginTrading.TradingHistory.Client
 {
+    /// <summary>
+    /// API for the trades
+    /// </summary>
     [PublicAPI]
     public interface ITradesApi
     {
         /// <summary>
-        /// Get a trade by id  
+        /// Get a trade by <param name="tradeId"/> 
         /// </summary>
         [Get("/api/trades/{tradeId}")]
         Task<TradeContract> Get([NotNull] string tradeId);
         
         /// <summary>
-        /// Get trades with optional filtering by order or position 
+        /// Get trades by <param name="accountId"/> with optional filtering by <param name="assetPairId"/> 
         /// </summary> 
         [Get("/api/trades/")]
-        Task<List<TradeContract>> List([Query, CanBeNull] string orderId, [Query, CanBeNull] string positionId); 
+        Task<List<TradeContract>> List([Query, NotNull] string accountId, [Query, CanBeNull] string assetPairId = null); 
     }
 }

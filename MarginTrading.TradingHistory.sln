@@ -37,7 +37,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistory.BrokerBase", "src\MarginTrading.TradingHistory.BrokerBase\MarginTrading.TradingHistory.BrokerBase.csproj", "{3E7D6405-273B-4200-87D6-E89C1159082F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistory.TradeHistoryBroker", "src\MarginTrading.TradingHistory.TradeHistoryBroker\MarginTrading.TradingHistory.TradeHistoryBroker.csproj", "{EB67E9DA-D29F-4FA1-9F12-3D758DCA98F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistory.PositionHistoryBroker", "src\MarginTrading.TradingHistory.PositionHistoryBroker\MarginTrading.TradingHistory.PositionHistoryBroker.csproj", "{EB67E9DA-D29F-4FA1-9F12-3D758DCA98F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistory.TestClient", "src\MarginTrading.TradingHistory.TestClient\MarginTrading.TradingHistory.TestClient.csproj", "{12D5E341-6CEC-41CA-9456-D5C6D0428950}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,6 +87,10 @@ Global
 		{EB67E9DA-D29F-4FA1-9F12-3D758DCA98F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB67E9DA-D29F-4FA1-9F12-3D758DCA98F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB67E9DA-D29F-4FA1-9F12-3D758DCA98F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12D5E341-6CEC-41CA-9456-D5C6D0428950}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12D5E341-6CEC-41CA-9456-D5C6D0428950}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12D5E341-6CEC-41CA-9456-D5C6D0428950}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12D5E341-6CEC-41CA-9456-D5C6D0428950}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,5 +106,6 @@ Global
 		{3E7D6405-273B-4200-87D6-E89C1159082F} = {75B9374F-F803-4B14-8F1A-C86FFC8E10C5}
 		{C29E609C-1A0F-466C-8712-9E0CF74342FD} = {BF745453-B940-470E-81BC-43FB67703D4E}
 		{EB67E9DA-D29F-4FA1-9F12-3D758DCA98F5} = {75B9374F-F803-4B14-8F1A-C86FFC8E10C5}
+		{12D5E341-6CEC-41CA-9456-D5C6D0428950} = {75B9374F-F803-4B14-8F1A-C86FFC8E10C5}
 	EndGlobalSection
 EndGlobal
