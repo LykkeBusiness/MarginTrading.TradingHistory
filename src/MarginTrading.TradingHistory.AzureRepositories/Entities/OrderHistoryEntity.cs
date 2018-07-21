@@ -62,6 +62,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
 
         public OrderUpdateType UpdateType { get; set; }
         public string AdditionalInfo { get; set; }
+        public string CorrelationId { get; set; }
 
         public static OrderHistoryEntity Create(IOrderHistory order)
         {
@@ -106,7 +107,8 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
                 TradingConditionId = order.TradingConditionId,
                 MatchedOrders = order.MatchedOrders,
                 UpdateType = order.UpdateType,
-                AdditionalInfo = order.AdditionalInfo
+                AdditionalInfo = order.AdditionalInfo,
+                CorrelationId = order.CorrelationId,
             };
         }
     }

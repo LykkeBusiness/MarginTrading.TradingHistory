@@ -43,5 +43,12 @@ namespace MarginTrading.TradingHistory.Client.Models
         public List<RelatedOrderInfoContract> RelatedOrderInfos { get; set; }
         public OrderUpdateTypeContract UpdateType { get; set; }
         public string AdditionalInfo { get; set; }
+        /// <summary>
+        /// The correlation identifier.
+        /// In every operation that results in the creation of a new message the correlationId should be copied from
+        /// the inbound message to the outbound message. This facilitates tracking of an operation through the system.
+        /// If there is no inbound identifier then one should be created eg. on the service layer boundary (API).  
+        /// </summary>
+        public string CorrelationId { get; set; }
     }
 }
