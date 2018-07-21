@@ -197,5 +197,13 @@ namespace MarginTrading.TradingHistory.Core.Domain
         OrderUpdateType UpdateType { get; }
         
         string AdditionalInfo { get; }
+        
+        /// <summary>
+        /// The correlation identifier.
+        /// In every operation that results in the creation of a new message the correlationId should be copied from
+        /// the inbound message to the outbound message. This facilitates tracking of an operation through the system.
+        /// If there is no inbound identifier then one should be created eg. on the service layer boundary (API).  
+        /// </summary>
+        string CorrelationId { get; }
     }
 }

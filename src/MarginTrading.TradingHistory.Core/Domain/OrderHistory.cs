@@ -44,5 +44,6 @@ namespace MarginTrading.TradingHistory.Core.Domain
         public List<RelatedOrderInfo> RelatedOrderInfos { get; set; }
         public OrderUpdateType UpdateType { get; set; }
         public string AdditionalInfo { get; set; }
+        public string CorrelationId { get; set; }
     }
 }
