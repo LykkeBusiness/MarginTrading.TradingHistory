@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Dapper;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
@@ -79,28 +80,18 @@ INDEX IX_DealHistory2 NONCLUSTERED (AccountId, AssetPairId)
             int? skip = null, int? take = null)
         {
             var whereClause = "WHERE 1=1 "
-                              + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND LegalEntity=@accountId")
-                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND MatchingEngineMode=@assetPairId");
+                              + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
+                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId");
             
             using (var conn = new SqlConnection(_connectionString))
             {
-                List<DealEntity> deals;
-                var totalCount = 0;
-                if (!take.HasValue)
-                {
-                    deals = (await conn.QueryAsync<DealEntity>(
-                        $"SELECT * FROM {TableName} {whereClause}", new {accountId, assetPairId})).ToList();
-                }
-                else
-                {
-                    var paginationClause = $" ORDER BY [Oid] OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
-                    var gridReader = await conn.QueryMultipleAsync(
-                        $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName}",
-                        new {accountId, assetPairId});
-                    deals = (await gridReader.ReadAsync<DealEntity>()).ToList();
-                    totalCount = await gridReader.ReadSingleAsync<int>();
-                }
-
+                var paginationClause = $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+                var gridReader = await conn.QueryMultipleAsync(
+                    $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
+                    new {accountId, assetPairId});
+                var deals = (await gridReader.ReadAsync<DealEntity>()).ToList();
+                var totalCount = await gridReader.ReadSingleAsync<int>();
+            
                 return new PaginatedResponse<IDeal>(
                     contents: deals, 
                     start: skip ?? 0, 

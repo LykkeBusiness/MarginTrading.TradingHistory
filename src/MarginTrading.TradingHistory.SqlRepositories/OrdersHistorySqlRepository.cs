@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Dapper;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
@@ -164,23 +165,13 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             
             using (var conn = new SqlConnection(_connectionString))
             {
-                List<OrderHistoryEntity> orderHistoryEntities;
-                var totalCount = 0;
-                if (!take.HasValue)
-                {
-                    orderHistoryEntities = (await conn.QueryAsync<OrderHistoryEntity>(
-                        $"SELECT * FROM {TableName} {whereClause}", new {accountId, assetPairId})).ToList();
-                }
-                else
-                {
-                    var paginationClause = $" ORDER BY [Oid] OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
-                    var gridReader = await conn.QueryMultipleAsync(
-                        $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName}",
-                        new {accountId, assetPairId});
-                    orderHistoryEntities = (await gridReader.ReadAsync<OrderHistoryEntity>()).ToList();
-                    totalCount = await gridReader.ReadSingleAsync<int>();
-                }
-
+                var paginationClause = $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+                var gridReader = await conn.QueryMultipleAsync(
+                    $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
+                    new {accountId, assetPairId, status = status?.ToString()});
+                var orderHistoryEntities = (await gridReader.ReadAsync<OrderHistoryEntity>()).ToList();
+                var totalCount = await gridReader.ReadSingleAsync<int>();
+            
                 return new PaginatedResponse<IOrderHistory>(
                     contents: orderHistoryEntities, 
                     start: skip ?? 0, 

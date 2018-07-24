@@ -123,23 +123,13 @@ INDEX IX_DealHistory1 NONCLUSTERED (AccountId, AssetPairId)
             
             using (var conn = new SqlConnection(_connectionString))
             {
-                List<TradeEntity> trades;
-                var totalCount = 0;
-                if (!take.HasValue)
-                {
-                    trades = (await conn.QueryAsync<TradeEntity>(
-                        $"SELECT * FROM {TableName} {whereClause}", new {accountId, assetPairId})).ToList();
-                }
-                else
-                {
-                    var paginationClause = $" ORDER BY [Oid] OFFSET {skip} ROWS FETCH NEXT {take} ROWS ONLY";
-                    var gridReader = await conn.QueryMultipleAsync(
-                        $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName}",
-                        new {accountId, assetPairId});
-                    trades = (await gridReader.ReadAsync<TradeEntity>()).ToList();
-                    totalCount = await gridReader.ReadSingleAsync<int>();
-                }
-
+                var paginationClause = $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+                var gridReader = await conn.QueryMultipleAsync(
+                    $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
+                    new {accountId, assetPairId});
+                var trades = (await gridReader.ReadAsync<TradeEntity>()).ToList();
+                var totalCount = await gridReader.ReadSingleAsync<int>();
+             
                 return new PaginatedResponse<ITrade>(
                     contents: trades, 
                     start: skip ?? 0, 
