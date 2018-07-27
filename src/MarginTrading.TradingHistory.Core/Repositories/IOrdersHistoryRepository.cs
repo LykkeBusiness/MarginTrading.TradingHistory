@@ -12,5 +12,8 @@ namespace MarginTrading.TradingHistory.Core.Repositories
             OrderStatus? status = null, bool withRelated = false);
         Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string orderId, 
             OrderStatus? status = null, bool withRelated = false);
+
+        Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId, 
+            OrderStatus? status, bool withRelated, int? skip = null, int? take = null);
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Dapper;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
@@ -72,6 +73,31 @@ INDEX IX_DealHistory2 NONCLUSTERED (AccountId, AssetPairId)
                 var objects = await conn.QueryAsync<DealEntity>(query, new {id});
                 
                 return objects.FirstOrDefault();
+            }
+        }
+
+        public async Task<PaginatedResponse<IDeal>> GetByPagesAsync(string accountId, string assetPairId, 
+            int? skip = null, int? take = null)
+        {
+            var whereClause = "WHERE 1=1 "
+                              + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
+                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId");
+            
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                var paginationClause = $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+                var gridReader = await conn.QueryMultipleAsync(
+                    $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
+                    new {accountId, assetPairId});
+                var deals = (await gridReader.ReadAsync<DealEntity>()).ToList();
+                var totalCount = await gridReader.ReadSingleAsync<int>();
+            
+                return new PaginatedResponse<IDeal>(
+                    contents: deals, 
+                    start: skip ?? 0, 
+                    size: deals.Count, 
+                    totalSize: !take.HasValue ? deals.Count : totalCount
+                );
             }
         }
 

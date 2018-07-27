@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MarginTrading.TradingHistory.Client;
+using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
@@ -36,6 +37,26 @@ namespace MarginTrading.TradingHistory.Controllers
             var orders = await _positionsHistoryRepository.GetAsync(accountId, instrument);
 
             return orders.Select(Convert).Where(d => d != null).ToList();
+        }
+        
+        /// <summary> 
+        /// Get positions with optional filtering and pagination
+        /// </summary> 
+        [HttpGet, Route("by-pages")] 
+        public async Task<PaginatedResponseContract<PositionEventContract>> PositionHistoryByPages(
+            [FromQuery] string accountId, [FromQuery] string instrument,
+            int? skip = null, int? take = null)
+        {
+            ApiValidationHelper.ValidatePagingParams(skip, take);
+            
+            var data = await _positionsHistoryRepository.GetByPagesAsync(accountId, instrument, skip, take);
+
+            return new PaginatedResponseContract<PositionEventContract>(
+                contents: data.Contents.Where(d => d != null).Select(Convert).ToList(),
+                start: data.Start,
+                size: data.Size,
+                totalSize: data.TotalSize
+            );
         }
 
         /// <summary>
