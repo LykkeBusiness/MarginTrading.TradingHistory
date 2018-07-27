@@ -42,7 +42,5 @@ namespace MarginTrading.TradingHistory.Core.Domain
             Fpl = fpl;
             AdditionalInfo = additionalInfo;
         }
-
-        public static string GetId(string positionId, string closeTradeId) => $"{positionId}_{closeTradeId}";
     }
 }
