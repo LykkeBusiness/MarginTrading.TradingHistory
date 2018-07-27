@@ -58,7 +58,7 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                 || positionHistoryEvent.EventType == PositionHistoryTypeContract.PartiallyClose)
             {
                 var deal = new Deal(
-                    Deal.GetId(positionHistoryEvent.Deal.PositionId, positionHistoryEvent.Deal.CloseTradeId),
+                    positionHistoryEvent.Deal.DealId,
                     positionHistoryEvent.Deal.Created,
                     positionHistoryEvent.PositionSnapshot.AccountId,
                     positionHistoryEvent.PositionSnapshot.AssetPairId,
