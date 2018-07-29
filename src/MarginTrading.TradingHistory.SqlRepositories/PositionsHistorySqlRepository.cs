@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Dapper;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
@@ -121,6 +122,31 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 var objects = await conn.QueryAsync<PositionsHistoryEntity>(query, new {accountId, assetPairId});
                 
                 return objects;
+            }
+        }
+
+        public async Task<PaginatedResponse<IPositionHistory>> GetByPagesAsync(string accountId, string assetPairId, 
+            int? skip = null, int? take = null)
+        {
+            var whereClause = " WHERE 1=1 "
+                              + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
+                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId");
+            
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                var paginationClause = $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+                var gridReader = await conn.QueryMultipleAsync(
+                    $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
+                    new {accountId,  assetPairId});
+                var positionsHistoryEntities = (await gridReader.ReadAsync<PositionsHistoryEntity>()).ToList();
+                var totalCount = await gridReader.ReadSingleAsync<int>();
+             
+                return new PaginatedResponse<IPositionHistory>(
+                    contents: positionsHistoryEntities, 
+                    start: skip ?? 0, 
+                    size: positionsHistoryEntities.Count, 
+                    totalSize: !take.HasValue ? positionsHistoryEntities.Count : totalCount
+                );
             }
         }
 

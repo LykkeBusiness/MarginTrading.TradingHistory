@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Dapper;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
@@ -149,6 +150,34 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 });
 
                 return objects;
+            }
+        }
+
+        public async Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId, 
+            OrderStatus? status, bool withRelated,
+            int? skip = null, int? take = null)
+        {
+            var whereClause = " WHERE 1=1 "
+                              + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
+                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
+                              + (status == null ? "" : " AND Status=@status")
+                              + (withRelated ? "" : " AND ParentOrderId IS NULL");
+            
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                var paginationClause = $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+                var gridReader = await conn.QueryMultipleAsync(
+                    $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
+                    new {accountId, assetPairId, status = status?.ToString()});
+                var orderHistoryEntities = (await gridReader.ReadAsync<OrderHistoryEntity>()).ToList();
+                var totalCount = await gridReader.ReadSingleAsync<int>();
+            
+                return new PaginatedResponse<IOrderHistory>(
+                    contents: orderHistoryEntities, 
+                    start: skip ?? 0, 
+                    size: orderHistoryEntities.Count, 
+                    totalSize: !take.HasValue ? orderHistoryEntities.Count : totalCount
+                );
             }
         }
     }

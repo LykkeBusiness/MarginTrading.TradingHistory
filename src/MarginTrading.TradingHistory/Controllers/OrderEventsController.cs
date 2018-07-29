@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MarginTrading.TradingHistory.Client;
+using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
@@ -40,6 +41,33 @@ namespace MarginTrading.TradingHistory.Controllers
                 withRelated: withRelated);
 
             return history.Select(Convert).ToList();
+        }
+
+        /// <summary>
+        /// Get orders with optional filtering, optionally including related orders, and with pagination
+        /// </summary>
+        [HttpGet, Route("by-pages")]
+        public async Task<PaginatedResponseContract<OrderEventContract>> OrderHistoryByPages(
+            [FromQuery] string accountId = null, 
+            [FromQuery] string assetPairId = null, [FromQuery] OrderStatusContract? status = null,
+            [FromQuery] bool withRelated = true, [FromQuery] int? skip = null, [FromQuery] int? take = null)
+        {
+            ApiValidationHelper.ValidatePagingParams(skip, take);
+            
+            var data = await _ordersHistoryRepository.GetHistoryByPagesAsync(
+                accountId: accountId, 
+                assetPairId: assetPairId,
+                status: status?.ToType<OrderStatus>(),
+                withRelated: withRelated,
+                skip: skip,
+                take: take);
+
+            return new PaginatedResponseContract<OrderEventContract>(
+                contents: data.Contents.Select(Convert).ToList(),
+                start: data.Start,
+                size: data.Size,
+                totalSize: data.TotalSize
+            );
         }
 
         /// <summary>
