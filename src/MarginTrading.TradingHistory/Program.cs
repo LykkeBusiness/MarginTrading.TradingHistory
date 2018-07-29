@@ -24,7 +24,7 @@ namespace MarginTrading.TradingHistory
             {
                 var host = new WebHostBuilder()
                     .UseKestrel()
-                    .UseUrls("http://*:5000")
+                    .UseUrls("http://*:5040")
                     .UseContentRoot(Directory.GetCurrentDirectory())
                     .UseStartup<Startup>()
                     .UseApplicationInsights()
