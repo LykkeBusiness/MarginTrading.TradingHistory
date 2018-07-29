@@ -57,7 +57,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [UpdateType] [nvarchar] (64) NULL,
 [MatchedOrders] [nvarchar](MAX) NULL,
 [RelatedOrderInfos] [nvarchar](MAX) NULL,
-[AdditionalInfo] [nvarchar](MAX) NULL
+[AdditionalInfo] [nvarchar](MAX) NULL,
+[CorrelationId] [nvarchar](64) NULL
 );";
 
         private readonly string _connectionString;
