@@ -52,10 +52,13 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                     positionHistoryEvent.PositionSnapshot, o => o.ConfigureMap(MemberList.Source));
             position.HistoryType = positionHistoryEvent.EventType.ToType<PositionHistoryType>();
             position.HistoryTimestamp = positionHistoryEvent.Timestamp;
+            position.DealId = positionHistoryEvent.Deal?.DealId;
+            
             tasks.Add(_positionsHistoryRepository.AddAsync(position));
 
-            if (positionHistoryEvent.EventType == PositionHistoryTypeContract.Close
-                || positionHistoryEvent.EventType == PositionHistoryTypeContract.PartiallyClose)
+            if ((positionHistoryEvent.EventType == PositionHistoryTypeContract.Close
+                 || positionHistoryEvent.EventType == PositionHistoryTypeContract.PartiallyClose)
+                && positionHistoryEvent.Deal != null)
             {
                 var deal = new Deal(
                     positionHistoryEvent.Deal.DealId,
