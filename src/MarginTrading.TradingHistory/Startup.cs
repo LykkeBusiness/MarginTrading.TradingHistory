@@ -8,6 +8,8 @@ using Lykke.Common.Api.Contract.Responses;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
+using Lykke.Logs.MsSql;
+using Lykke.Logs.MsSql.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Settings;
 using MarginTrading.TradingHistory.Modules;

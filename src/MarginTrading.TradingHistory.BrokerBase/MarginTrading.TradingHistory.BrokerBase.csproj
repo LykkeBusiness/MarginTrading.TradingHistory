@@ -27,4 +27,9 @@
     <ProjectReference Include="..\MarginTrading.TradingHistory.Services\MarginTrading.TradingHistory.Services.csproj" />
     <ProjectReference Include="..\MarginTrading.TradingHistory.SqlRepositories\MarginTrading.TradingHistory.SqlRepositories.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Lykke.Logs.MsSql, Version=1.1.1.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\..\.nuget\packages\lykke.logs.mssql\1.1.1\lib\netcoreapp2.1\Lykke.Logs.MsSql.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>
