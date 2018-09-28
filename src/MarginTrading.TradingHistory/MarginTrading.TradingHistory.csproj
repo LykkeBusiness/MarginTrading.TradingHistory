@@ -44,6 +44,11 @@
     <ProjectReference Include="..\MarginTrading.TradingHistory.Services\MarginTrading.TradingHistory.Services.csproj" />
     <ProjectReference Include="..\MarginTrading.TradingHistory.SqlRepositories\MarginTrading.TradingHistory.SqlRepositories.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+      <HintPath>..\..\..\..\..\..\usr\local\share\dotnet\sdk\NuGetFallbackFolder\newtonsoft.json\9.0.1\lib\netstandard1.0\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
     <ItemGroup>
       <DocFile Include="$(OutputPath)$(AssemblyName).xml" />
