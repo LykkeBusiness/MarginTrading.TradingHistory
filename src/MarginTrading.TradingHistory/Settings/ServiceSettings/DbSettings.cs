@@ -1,5 +1,4 @@
-﻿using Lykke.SettingsReader.Attributes;
-using MarginTrading.TradingHistory.Core;
+﻿using MarginTrading.TradingHistory.Core;
 
 namespace MarginTrading.TradingHistory.Settings.ServiceSettings
 {
