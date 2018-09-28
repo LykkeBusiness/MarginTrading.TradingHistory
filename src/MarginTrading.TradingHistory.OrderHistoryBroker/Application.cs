@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Log;
+using Lykke.MarginTrading.BrokerBase;
+using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.SlackNotifications;
 using MarginTrading.Backend.Contracts.Events;
-using MarginTrading.Backend.Contracts.Orders;
-using MarginTrading.TradingHistory.BrokerBase;
-using MarginTrading.TradingHistory.BrokerBase.Settings;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 

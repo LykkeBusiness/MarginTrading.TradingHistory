@@ -1,5 +1,4 @@
 using System;
-using AzureStorage.Tables;
 using Lykke.AzureStorage.Tables;
 using MarginTrading.TradingHistory.Core.Domain;
 

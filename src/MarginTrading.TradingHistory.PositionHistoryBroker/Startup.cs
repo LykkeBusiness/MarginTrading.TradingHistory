@@ -1,9 +1,10 @@
 ﻿using Autofac;
 using Common.Log;
+using JetBrains.Annotations;
+using Lykke.MarginTrading.BrokerBase;
+using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.SettingsReader;
 using MarginTrading.TradingHistory.AzureRepositories;
-using MarginTrading.TradingHistory.BrokerBase;
-using MarginTrading.TradingHistory.BrokerBase.Settings;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Services;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MarginTrading.TradingHistory.PositionHistoryBroker
 {
+    [UsedImplicitly]
     public class Startup : BrokerStartupBase<DefaultBrokerApplicationSettings<Settings>, Settings>
     {
         public Startup(IHostingEnvironment env) : base(env)
