@@ -33,8 +33,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [ClosePrice] [float] NULL,
 [CloseFxPrice] [float] NULL,
 [Fpl] [float] NULL,
-[AdditionalInfo] [nvarchar](MAX) NULL,
-INDEX IX_DealHistory2 NONCLUSTERED (AccountId, AssetPairId)
+[AdditionalInfo] [nvarchar](MAX) NULL ,
+INDEX IX_{0}_Base (DealId, AccountId, AssetPairId)
 );";
 
         private readonly string _connectionString;

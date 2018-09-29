@@ -59,7 +59,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [ChargedPnl] [float] NULL,
 [HistoryType] [nvarchar] (64) NULL,
 [DealInfo] [nvarchar] (1024) NULL,
-[HistoryTimestamp] [datetime] NULL
+[HistoryTimestamp] [datetime] NULL,
+INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
 );";
 
         private readonly string _connectionString;
