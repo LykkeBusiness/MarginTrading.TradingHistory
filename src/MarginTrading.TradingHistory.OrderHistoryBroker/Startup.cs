@@ -7,6 +7,7 @@ using Lykke.SettingsReader;
 using MarginTrading.TradingHistory.AzureRepositories;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
+using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         protected override void RegisterCustomServices(IServiceCollection services, ContainerBuilder builder, IReloadingManager<Settings> settings, ILog log)
         {
             builder.RegisterType<Application>().As<IBrokerApplication>().SingleInstance();
+            builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();
             
             if (settings.CurrentValue.Db.StorageMode == StorageMode.Azure)
             {
