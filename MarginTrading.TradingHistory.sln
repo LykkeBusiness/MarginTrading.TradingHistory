@@ -35,8 +35,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5. Hosts", "5. Hosts", "{75
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistory.OrderHistoryBroker", "src\MarginTrading.TradingHistory.OrderHistoryBroker\MarginTrading.TradingHistory.OrderHistoryBroker.csproj", "{4644516D-366B-4DB2-A686-2D8371EDB86C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistory.BrokerBase", "src\MarginTrading.TradingHistory.BrokerBase\MarginTrading.TradingHistory.BrokerBase.csproj", "{3E7D6405-273B-4200-87D6-E89C1159082F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistory.PositionHistoryBroker", "src\MarginTrading.TradingHistory.PositionHistoryBroker\MarginTrading.TradingHistory.PositionHistoryBroker.csproj", "{EB67E9DA-D29F-4FA1-9F12-3D758DCA98F5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistory.TestClient", "src\MarginTrading.TradingHistory.TestClient\MarginTrading.TradingHistory.TestClient.csproj", "{12D5E341-6CEC-41CA-9456-D5C6D0428950}"
@@ -75,10 +73,6 @@ Global
 		{4644516D-366B-4DB2-A686-2D8371EDB86C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4644516D-366B-4DB2-A686-2D8371EDB86C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4644516D-366B-4DB2-A686-2D8371EDB86C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3E7D6405-273B-4200-87D6-E89C1159082F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E7D6405-273B-4200-87D6-E89C1159082F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E7D6405-273B-4200-87D6-E89C1159082F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E7D6405-273B-4200-87D6-E89C1159082F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C29E609C-1A0F-466C-8712-9E0CF74342FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C29E609C-1A0F-466C-8712-9E0CF74342FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C29E609C-1A0F-466C-8712-9E0CF74342FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -103,7 +97,6 @@ Global
 		{A61FFDEE-5725-4650-A788-6E55EE5EFD5B} = {8F9036B1-5106-4C69-B2D2-B78EE52687A0}
 		{E414FDB9-FEEA-4CD0-9BBA-D1541601DF29} = {75B9374F-F803-4B14-8F1A-C86FFC8E10C5}
 		{4644516D-366B-4DB2-A686-2D8371EDB86C} = {75B9374F-F803-4B14-8F1A-C86FFC8E10C5}
-		{3E7D6405-273B-4200-87D6-E89C1159082F} = {75B9374F-F803-4B14-8F1A-C86FFC8E10C5}
 		{C29E609C-1A0F-466C-8712-9E0CF74342FD} = {BF745453-B940-470E-81BC-43FB67703D4E}
 		{EB67E9DA-D29F-4FA1-9F12-3D758DCA98F5} = {75B9374F-F803-4B14-8F1A-C86FFC8E10C5}
 		{12D5E341-6CEC-41CA-9456-D5C6D0428950} = {75B9374F-F803-4B14-8F1A-C86FFC8E10C5}

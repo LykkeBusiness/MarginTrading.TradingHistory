@@ -3,8 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using AutoMapper;
 using JetBrains.Annotations;
-using MarginTrading.TradingHistory.AzureRepositories.Entities;
-using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Services;
 using Microsoft.AspNetCore.Routing;

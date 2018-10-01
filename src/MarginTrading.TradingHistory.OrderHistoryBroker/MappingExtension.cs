@@ -10,7 +10,6 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
 {
     public static class MappingExtension
     {
-        
         public static OrderHistory ToOrderHistoryDomain(this OrderContract order, OrderHistoryTypeContract historyType)
         {
             var orderContract = new OrderHistory
@@ -26,7 +25,6 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                 ForceOpen = order.ForceOpen,
                 ModifiedTimestamp = order.ModifiedTimestamp,
                 Originator = order.Originator.ToType<OriginatorType>(),
-                CancellationOriginator = order.CancellationOriginator?.ToType<OriginatorType>(),
                 ParentOrderId = order.ParentOrderId,
                 PositionId = order.PositionId,
                 Status = order.Status.ToType<OrderStatus>(),
@@ -37,7 +35,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                 AccountAssetId = order.AccountAssetId,
                 EquivalentAsset = order.EquivalentAsset,
                 ActivatedTimestamp = order.ActivatedTimestamp == default(DateTime)
-                    ? (DateTime?) null
+                    ? null
                     : order.ActivatedTimestamp,
                 CanceledTimestamp = order.CanceledTimestamp,
                 Code = order.Code,
@@ -58,7 +56,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                 UpdateType = historyType.ToType<OrderUpdateType>(),
                 MatchedOrders = new List<MatchedOrder>(),
                 AdditionalInfo = order.AdditionalInfo,
-                CorrelationId = order.CorrelationId,
+                CorrelationId = order.CorrelationId
             };
 
             foreach (var mo in order.MatchedOrders)
@@ -68,8 +66,8 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
 
             return orderContract;
         }
-        
-        public static MatchedOrder ToDomain(this MatchedOrderContract src)
+
+        private static MatchedOrder ToDomain(this MatchedOrderContract src)
         {
             return new MatchedOrder
             {

@@ -6,8 +6,6 @@ using AzureStorage;
 using MarginTrading.TradingHistory.AzureRepositories.Entities;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
-using MarginTrading.TradingHistory.Core.Services;
-using MoreLinq;
 
 namespace MarginTrading.TradingHistory.AzureRepositories
 {

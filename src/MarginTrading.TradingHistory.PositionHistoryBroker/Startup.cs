@@ -1,11 +1,13 @@
 ﻿using Autofac;
 using Common.Log;
+using JetBrains.Annotations;
+using Lykke.MarginTrading.BrokerBase;
+using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.SettingsReader;
 using MarginTrading.TradingHistory.AzureRepositories;
-using MarginTrading.TradingHistory.BrokerBase;
-using MarginTrading.TradingHistory.BrokerBase.Settings;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
+using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Services;
 using MarginTrading.TradingHistory.SqlRepositories;
 using Microsoft.AspNetCore.Hosting;
@@ -13,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MarginTrading.TradingHistory.PositionHistoryBroker
 {
+    [UsedImplicitly]
     public class Startup : BrokerStartupBase<DefaultBrokerApplicationSettings<Settings>, Settings>
     {
         public Startup(IHostingEnvironment env) : base(env)
@@ -24,6 +27,7 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
         protected override void RegisterCustomServices(IServiceCollection services, ContainerBuilder builder, IReloadingManager<Settings> settings, ILog log)
         {
             builder.RegisterType<Application>().As<IBrokerApplication>().SingleInstance();
+            builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();
             
             if (settings.CurrentValue.Db.StorageMode == StorageMode.Azure)
             {

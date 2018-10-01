@@ -10,7 +10,6 @@ using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories;
 using Microsoft.Extensions.DependencyInjection;
-using Polly.Fallback;
 
 namespace MarginTrading.TradingHistory.Modules
 {

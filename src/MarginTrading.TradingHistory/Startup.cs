@@ -5,6 +5,7 @@ using Autofac.Extensions.DependencyInjection;
 using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
+using Newtonsoft.Json;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
@@ -15,15 +16,13 @@ using MarginTrading.TradingHistory.Settings;
 using MarginTrading.TradingHistory.Modules;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
-using Lykke.MonitoringServiceApiCaller;
 using MarginTrading.TradingHistory.Core;
-using MarginTrading.TradingHistory.Services;
-using MarginTrading.TradingHistory.SqlRepositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
+using Newtonsoft.Json.Serialization;
 using LogEntity = Lykke.Logs.LogEntity;
 
 namespace MarginTrading.TradingHistory
@@ -55,8 +54,7 @@ namespace MarginTrading.TradingHistory
                 services.AddMvc()
                     .AddJsonOptions(options =>
                     {
-                        options.SerializerSettings.ContractResolver =
-                            new Newtonsoft.Json.Serialization.DefaultContractResolver();
+                        options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                     });
 
                 services.AddSwaggerGen(options =>
