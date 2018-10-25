@@ -247,6 +247,8 @@ namespace MarginTrading.TradingHistory
                 aggregateLogger.AddLog(sqlLogger);
             }
 
+            LogLocator.Log = aggregateLogger;
+            
             return aggregateLogger;
         }
     }
