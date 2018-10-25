@@ -1,11 +1,15 @@
 ﻿using System;
 using System.IO;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.PlatformAbstractions;
 
 namespace MarginTrading.TradingHistory
 {
+    [UsedImplicitly]
     internal sealed class Program
     {
         public static string EnvInfo => Environment.GetEnvironmentVariable("ENV_INFO");
@@ -21,10 +25,13 @@ namespace MarginTrading.TradingHistory
             Console.WriteLine($"ENV_INFO: {EnvInfo}");
 
             try
-            {
+            {   
                 var host = new WebHostBuilder()
-                    .UseKestrel()
-                    .UseUrls("http://*:5040")
+                    .UseKestrel(options =>
+                    {
+                        options.Listen(IPAddress.Any, 5040);
+                        options.Listen(IPAddress.Any, 5041, SecurityHelpers.ConfigureHttpsEndpoint);
+                    })
                     .UseContentRoot(Directory.GetCurrentDirectory())
                     .UseStartup<Startup>()
                     .UseApplicationInsights()

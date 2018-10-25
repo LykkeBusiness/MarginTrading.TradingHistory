@@ -4,8 +4,6 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AzureStorage.Tables;
 using Common.Log;
-using Lykke.Common.Api.Contract.Responses;
-using Newtonsoft.Json;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
@@ -84,9 +82,21 @@ namespace MarginTrading.TradingHistory
         {
             try
             {
+                var forceHttpsRedirection = 
+                    System.Environment.GetEnvironmentVariable("FORCE_HTTPS_REDIRECTION") == "true";
+                
                 if (env.IsDevelopment())
                 {
                     app.UseDeveloperExceptionPage();
+                }
+                else if (forceHttpsRedirection)
+                {
+                    app.UseHsts();
+                }
+            
+                if (forceHttpsRedirection)
+                {
+                    app.UseHttpsRedirection();
                 }
 
                 app.UseLykkeForwardedHeaders();

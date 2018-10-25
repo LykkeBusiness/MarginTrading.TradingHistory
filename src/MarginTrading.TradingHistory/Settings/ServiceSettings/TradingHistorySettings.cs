@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Lykke.SettingsReader.Attributes;
 
 namespace MarginTrading.TradingHistory.Settings.ServiceSettings
 {
