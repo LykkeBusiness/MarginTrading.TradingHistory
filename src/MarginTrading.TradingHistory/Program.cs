@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
@@ -12,50 +13,42 @@ namespace MarginTrading.TradingHistory
     [UsedImplicitly]
     internal sealed class Program
     {
-        public static string EnvInfo => Environment.GetEnvironmentVariable("ENV_INFO");
-
         public static async Task Main(string[] args)
         {
             Console.WriteLine($"{PlatformServices.Default.Application.ApplicationName} version {PlatformServices.Default.Application.ApplicationVersion}");
-#if DEBUG
-            Console.WriteLine("Is DEBUG");
-#else
-            Console.WriteLine("Is RELEASE");
-#endif           
-            Console.WriteLine($"ENV_INFO: {EnvInfo}");
+            
+            var restartAttemptsLeft = int.TryParse(Environment.GetEnvironmentVariable("RESTART_ATTEMPTS_NUMBER"),
+                out var restartAttemptsFromEnv) 
+                ? restartAttemptsFromEnv
+                : int.MaxValue;
+            var restartAttemptsInterval = int.TryParse(Environment.GetEnvironmentVariable("RESTART_ATTEMPTS_INTERVAL_MS"),
+                out var restartAttemptsIntervalFromEnv) 
+                ? restartAttemptsIntervalFromEnv
+                : 10000;
 
-            try
-            {   
-                var host = new WebHostBuilder()
-                    .UseKestrel(options =>
-                    {
-                        options.Listen(IPAddress.Any, 5040);
-                        options.Listen(IPAddress.Any, 5041, SecurityHelpers.ConfigureHttpsEndpoint);
-                    })
-                    .UseContentRoot(Directory.GetCurrentDirectory())
-                    .UseStartup<Startup>()
-                    .UseApplicationInsights()
-                    .Build();
-
-                await host.RunAsync();
-            }
-            catch (Exception ex)
+            while (restartAttemptsLeft > 0)
             {
-                Console.WriteLine("Fatal error:");
-                Console.WriteLine(ex);
+                try
+                {
+                    var host = new WebHostBuilder()
+                        .UseKestrel(options =>
+                        {
+                            options.Listen(IPAddress.Any, 5040);
+                            options.Listen(IPAddress.Any, 5041, SecurityHelpers.ConfigureHttpsEndpoint);
+                        })
+                        .UseContentRoot(Directory.GetCurrentDirectory())
+                        .UseStartup<Startup>()
+                        .UseApplicationInsights()
+                        .Build();
 
-                // Lets devops to see startup error in console between restarts in the Kubernetes
-                var delay = TimeSpan.FromMinutes(1);
-
-                Console.WriteLine();
-                Console.WriteLine($"Process will be terminated in {delay}. Press any key to terminate immediately.");
-
-                await Task.WhenAny(
-                               Task.Delay(delay),
-                               Task.Run(() =>
-                               {
-                                   Console.ReadKey(true);
-                               }));
+                    await host.RunAsync();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}Restarting... Attempts left: {restartAttemptsLeft}");
+                    Thread.Sleep(restartAttemptsInterval);
+                    restartAttemptsLeft--;
+                }
             }
 
             Console.WriteLine("Terminated");
