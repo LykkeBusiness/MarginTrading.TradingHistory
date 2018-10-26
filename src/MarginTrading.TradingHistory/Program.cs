@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.PlatformAbstractions;
 
 namespace MarginTrading.TradingHistory
 {
+    [UsedImplicitly]
     internal sealed class Program
     {
         public static string EnvInfo => Environment.GetEnvironmentVariable("ENV_INFO");
