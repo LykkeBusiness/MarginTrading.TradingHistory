@@ -91,7 +91,7 @@ namespace MarginTrading.TradingHistory
                 {
                     app.UseDeveloperExceptionPage();
                 }
-                else if (forceHttpsRedirection)
+                else
                 {
                     app.UseHsts();
                 }

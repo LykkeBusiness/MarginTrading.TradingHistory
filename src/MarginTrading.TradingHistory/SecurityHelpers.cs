@@ -1,14 +1,29 @@
 using System;
 using System.Security.Cryptography.X509Certificates;
 using JetBrains.Annotations;
-using MarginTrading.TradingHistory.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Configuration;
 
 namespace MarginTrading.TradingHistory
 {
     public static class SecurityHelpers
     {
+        public static void ConfigureHttpsEndpoint(ListenOptions listenOptions, IConfiguration configuration)
+        {
+            var certificate = LoadCertificate(
+                configuration.GetValue<string>("X509-Certificate-Path"),
+                configuration.GetValue<string>("X509-Certificate-Password"));
+            if (certificate != null)
+            {
+                listenOptions.UseHttps(certificate);
+            }
+            else
+            {
+                listenOptions.UseHttps();
+            }
+        }
+        
         [CanBeNull]
         private static X509Certificate2 LoadCertificate(string path, string pwd)
         {
@@ -18,21 +33,6 @@ namespace MarginTrading.TradingHistory
             }
 
             return null;
-        }
-
-        public static void ConfigureHttpsEndpoint(ListenOptions listenOptions)
-        {
-            var certificate = LoadCertificate(
-                Environment.GetEnvironmentVariable("X509_CERTIFICATE_PATH"), 
-                Environment.GetEnvironmentVariable("X509_CERTIFICATE_PASSWORD"));
-            if (certificate != null)
-            {
-                listenOptions.UseHttps(certificate);
-            }
-            else
-            {
-                listenOptions.UseHttps();
-            }
         }
     }
 }
