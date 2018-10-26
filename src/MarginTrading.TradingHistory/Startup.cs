@@ -11,6 +11,7 @@ using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
 using Lykke.Logs.MsSql;
 using Lykke.Logs.MsSql.Repositories;
+using Lykke.Logs.Serilog;
 using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Settings;
 using MarginTrading.TradingHistory.Modules;
@@ -41,6 +42,7 @@ namespace MarginTrading.TradingHistory
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
+                .AddSerilogJson(env)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
 
@@ -65,7 +67,7 @@ namespace MarginTrading.TradingHistory
                 var builder = new ContainerBuilder();
                 var appSettings = Configuration.LoadSettings<AppSettings>();
 
-                Log = CreateLogWithSlack(services, appSettings);
+                Log = CreateLogWithSlack(Configuration, services, appSettings);
 
                 builder.RegisterModule(new ServiceModule(appSettings.Nested(x => x.TradingHistoryService), Log));
                 builder.Populate(services);
@@ -178,7 +180,8 @@ namespace MarginTrading.TradingHistory
             }
         }
 
-        private static ILog CreateLogWithSlack(IServiceCollection services, IReloadingManager<AppSettings> settings)
+        private static ILog CreateLogWithSlack(IConfiguration configuration, IServiceCollection services, 
+            IReloadingManager<AppSettings> settings)
         {
             var consoleLogger = new LogToConsole();
             var aggregateLogger = new AggregateLogger();
@@ -215,7 +218,11 @@ namespace MarginTrading.TradingHistory
                 slackNotificationsManager = new LykkeLogToAzureSlackNotificationsManager(slackService, consoleLogger);
             }
 
-            if (settings.CurrentValue.TradingHistoryService.Db.StorageMode == StorageMode.Azure)
+            if (settings.CurrentValue.TradingHistoryService.UseSerilog)
+            {
+                aggregateLogger.AddLog(new SerilogLogger(typeof(Startup).Assembly, configuration));
+            }
+            else if (settings.CurrentValue.TradingHistoryService.Db.StorageMode == StorageMode.Azure)
             {
                 // Creating azure storage logger, which logs own messages to concole log
                 var azureStorageLogger = new LykkeLogToAzureStorage(
