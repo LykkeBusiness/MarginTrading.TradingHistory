@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using MarginTrading.TradingHistory.Core.Services;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -35,17 +36,13 @@ namespace MarginTrading.TradingHistory
                 try
                 {
                     var configuration = new ConfigurationBuilder()
-                        .AddEnvironmentSecrets()
+                        .AddJsonFile("appsettings.json")
+                        .AddUserSecrets<Startup>()
+                        .AddEnvironmentVariables()
                         .Build();
                     
-                    var host = new WebHostBuilder()
-                        .UseKestrel(options =>
-                        {
-                            options.Listen(IPAddress.Any, 5040);
-                            options.Listen(IPAddress.Any, 5041, listenOptions => 
-                                SecurityHelpers.ConfigureHttpsEndpoint(listenOptions, configuration));
-                        })
-                        .UseContentRoot(Directory.GetCurrentDirectory())
+                    var host = WebHost.CreateDefaultBuilder()
+                        .UseConfiguration(configuration)
                         .UseStartup<Startup>()
                         .UseApplicationInsights()
                         .Build();

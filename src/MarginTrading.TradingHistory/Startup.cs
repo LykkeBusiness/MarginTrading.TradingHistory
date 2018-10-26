@@ -5,6 +5,7 @@ using Autofac.Extensions.DependencyInjection;
 using AzureStorage.Tables;
 using Common.Log;
 using JetBrains.Annotations;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
@@ -33,15 +34,14 @@ namespace MarginTrading.TradingHistory
         public IConfigurationRoot Configuration { get; }
         public ILog Log { get; private set; }
 
-        public static string ServiceName { get; } = PlatformServices.Default
-            .Application.ApplicationName;
+        public static string ServiceName { get; } = PlatformServices.Default.Application.ApplicationName;
 
         public Startup(IHostingEnvironment env)
         {
-            var builder = new ConfigurationBuilder()
+            Configuration = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddEnvironmentVariables();
-            Configuration = builder.Build();
+                .AddEnvironmentVariables()
+                .Build();
 
             Environment = env;
         }
@@ -84,9 +84,6 @@ namespace MarginTrading.TradingHistory
         {
             try
             {
-                var forceHttpsRedirection = 
-                    System.Environment.GetEnvironmentVariable("FORCE_HTTPS_REDIRECTION") == "true";
-                
                 if (env.IsDevelopment())
                 {
                     app.UseDeveloperExceptionPage();
@@ -94,11 +91,6 @@ namespace MarginTrading.TradingHistory
                 else
                 {
                     app.UseHsts();
-                }
-            
-                if (forceHttpsRedirection)
-                {
-                    app.UseHttpsRedirection();
                 }
 
                 app.UseLykkeForwardedHeaders();
@@ -135,7 +127,7 @@ namespace MarginTrading.TradingHistory
         {
             try
             {
-                // NOTE: Service not yet recieve and process requests here
+                // NOTE: Service not yet receive and process requests here
 
                 await ApplicationContainer.Resolve<IStartupManager>().StartAsync();
 
@@ -152,7 +144,7 @@ namespace MarginTrading.TradingHistory
         {
             try
             {
-                // NOTE: Service still can recieve and process requests here, so take care about it if you add logic here.
+                // NOTE: Service still can receive and process requests here, so take care about it if you add logic here.
 
                 await ApplicationContainer.Resolve<IShutdownManager>().StopAsync();
             }
@@ -170,7 +162,7 @@ namespace MarginTrading.TradingHistory
         {
             try
             {
-                // NOTE: Service can't recieve and process requests here, so you can destroy all resources
+                // NOTE: Service can't receive and process requests here, so you can destroy all resources
 
                 if (Log != null)
                 {
