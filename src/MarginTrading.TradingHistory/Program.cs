@@ -36,7 +36,7 @@ namespace MarginTrading.TradingHistory
                 try
                 {
                     var configuration = new ConfigurationBuilder()
-                        .AddJsonFile("appsettings.json")
+                        .AddJsonFile("appsettings.json", optional: true)
                         .AddUserSecrets<Startup>()
                         .AddEnvironmentVariables()
                         .Build();
