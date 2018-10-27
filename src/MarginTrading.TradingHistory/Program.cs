@@ -1,8 +1,14 @@
 ﻿using System;
 using System.IO;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using MarginTrading.TradingHistory.Core.Services;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.PlatformAbstractions;
 
 namespace MarginTrading.TradingHistory
@@ -11,46 +17,46 @@ namespace MarginTrading.TradingHistory
     internal sealed class Program
     {
         public static string EnvInfo => Environment.GetEnvironmentVariable("ENV_INFO");
-
+        
         public static async Task Main(string[] args)
         {
             Console.WriteLine($"{PlatformServices.Default.Application.ApplicationName} version {PlatformServices.Default.Application.ApplicationVersion}");
-#if DEBUG
-            Console.WriteLine("Is DEBUG");
-#else
-            Console.WriteLine("Is RELEASE");
-#endif           
-            Console.WriteLine($"ENV_INFO: {EnvInfo}");
+            
+            var restartAttemptsLeft = int.TryParse(Environment.GetEnvironmentVariable("RESTART_ATTEMPTS_NUMBER"),
+                out var restartAttemptsFromEnv) 
+                ? restartAttemptsFromEnv
+                : int.MaxValue;
+            var restartAttemptsInterval = int.TryParse(Environment.GetEnvironmentVariable("RESTART_ATTEMPTS_INTERVAL_MS"),
+                out var restartAttemptsIntervalFromEnv) 
+                ? restartAttemptsIntervalFromEnv
+                : 10000;
 
-            try
+            while (restartAttemptsLeft > 0)
             {
-                var host = new WebHostBuilder()
-                    .UseKestrel()
-                    .UseUrls("http://*:5040")
-                    .UseContentRoot(Directory.GetCurrentDirectory())
-                    .UseStartup<Startup>()
-                    .UseApplicationInsights()
-                    .Build();
+                try
+                {
+                    var configuration = new ConfigurationBuilder()
+                        .AddJsonFile("appsettings.json")
+                        .AddUserSecrets<Startup>()
+                        .AddEnvironmentVariables()
+                        .Build();
+                    
+                    var host = WebHost.CreateDefaultBuilder()
+                        .UseConfiguration(configuration)
+                        .UseStartup<Startup>()
+                        .UseApplicationInsights()
+                        .Build();
 
-                await host.RunAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Fatal error:");
-                Console.WriteLine(ex);
-
-                // Lets devops to see startup error in console between restarts in the Kubernetes
-                var delay = TimeSpan.FromMinutes(1);
-
-                Console.WriteLine();
-                Console.WriteLine($"Process will be terminated in {delay}. Press any key to terminate immediately.");
-
-                await Task.WhenAny(
-                               Task.Delay(delay),
-                               Task.Run(() =>
-                               {
-                                   Console.ReadKey(true);
-                               }));
+                    await host.RunAsync();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}Restarting...");
+                    LogLocator.Log?.WriteFatalErrorAsync(
+                        "MT TradingHistory", "Restart host", $"Attempts left: {restartAttemptsLeft}", e);
+                    restartAttemptsLeft--;
+                    Thread.Sleep(restartAttemptsInterval);
+                }
             }
 
             Console.WriteLine("Terminated");
