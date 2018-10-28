@@ -34,6 +34,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
 
         protected override BrokerSettingsBase Settings => _settings;
         protected override string ExchangeName => _settings.RabbitMqQueues.OrderHistory.ExchangeName;
+        protected override string RoutingKey => null;
 
         protected override Task HandleMessage(OrderHistoryEvent historyEvent)
         {

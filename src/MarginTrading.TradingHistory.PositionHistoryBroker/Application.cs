@@ -42,6 +42,7 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
 
         protected override BrokerSettingsBase Settings => _settings;
         protected override string ExchangeName => _settings.RabbitMqQueues.PositionsHistory.ExchangeName;
+        protected override string RoutingKey => null;
         protected override string QueuePostfix => ".PositionsHistory";
 
         protected override Task HandleMessage(PositionHistoryEvent positionHistoryEvent)
