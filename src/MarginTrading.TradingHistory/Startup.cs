@@ -4,6 +4,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AzureStorage.Tables;
 using Common.Log;
+using JetBrains.Annotations;
 using Lykke.Common.Api.Contract.Responses;
 using Newtonsoft.Json;
 using Lykke.Common.ApiLibrary.Middleware;
@@ -82,6 +83,7 @@ namespace MarginTrading.TradingHistory
             }
         }
 
+        [UsedImplicitly]
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime appLifetime)
         {
             try
