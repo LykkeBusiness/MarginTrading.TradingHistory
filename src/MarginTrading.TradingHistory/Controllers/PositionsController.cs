@@ -61,15 +61,18 @@ namespace MarginTrading.TradingHistory.Controllers
                 throw new ArgumentException("Position id must be set", nameof(positionId));
             }
 
-            var position = await _positionsHistoryRepository.GetAsync(positionId);
+            var anyPositionEvent = (await _positionsHistoryRepository.GetAsync(positionId)).FirstOrDefault();
 
-            if (position == null)
+            if (anyPositionEvent == null)
                 return null;
             
-            var deals = (await _dealsRepository.GetAsync(position.AccountId, position.AssetPairId))
+            var deals = (await _dealsRepository.GetAsync(anyPositionEvent.AccountId, anyPositionEvent.AssetPairId))
                 .ToDictionary(x => x.DealId);
 
-            return Convert(new Dictionary<string, IPositionHistory>{{position.DealId, position}}, deals, position.DealId);
+            return Convert(new Dictionary<string, IPositionHistory>
+            {
+                {anyPositionEvent.DealId, anyPositionEvent}
+            }, deals, anyPositionEvent.DealId);
         }
 
         private PositionContract Convert(Dictionary<string, IPositionHistory> positions, 

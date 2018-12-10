@@ -111,7 +111,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
             }
         }
 
-        public async Task<IEnumerable<IPositionHistory>> GetAsync(string accountId, string assetPairId)
+        public async Task<List<IPositionHistory>> GetAsync(string accountId, string assetPairId)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
@@ -122,7 +122,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
                 var query = $"SELECT * FROM {TableName} {whereClause}";
                 var objects = await conn.QueryAsync<PositionsHistoryEntity>(query, new {accountId, assetPairId});
                 
-                return objects;
+                return objects.Cast<IPositionHistory>().ToList();
             }
         }
 
@@ -151,14 +151,14 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
             }
         }
 
-        public async Task<IPositionHistory> GetAsync(string id)
+        public async Task<List<IPositionHistory>> GetAsync(string id)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
                 var query = $"SELECT * FROM {TableName} Where Id = @id";
                 var objects = await conn.QueryAsync<PositionsHistoryEntity>(query, new {id});
                 
-                return objects.SingleOrDefault();
+                return objects.Cast<IPositionHistory>().ToList();
             }
         }
     }
