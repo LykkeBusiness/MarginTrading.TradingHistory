@@ -9,6 +9,10 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
     {
         public Db Db { get; set; }
         public RabbitMqQueues RabbitMqQueues { get; set; }
+        
+        public string CancelledOrderIdAttributeName { get; set; }
+        
+        public string IsCancellationTradeAttributeName { get; set; }
     }
     
     [UsedImplicitly]

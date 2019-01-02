@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Common.Log;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.SlackNotifications;
 using MarginTrading.Backend.Contracts.Events;
+using MarginTrading.Backend.Contracts.Orders;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
+using Newtonsoft.Json;
 
 namespace MarginTrading.TradingHistory.OrderHistoryBroker
 {
@@ -61,7 +64,16 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                     historyEvent.OrderSnapshot.FxRate,
                     historyEvent.OrderSnapshot.AdditionalInfo
                     );
+                
                 tasks.Add(_tradesRepository.AddAsync(trade));
+
+                var cancelledOrderId = TryGetCancelledOrderId(historyEvent.OrderSnapshot);
+
+                if (!string.IsNullOrEmpty(cancelledOrderId))
+                {
+                    tasks.Add(_ordersHistoryRepository.SetCancelledByAsync(cancelledOrderId,
+                        historyEvent.OrderSnapshot.Id));
+                }
             }
 
             return Task.WhenAll(tasks.Select(t => Task.Run(async () =>
@@ -75,6 +87,33 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                     await _log.WriteErrorAsync(nameof(HandleMessage), "SwitchThread", "", ex);
                 }
             })));
+        }
+
+        private string TryGetCancelledOrderId(OrderContract order)
+        {
+            try
+            {
+                var info = JsonConvert.DeserializeObject<Dictionary<string, object>>(order.AdditionalInfo);
+
+                if (info.TryGetValue(_settings.IsCancellationTradeAttributeName, out var cancellationFlagStr))
+                {
+                    if (bool.TryParse(cancellationFlagStr.ToString(), out bool cancellationFlag))
+                    {
+                        if (cancellationFlag &&
+                            info.TryGetValue(_settings.CancelledOrderIdAttributeName, out var cancelledOrderId))
+                        {
+                            return cancelledOrderId.ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.WriteWarningAsync(nameof(TryGetCancelledOrderId), order.AdditionalInfo,
+                    "Error getting of cancelled order id", ex);
+            }
+
+            return null;
         }
     }
 }
