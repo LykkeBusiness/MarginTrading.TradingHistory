@@ -45,5 +45,6 @@ namespace MarginTrading.TradingHistory.Core.Domain
         public OrderUpdateType UpdateType { get; set; }
         public string AdditionalInfo { get; set; }
         public string CorrelationId { get; set; }
+        public string CancelledBy { get; set; }
     }
 }

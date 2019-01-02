@@ -136,6 +136,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 UpdateType = history.UpdateType.ToType<OrderUpdateTypeContract>(),
                 AdditionalInfo = history.AdditionalInfo,
                 CorrelationId = history.CorrelationId,
+                CancelledBy = history.CancelledBy
             };
         }
     }
