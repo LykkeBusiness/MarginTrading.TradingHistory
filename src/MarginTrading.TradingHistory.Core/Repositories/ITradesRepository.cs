@@ -12,5 +12,6 @@ namespace MarginTrading.TradingHistory.Core.Repositories
         Task<IEnumerable<ITrade>> GetByAccountAsync([NotNull] string accountId, [CanBeNull] string assetPairId = null);
         Task<PaginatedResponse<ITrade>> GetByPagesAsync(string accountId, string assetPairId, 
             int? skip = null, int? take = null);
+        Task SetCancelledByAsync(string cancelledOrderId, string cancelledBy);
     }
 }
