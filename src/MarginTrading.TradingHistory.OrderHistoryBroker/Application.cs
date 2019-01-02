@@ -87,19 +87,32 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                 }
             })));
         }
-        
+
         private string TryGetCancelledOrderId(OrderContract order)
         {
             try
             {
                 var info = JsonConvert.DeserializeObject<Dictionary<string, object>>(order.AdditionalInfo);
 
-                return info[_settings.CancelledOrderIdAttributeName].ToString();
+                if (info.TryGetValue(_settings.IsCancellationTradeAttributeName, out var cancellationFlagStr))
+                {
+                    if (bool.TryParse(cancellationFlagStr.ToString(), out bool cancellationFlag))
+                    {
+                        if (cancellationFlag &&
+                            info.TryGetValue(_settings.CancelledOrderIdAttributeName, out var cancelledOrderId))
+                        {
+                            return cancelledOrderId.ToString();
+                        }
+                    }
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                _log.WriteWarningAsync(nameof(TryGetCancelledOrderId), order.AdditionalInfo,
+                    "Error getting of cancelled order id", ex);
             }
+
+            return null;
         }
     }
 }
