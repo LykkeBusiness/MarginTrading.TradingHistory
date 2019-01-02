@@ -71,7 +71,8 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
 
                 if (!string.IsNullOrEmpty(cancelledOrderId))
                 {
-                    tasks.Add(_tradesRepository.SetCancelledByAsync(cancelledOrderId, historyEvent.OrderSnapshot.Id));
+                    tasks.Add(_ordersHistoryRepository.SetCancelledByAsync(cancelledOrderId,
+                        historyEvent.OrderSnapshot.Id));
                 }
             }
 

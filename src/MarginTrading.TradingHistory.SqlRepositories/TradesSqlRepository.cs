@@ -33,7 +33,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [OrderExpectedPrice] [float] NULL,
 [FxRate] [float] NULL,
 [AdditionalInfo] [nvarchar] (MAX) NULL,
-[CancelledBy] [nvarchar] (64) NULL,
 INDEX IX_{0}_Base (AccountId, AssetPairId)
 );";
 
@@ -137,16 +136,6 @@ INDEX IX_{0}_Base (AccountId, AssetPairId)
                     size: trades.Count, 
                     totalSize: !take.HasValue ? trades.Count : totalCount
                 );
-            }
-        }
-
-        public async Task SetCancelledByAsync(string cancelledOrderId, string cancelledBy)
-        {
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                await conn.ExecuteAsync(
-                    $"UPDATE {TableName} SET CancelledBy = @cancelledBy WHERE Id = @cancelledOrderId",
-                    new {cancelledOrderId, cancelledBy});
             }
         }
     }

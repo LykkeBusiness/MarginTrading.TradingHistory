@@ -59,6 +59,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [RelatedOrderInfos] [nvarchar](MAX) NULL,
 [AdditionalInfo] [nvarchar](MAX) NULL,
 [CorrelationId] [nvarchar](64) NULL,
+[CancelledBy] [nvarchar] (64) NULL,
 CONSTRAINT PK_{0}_OID PRIMARY KEY CLUSTERED (OID DESC),
 INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTimestamp, CreatedTimestamp)
 );";
@@ -180,6 +181,16 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
                     size: orderHistoryEntities.Count, 
                     totalSize: !take.HasValue ? orderHistoryEntities.Count : totalCount
                 );
+            }
+        }
+        
+        public async Task SetCancelledByAsync(string cancelledOrderId, string cancelledBy)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                await conn.ExecuteAsync(
+                    $"UPDATE {TableName} SET CancelledBy = @cancelledBy WHERE Id = @cancelledOrderId",
+                    new {cancelledOrderId, cancelledBy});
             }
         }
     }

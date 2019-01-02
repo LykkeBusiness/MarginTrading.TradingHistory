@@ -57,10 +57,5 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 totalSize: data.Count
             );
         }
-
-        public Task SetCancelledByAsync(string cancelledOrderId, string cancelledBy)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }
