@@ -89,7 +89,9 @@ namespace MarginTrading.TradingHistory.Controllers
                 Type = tradeEntity.Type.ToType<TradeTypeContract>(),
                 Timestamp = tradeEntity.TradeTimestamp,
                 Price = tradeEntity.Price,
-                Volume = tradeEntity.Volume
+                Volume = tradeEntity.Volume,
+                AdditionalInfo = tradeEntity.AdditionalInfo,
+                CancelledBy = tradeEntity.CancelledBy
             };
         }
     }

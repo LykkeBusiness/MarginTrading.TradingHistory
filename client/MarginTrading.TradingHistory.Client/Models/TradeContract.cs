@@ -35,11 +35,6 @@ namespace MarginTrading.TradingHistory.Client.Models
         public DateTime Timestamp { get; set; }
         
         /// <summary>
-        /// Initiating client
-        /// </summary>
-        public string ClientId { get; set; }
-
-        /// <summary>
         /// Instrument id (e.g."BTCUSD", where BTC - base asset unit, USD - quoting unit)
         /// </summary>
         public string AssetPairId { get; set; }
@@ -58,5 +53,15 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// Order volume in base asset units
         /// </summary>
         public decimal Volume { get; set; }
+        
+        /// <summary>
+        /// Trade additional info
+        /// </summary>
+        public string AdditionalInfo { get; set; }
+        
+        /// <summary>
+        /// Order Id, that cancelled current trade
+        /// </summary>
+        public string CancelledBy { get; set; }
     }
 }
