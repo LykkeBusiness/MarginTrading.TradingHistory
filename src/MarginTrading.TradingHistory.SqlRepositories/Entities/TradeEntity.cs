@@ -23,6 +23,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public decimal? OrderExpectedPrice { get; set; }
         public decimal FxRate { get; set; }
         public string AdditionalInfo { get; set; }
+        public string CancelledBy { get; set; }
 
         public static TradeEntity Create(ITrade obj)
         {
@@ -42,6 +43,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 OrderExpectedPrice = obj.OrderExpectedPrice,
                 FxRate = obj.FxRate,
                 AdditionalInfo = obj.AdditionalInfo,
+                CancelledBy = obj.CancelledBy
             };
         }
     }

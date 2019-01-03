@@ -22,7 +22,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         private readonly ILog _log;
         private readonly Settings _settings;
 
-        public Application(IOrdersHistoryRepository ordersHistoryRepository, 
+        public Application(IOrdersHistoryRepository ordersHistoryRepository,
             ITradesRepository tradesRepository,
             ILog logger,
             Settings settings, CurrentApplicationInfo applicationInfo,
@@ -42,14 +42,14 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         protected override Task HandleMessage(OrderHistoryEvent historyEvent)
         {
             var tasks = new List<Task>();
-            
+
             var orderHistory = historyEvent.OrderSnapshot.ToOrderHistoryDomain(historyEvent.Type);
             tasks.Add(_ordersHistoryRepository.AddAsync(orderHistory));
 
             if (historyEvent.Type == OrderHistoryTypeContract.Executed)
             {
                 var trade = new Trade(
-                    historyEvent.OrderSnapshot.Id, 
+                    historyEvent.OrderSnapshot.Id,
                     historyEvent.OrderSnapshot.AccountId,
                     historyEvent.OrderSnapshot.Id,
                     historyEvent.OrderSnapshot.AssetPairId,
@@ -63,15 +63,15 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                     historyEvent.OrderSnapshot.ExpectedOpenPrice,
                     historyEvent.OrderSnapshot.FxRate,
                     historyEvent.OrderSnapshot.AdditionalInfo
-                    );
-                
+                );
+
                 tasks.Add(_tradesRepository.AddAsync(trade));
 
-                var cancelledOrderId = TryGetCancelledOrderId(historyEvent.OrderSnapshot);
+                var cancelledTradeId = TryGetCancelledTradeId(historyEvent.OrderSnapshot);
 
-                if (!string.IsNullOrEmpty(cancelledOrderId))
+                if (!string.IsNullOrEmpty(cancelledTradeId))
                 {
-                    tasks.Add(_ordersHistoryRepository.SetCancelledByAsync(cancelledOrderId,
+                    tasks.Add(_tradesRepository.SetCancelledByAsync(cancelledTradeId,
                         historyEvent.OrderSnapshot.Id));
                 }
             }
@@ -89,7 +89,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
             })));
         }
 
-        private string TryGetCancelledOrderId(OrderContract order)
+        private string TryGetCancelledTradeId(OrderContract order)
         {
             try
             {
@@ -100,42 +100,20 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                     if (bool.TryParse(cancellationFlagStr.ToString(), out bool cancellationFlag))
                     {
                         if (cancellationFlag &&
-                            info.TryGetValue(_settings.CancelledOrderIdAttributeName, out var cancelledOrderId))
+                            info.TryGetValue(_settings.CancelledTradeIdAttributeName, out var cancelledTradeId))
                         {
-                            return cancelledOrderId.ToString();
+                            return cancelledTradeId.ToString();
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                _log.WriteWarningAsync(nameof(TryGetCancelledOrderId), order.AdditionalInfo,
-                    "Error getting of cancelled order id", ex);
+                _log.WriteWarningAsync(nameof(TryGetCancelledTradeId), order.AdditionalInfo,
+                    "Error getting of cancelled trade id", ex);
             }
 
             return null;
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
