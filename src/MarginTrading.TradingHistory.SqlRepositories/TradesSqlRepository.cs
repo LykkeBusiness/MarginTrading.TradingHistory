@@ -146,7 +146,7 @@ INDEX IX_{0}_Base (AccountId, AssetPairId)
             {
                 await conn.ExecuteAsync(
                     $"UPDATE {TableName} SET CancelledBy = @cancelledBy WHERE Id = @cancelledTradeId",
-                    new {cancelledOrderId = cancelledTradeId, cancelledBy});
+                    new {cancelledTradeId, cancelledBy});
             }
         }
     }
