@@ -50,10 +50,5 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// If there is no inbound identifier then one should be created eg. on the service layer boundary (API).  
         /// </summary>
         public string CorrelationId { get; set; }
-
-        /// <summary>
-        /// Order Id, that cancelled current order
-        /// </summary>
-        public string CancelledBy { get; set; }
     }
 }
