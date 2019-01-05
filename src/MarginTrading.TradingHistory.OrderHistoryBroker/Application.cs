@@ -97,7 +97,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
 
                 if (info.TryGetValue(_settings.IsCancellationTradeAttributeName, out var cancellationFlagStr))
                 {
-                    if (bool.TryParse(cancellationFlagStr.ToString(), out bool cancellationFlag))
+                    if (bool.TryParse(cancellationFlagStr.ToString(), out var cancellationFlag))
                     {
                         if (cancellationFlag &&
                             info.TryGetValue(_settings.CancelledTradeIdAttributeName, out var cancelledTradeId))
