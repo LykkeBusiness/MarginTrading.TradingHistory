@@ -91,7 +91,7 @@ INDEX IX_{0}_Base (DealId, AccountId, AssetPairId, Created)
                 var paginationClause = $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
                 var gridReader = await conn.QueryMultipleAsync(
                     $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
-                    new {accountId, assetPairId});
+                    new {accountId, assetPairId, closeTimeStart, closeTimeEnd});
                 var deals = (await gridReader.ReadAsync<DealEntity>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
             
@@ -116,7 +116,8 @@ INDEX IX_{0}_Base (DealId, AccountId, AssetPairId, Created)
                     + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
                 
                 var query = $"SELECT * FROM {TableName} {clause}";
-                return await conn.QueryAsync<DealEntity>(query, new {accountId, assetPairId});
+                return await conn.QueryAsync<DealEntity>(query, 
+                    new {accountId, assetPairId, closeTimeStart, closeTimeEnd});
             }
         }
 
