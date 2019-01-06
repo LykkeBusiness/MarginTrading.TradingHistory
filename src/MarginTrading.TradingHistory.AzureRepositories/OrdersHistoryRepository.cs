@@ -28,12 +28,18 @@ namespace MarginTrading.TradingHistory.AzureRepositories
         }
 
         public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId, string assetPairId,
-            OrderStatus? status = null, bool withRelated = false)
+            OrderStatus? status = null, bool withRelated = false, 
+            DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
+            DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null)
         {
             var entities = await _tableStorage.GetDataAsync(x =>
                 (string.IsNullOrWhiteSpace(accountId) || x.AccountId == accountId)
-                || (string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId)
-                || (status == null || x.Status == status));
+                && (string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId)
+                && (status == null || x.Status == status)
+                && (createdTimeStart == null || x.CreatedTimestamp >= createdTimeStart)
+                && (createdTimeEnd == null || x.CreatedTimestamp < createdTimeEnd)
+                && (modifiedTimeStart == null || x.ModifiedTimestamp >= modifiedTimeStart)
+                && (modifiedTimeEnd == null || x.ModifiedTimestamp < modifiedTimeEnd));
 
             var related = withRelated
                 ? await _tableStorage.GetDataAsync(x => entities.Select(e => e.Id).Contains(x.ParentOrderId))
@@ -53,10 +59,13 @@ namespace MarginTrading.TradingHistory.AzureRepositories
         }
 
         public async Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId, 
-            OrderStatus? status, bool withRelated,
+            OrderStatus? status, bool withRelated, 
+            DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
+            DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
             int? skip = null, int? take = null)
         {
-            var allData = await GetHistoryAsync(accountId, assetPairId, status, withRelated);
+            var allData = await GetHistoryAsync(accountId, assetPairId, status, withRelated, 
+                createdTimeStart, createdTimeEnd, modifiedTimeStart, modifiedTimeEnd);
 
             //TODO refactor before using azure impl
             var data = allData.OrderBy(x => x.CreatedTimestamp).ToList();
