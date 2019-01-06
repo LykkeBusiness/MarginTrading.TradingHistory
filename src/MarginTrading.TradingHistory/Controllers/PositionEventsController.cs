@@ -59,12 +59,12 @@ namespace MarginTrading.TradingHistory.Controllers
         }
 
         /// <summary>
-        /// Get position by Id
+        /// Get position events by Id
         /// </summary>
         /// <param name="positionId"></param>
         /// <returns></returns>
         [HttpGet, Route("{positionId}")]
-        public async Task<PositionEventContract> PositionById(string positionId)
+        public async Task<List<PositionEventContract>> PositionById(string positionId)
         {
             if (string.IsNullOrWhiteSpace(positionId))
             {
@@ -73,7 +73,7 @@ namespace MarginTrading.TradingHistory.Controllers
 
             var position = await _positionsHistoryRepository.GetAsync(positionId);
 
-            return position == null ? null : Convert(position);
+            return position.Select(Convert).ToList();
         }
 
         private PositionEventContract Convert(IPositionHistory positionHistory)

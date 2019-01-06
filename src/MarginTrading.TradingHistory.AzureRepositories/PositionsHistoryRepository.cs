@@ -24,14 +24,15 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             _convertService = convertService;
         }
 
-        public async Task<IEnumerable<IPositionHistory>> GetAsync(string accountId, string assetPairId)
+        public async Task<List<IPositionHistory>> GetAsync(string accountId, string assetPairId)
         {
             var predicate = new Func<PositionHistoryEntity, bool>(p =>
                 (string.IsNullOrEmpty(assetPairId) || p.AssetPairId == accountId));
-            
-            return string.IsNullOrEmpty(accountId)
-                ? await _tableStorage.GetDataAsync(predicate)
-                : await _tableStorage.GetDataAsync(accountId, predicate);
+
+            return (string.IsNullOrEmpty(accountId)
+                    ? await _tableStorage.GetDataAsync(predicate)
+                    : await _tableStorage.GetDataAsync(accountId, predicate))
+                .Cast<IPositionHistory>().ToList();
         }
 
         public async Task<PaginatedResponse<IPositionHistory>> GetByPagesAsync(string accountId, string assetPairId, 
@@ -51,10 +52,10 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             );
         }
 
-        public async Task<IPositionHistory> GetAsync(string id)
+        public async Task<List<IPositionHistory>> GetAsync(string id)
         {
             return (await _tableStorage.GetDataAsync(p => p.DealId == id))
-                .SingleOrDefault();
+                .Cast<IPositionHistory>().ToList();
         }
 
         public async Task AddAsync(IPositionHistory positionHistory)
