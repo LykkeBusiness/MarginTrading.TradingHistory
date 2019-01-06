@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,10 +28,10 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             return (await _tableStorage.GetDataAsync(x => x.DealId == id)).SingleOrDefault();
         }
 
-        public async Task<PaginatedResponse<IDeal>> GetByPagesAsync(string accountId, string assetPairId, 
-            int? skip = null, int? take = null)
+        public async Task<PaginatedResponse<IDeal>> GetByPagesAsync(string accountId, string assetPairId,
+            DateTime? closeTimeStart = null, DateTime? closeTimeEnd = null, int? skip = null, int? take = null)
         {
-            var allData = await GetAsync(accountId, assetPairId);
+            var allData = await GetAsync(accountId, assetPairId, closeTimeStart, closeTimeEnd);
 
             //TODO refactor before using azure impl
             var data = allData.OrderBy(x => x.Created).ToList();
@@ -44,13 +45,16 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             );
         }
 
-        public async Task<IEnumerable<IDeal>> GetAsync(string accountId, string assetPairId)
+        public async Task<IEnumerable<IDeal>> GetAsync(string accountId, string assetPairId,
+            DateTime? closeTimeStart = null, DateTime? closeTimeEnd = null)
         {
+            bool Predicate(DealEntity x) => (string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId) 
+                                            && (closeTimeStart == null || x.Created >= closeTimeStart) 
+                                            && (closeTimeEnd == null || x.Created < closeTimeEnd);
+
             return string.IsNullOrWhiteSpace(accountId)
-                ? await _tableStorage.GetDataAsync(x =>
-                    (string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId))
-                : await _tableStorage.GetDataAsync(accountId, x => 
-                    (string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId));
+                ? await _tableStorage.GetDataAsync((Func<DealEntity, bool>) Predicate)
+                : await _tableStorage.GetDataAsync(accountId, (Func<DealEntity, bool>) Predicate);
         }
 
         public Task AddAsync(IDeal obj)

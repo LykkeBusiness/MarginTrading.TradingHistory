@@ -34,7 +34,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [CloseFxPrice] [float] NULL,
 [Fpl] [float] NULL,
 [AdditionalInfo] [nvarchar](MAX) NULL ,
-INDEX IX_{0}_Base (DealId, AccountId, AssetPairId)
+INDEX IX_{0}_Base (DealId, AccountId, AssetPairId, Created)
 );";
 
         private readonly string _connectionString;
@@ -76,12 +76,15 @@ INDEX IX_{0}_Base (DealId, AccountId, AssetPairId)
             }
         }
 
-        public async Task<PaginatedResponse<IDeal>> GetByPagesAsync(string accountId, string assetPairId, 
+        public async Task<PaginatedResponse<IDeal>> GetByPagesAsync(string accountId, string assetPairId,
+            DateTime? closeTimeStart = null, DateTime? closeTimeEnd = null,
             int? skip = null, int? take = null)
         {
             var whereClause = "WHERE 1=1 "
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
-                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId");
+                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
+                              + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
+                              + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
             
             using (var conn = new SqlConnection(_connectionString))
             {
@@ -101,13 +104,16 @@ INDEX IX_{0}_Base (DealId, AccountId, AssetPairId)
             }
         }
 
-        public async Task<IEnumerable<IDeal>> GetAsync(string accountId, string assetPairId)
+        public async Task<IEnumerable<IDeal>> GetAsync(string accountId, string assetPairId,
+            DateTime? closeTimeStart = null, DateTime? closeTimeEnd = null)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
                 var clause = "WHERE 1=1 "
                     + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId = @accountId")
-                    + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId = @assetPairId");
+                    + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId = @assetPairId")
+                    + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
+                    + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
                 
                 var query = $"SELECT * FROM {TableName} {clause}";
                 return await conn.QueryAsync<DealEntity>(query, new {accountId, assetPairId});
