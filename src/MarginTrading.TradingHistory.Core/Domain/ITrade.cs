@@ -18,5 +18,10 @@ namespace MarginTrading.TradingHistory.Core.Domain
         decimal? OrderExpectedPrice { get; }
         decimal FxRate { get; }
         string AdditionalInfo { get; }
+        
+        /// <summary>
+        /// Order Id, that cancelled current trade
+        /// </summary>
+        string CancelledBy { get; }
     }
 }

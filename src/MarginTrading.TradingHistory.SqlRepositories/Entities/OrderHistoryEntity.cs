@@ -61,7 +61,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public string UpdateType { get; set; }
         public string AdditionalInfo { get; set; }
         public string CorrelationId { get; set; }
-
         public string MatchedOrders { get; set; }
         public string RelatedOrderInfos { get; set; }
         
@@ -109,7 +108,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 MatchedOrders = order.MatchedOrders.ToJson(),
                 UpdateType = order.UpdateType.ToString(),
                 AdditionalInfo = order.AdditionalInfo,
-                CorrelationId = order.CorrelationId,
+                CorrelationId = order.CorrelationId
             };
         }
     }

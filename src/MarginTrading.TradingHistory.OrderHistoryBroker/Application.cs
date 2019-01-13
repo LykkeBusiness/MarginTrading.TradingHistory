@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Common.Log;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.SlackNotifications;
 using MarginTrading.Backend.Contracts.Events;
+using MarginTrading.Backend.Contracts.Orders;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
+using Newtonsoft.Json;
 
 namespace MarginTrading.TradingHistory.OrderHistoryBroker
 {
@@ -19,7 +22,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         private readonly ILog _log;
         private readonly Settings _settings;
 
-        public Application(IOrdersHistoryRepository ordersHistoryRepository, 
+        public Application(IOrdersHistoryRepository ordersHistoryRepository,
             ITradesRepository tradesRepository,
             ILog logger,
             Settings settings, CurrentApplicationInfo applicationInfo,
@@ -39,14 +42,14 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         protected override Task HandleMessage(OrderHistoryEvent historyEvent)
         {
             var tasks = new List<Task>();
-            
+
             var orderHistory = historyEvent.OrderSnapshot.ToOrderHistoryDomain(historyEvent.Type);
             tasks.Add(_ordersHistoryRepository.AddAsync(orderHistory));
 
             if (historyEvent.Type == OrderHistoryTypeContract.Executed)
             {
                 var trade = new Trade(
-                    historyEvent.OrderSnapshot.Id, 
+                    historyEvent.OrderSnapshot.Id,
                     historyEvent.OrderSnapshot.AccountId,
                     historyEvent.OrderSnapshot.Id,
                     historyEvent.OrderSnapshot.AssetPairId,
@@ -60,8 +63,17 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                     historyEvent.OrderSnapshot.ExpectedOpenPrice,
                     historyEvent.OrderSnapshot.FxRate,
                     historyEvent.OrderSnapshot.AdditionalInfo
-                    );
+                );
+
                 tasks.Add(_tradesRepository.AddAsync(trade));
+
+                var cancelledTradeId = TryGetCancelledTradeId(historyEvent.OrderSnapshot);
+
+                if (!string.IsNullOrEmpty(cancelledTradeId))
+                {
+                    tasks.Add(_tradesRepository.SetCancelledByAsync(cancelledTradeId,
+                        historyEvent.OrderSnapshot.Id));
+                }
             }
 
             return Task.WhenAll(tasks.Select(t => Task.Run(async () =>
@@ -76,27 +88,32 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                 }
             })));
         }
+
+        private string TryGetCancelledTradeId(OrderContract order)
+        {
+            try
+            {
+                var info = JsonConvert.DeserializeObject<Dictionary<string, object>>(order.AdditionalInfo);
+
+                if (info.TryGetValue(_settings.IsCancellationTradeAttributeName, out var cancellationFlagStr))
+                {
+                    if (bool.TryParse(cancellationFlagStr.ToString(), out var cancellationFlag))
+                    {
+                        if (cancellationFlag &&
+                            info.TryGetValue(_settings.CancelledTradeIdAttributeName, out var cancelledTradeId))
+                        {
+                            return cancelledTradeId.ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.WriteWarningAsync(nameof(TryGetCancelledTradeId), order.AdditionalInfo,
+                    "Error getting of cancelled trade id", ex);
+            }
+
+            return null;
+        }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
