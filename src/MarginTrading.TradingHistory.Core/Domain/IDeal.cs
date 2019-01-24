@@ -8,8 +8,15 @@ namespace MarginTrading.TradingHistory.Core.Domain
         DateTime Created { get; }
         string AccountId { get; }
         string AssetPairId { get; }
+        
         string OpenTradeId { get; }
+        OrderType OpenOrderType { get; }
+        decimal OpenOrderVolume { get; }
+        decimal? OpenOrderExpectedPrice { get; }
         string CloseTradeId { get; }
+        OrderType CloseOrderType { get; }
+        decimal CloseOrderVolume { get; }
+        decimal? CloseOrderExpectedPrice { get; }
         PositionDirection Direction { get; }
         decimal Volume { get; }
         OriginatorType Originator { get; }

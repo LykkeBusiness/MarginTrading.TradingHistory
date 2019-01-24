@@ -21,7 +21,13 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public DateTime Created { get; set; }
         public string AssetPairId { get; set; }
         public string OpenTradeId { get; set; }
+        public OrderType OpenOrderType { get; set; }
+        public decimal OpenOrderVolume { get; set; }
+        public decimal? OpenOrderExpectedPrice { get; set; }
         public string CloseTradeId { get; set; }
+        public OrderType CloseOrderType { get; set; }
+        public decimal CloseOrderVolume { get; set; }
+        public decimal? CloseOrderExpectedPrice { get; set; }
         PositionDirection IDeal.Direction => Enum.Parse<PositionDirection>(Direction);        
         public string Direction { get; set; }
         public decimal Volume { get; set; }
