@@ -115,16 +115,17 @@ INDEX IX_{0}_Base (AccountId, AssetPairId)
             }
         }
 
-        public async Task<PaginatedResponse<ITrade>> GetByPagesAsync(string accountId, string assetPairId, 
-            int? skip = null, int? take = null)
+        public async Task<PaginatedResponse<ITrade>> GetByPagesAsync(string accountId, string assetPairId,
+            int? skip = null, int? take = null, bool isAscending = true)
         {
             var whereClause = "WHERE 1=1 "
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId");
+            var order = isAscending ? string.Empty : Constants.DescendingOrder;
+            var paginationClause = $" ORDER BY [TradeTimestamp] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
             
             using (var conn = new SqlConnection(_connectionString))
             {
-                var paginationClause = $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
                 var gridReader = await conn.QueryMultipleAsync(
                     $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
                     new {accountId, assetPairId});

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AzureStorage;
 using MarginTrading.TradingHistory.AzureRepositories.Entities;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 
@@ -58,17 +59,20 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             return entities;
         }
 
-        public async Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId, 
-            OrderStatus? status, bool withRelated, 
+        public async Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId,
+            OrderStatus? status, bool withRelated,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
-            int? skip = null, int? take = null)
+            int? skip = null, int? take = null, bool isAscending = true)
         {
             var allData = await GetHistoryAsync(accountId, assetPairId, status, withRelated, 
                 createdTimeStart, createdTimeEnd, modifiedTimeStart, modifiedTimeEnd);
 
             //TODO refactor before using azure impl
-            var data = allData.OrderBy(x => x.CreatedTimestamp).ToList();
+            var data = (isAscending
+                    ? allData.OrderBy(x => x.CreatedTimestamp)
+                    : allData.OrderByDescending(x => x.CreatedTimestamp))
+                .ToList();
             var filtered = take.HasValue ? data.Skip(skip.Value).Take(take.Value).ToList() : data;
             
             return new PaginatedResponse<IOrderHistory>(

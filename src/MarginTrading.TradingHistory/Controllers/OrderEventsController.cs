@@ -57,7 +57,8 @@ namespace MarginTrading.TradingHistory.Controllers
             [FromQuery] OrderStatusContract? status = null, [FromQuery] bool withRelated = true,
             [FromQuery] DateTime? createdTimeStart = null, [FromQuery] DateTime? createdTimeEnd = null,
             [FromQuery] DateTime? modifiedTimeStart = null, [FromQuery] DateTime? modifiedTimeEnd = null, 
-            [FromQuery] int? skip = null, [FromQuery] int? take = null)
+            [FromQuery] int? skip = null, [FromQuery] int? take = null, 
+            [FromQuery] string order = Constants.AscendingOrder)
         {
             ApiValidationHelper.ValidatePagingParams(skip, take);
             
@@ -71,7 +72,8 @@ namespace MarginTrading.TradingHistory.Controllers
                 modifiedTimeStart: modifiedTimeStart, 
                 modifiedTimeEnd: modifiedTimeEnd,
                 skip: skip,
-                take: take);
+                take: take,
+                isAscending: order == Constants.AscendingOrder);
 
             return new PaginatedResponseContract<OrderEventContract>(
                 contents: data.Contents.Select(Convert).ToList(),
