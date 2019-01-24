@@ -62,21 +62,27 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                 && positionHistoryEvent.Deal != null)
             {
                 var deal = new Deal(
-                    positionHistoryEvent.Deal.DealId,
-                    positionHistoryEvent.Deal.Created,
-                    positionHistoryEvent.PositionSnapshot.AccountId,
-                    positionHistoryEvent.PositionSnapshot.AssetPairId,
-                    positionHistoryEvent.Deal.OpenTradeId,
-                    positionHistoryEvent.Deal.CloseTradeId,
-                    positionHistoryEvent.PositionSnapshot.Direction.ToType<PositionDirection>(),
-                    positionHistoryEvent.Deal.Volume,
-                    positionHistoryEvent.Deal.Originator.ToType<OriginatorType>(),
-                    positionHistoryEvent.Deal.OpenPrice,
-                    positionHistoryEvent.Deal.OpenFxPrice,
-                    positionHistoryEvent.Deal.ClosePrice,
-                    positionHistoryEvent.Deal.CloseFxPrice,
-                    positionHistoryEvent.Deal.Fpl,
-                    positionHistoryEvent.Deal.AdditionalInfo);
+                    dealId: positionHistoryEvent.Deal.DealId,
+                    created: positionHistoryEvent.Deal.Created,
+                    accountId: positionHistoryEvent.PositionSnapshot.AccountId,
+                    assetPairId: positionHistoryEvent.PositionSnapshot.AssetPairId,
+                    openTradeId: positionHistoryEvent.Deal.OpenTradeId,
+                    openOrderType: positionHistoryEvent.Deal.OpenOrderType.ToType<OrderType>(),
+                    openOrderVolume: positionHistoryEvent.Deal.OpenOrderVolume,
+                    openOrderExpectedPrice: positionHistoryEvent.Deal.OpenOrderExpectedPrice,
+                    closeTradeId: positionHistoryEvent.Deal.CloseTradeId,
+                    closeOrderType: positionHistoryEvent.Deal.CloseOrderType.ToType<OrderType>(),
+                    closeOrderVolume: positionHistoryEvent.Deal.CloseOrderVolume,
+                    closeOrderExpectedPrice: positionHistoryEvent.Deal.CloseOrderExpectedPrice,
+                    direction: positionHistoryEvent.PositionSnapshot.Direction.ToType<PositionDirection>(),
+                    volume: positionHistoryEvent.Deal.Volume,
+                    originator: positionHistoryEvent.Deal.Originator.ToType<OriginatorType>(),
+                    openPrice: positionHistoryEvent.Deal.OpenPrice,
+                    openFxPrice: positionHistoryEvent.Deal.OpenFxPrice,
+                    closePrice: positionHistoryEvent.Deal.ClosePrice,
+                    closeFxPrice: positionHistoryEvent.Deal.CloseFxPrice,
+                    fpl: positionHistoryEvent.Deal.Fpl,
+                    additionalInfo: positionHistoryEvent.Deal.AdditionalInfo);
                 tasks.Add(_dealsRepository.AddAsync(deal));
             }
 

@@ -10,7 +10,13 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public string AccountId { get; set; }
         public string AssetPairId { get; set; }
         public string OpenTradeId { get; set; }
+        public OrderType OpenOrderType { get; set; }
+        public decimal OpenOrderVolume { get; set; }
+        public decimal? OpenOrderExpectedPrice { get; set; }
         public string CloseTradeId { get; set; }
+        public OrderType CloseOrderType { get; set; }
+        public decimal CloseOrderVolume { get; set; }
+        public decimal? CloseOrderExpectedPrice { get; set; }
         PositionDirection IDeal.Direction => Enum.Parse<PositionDirection>(Direction); 
         public string Direction { get; set; }
         public decimal Volume { get; set; }
@@ -32,7 +38,13 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 AccountId = deal.AccountId,
                 AssetPairId = deal.AssetPairId,
                 OpenTradeId = deal.OpenTradeId,
+                OpenOrderType = deal.OpenOrderType,
+                OpenOrderVolume = deal.OpenOrderVolume,
+                OpenOrderExpectedPrice = deal.OpenOrderExpectedPrice,
                 CloseTradeId = deal.CloseTradeId,
+                CloseOrderType = deal.CloseOrderType,
+                CloseOrderVolume = deal.CloseOrderVolume,
+                CloseOrderExpectedPrice = deal.CloseOrderExpectedPrice,
                 Direction = deal.Direction.ToString(),
                 Volume = deal.Volume,
                 Originator = deal.Originator.ToString(),
