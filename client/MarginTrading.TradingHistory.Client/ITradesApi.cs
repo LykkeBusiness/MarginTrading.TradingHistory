@@ -31,6 +31,7 @@ namespace MarginTrading.TradingHistory.Client
         [Get("/api/trades/by-pages")]
         Task<PaginatedResponseContract<TradeContract>> ListByPages([Query, NotNull] string accountId, 
             [Query, CanBeNull] string assetPairId = null,
-            [Query, CanBeNull] int? skip = null, [Query, CanBeNull] int? take = null); 
+            [Query, CanBeNull] int? skip = null, [Query, CanBeNull] int? take = null,
+            [Query] string order = "ASC"); 
     }
 }

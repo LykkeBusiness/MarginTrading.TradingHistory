@@ -29,7 +29,8 @@ namespace MarginTrading.TradingHistory.Client
         Task<PaginatedResponseContract<DealContract>> ListByPages( 
             [Query, CanBeNull] string accountId, [Query, CanBeNull] string instrument,
             [Query, CanBeNull] DateTime? closeTimeStart = null, [Query, CanBeNull] DateTime? closeTimeEnd = null,
-            [Query, CanBeNull] int? skip = null, [Query, CanBeNull] int? take = null);
+            [Query, CanBeNull] int? skip = null, [Query, CanBeNull] int? take = null,
+            [Query] string order = "ASC");
         
         /// <summary>
         /// Get deal by Id

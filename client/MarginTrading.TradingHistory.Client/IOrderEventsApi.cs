@@ -38,7 +38,8 @@ namespace MarginTrading.TradingHistory.Client
             [Query, CanBeNull] DateTime? createdTimeStart = null, [Query, CanBeNull] DateTime? createdTimeEnd = null,
             [Query, CanBeNull] DateTime? modifiedTimeStart = null, [Query, CanBeNull] DateTime? modifiedTimeEnd = null,
             [Query, CanBeNull] int? skip = null, 
-            [Query, CanBeNull] int? take = null);
+            [Query, CanBeNull] int? take = null,
+            [Query] string order = "ASC");
 
         /// <summary>
         /// Get order by Id, optionally including related orders.
