@@ -37,17 +37,17 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// <summary>
         /// Type of opening order
         /// </summary>
-        public OrderTypeContract OpenOrderType { get; }
+        public OrderTypeContract OpenOrderType { get; set; }
         
         /// <summary>
         /// Volume of opening order
         /// </summary>
-        public decimal OpenOrderVolume { get; }
+        public decimal OpenOrderVolume { get; set; }
         
         /// <summary>
         /// Expected price of opening order
         /// </summary>
-        public decimal? OpenOrderExpectedPrice { get; }
+        public decimal? OpenOrderExpectedPrice { get; set; }
         
         /// <summary>
         /// Id of the closing trade
@@ -57,17 +57,17 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// <summary>
         /// Type of closing order
         /// </summary>
-        public OrderTypeContract CloseOrderType { get; }
+        public OrderTypeContract CloseOrderType { get; set; }
         
         /// <summary>
         /// Volume of closing order
         /// </summary>
-        public decimal CloseOrderVolume { get; }
+        public decimal CloseOrderVolume { get; set; }
         
         /// <summary>
         /// Expected price of closing order
         /// </summary>
-        public decimal? CloseOrderExpectedPrice { get; }
+        public decimal? CloseOrderExpectedPrice { get; set; }
         
         /// <summary>
         /// The direction of a position
