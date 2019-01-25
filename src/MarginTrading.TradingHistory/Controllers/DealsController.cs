@@ -81,7 +81,8 @@ namespace MarginTrading.TradingHistory.Controllers
         private DealContract Convert(IDeal deal)
         {
             return _convertService.Convert<IDeal, DealContract>(deal, opts => opts.ConfigureMap()
-                .ForMember(x => x.Direction, o => o.ResolveUsing(z => z.Direction.ToType<PositionDirectionContract>())));
+                .ForMember(x => x.Direction, 
+                    o => o.ResolveUsing(z => z.Direction.ToType<PositionDirectionContract>())));
         }
     }
 }
