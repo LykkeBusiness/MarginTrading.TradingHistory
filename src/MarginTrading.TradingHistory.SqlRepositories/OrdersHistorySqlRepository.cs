@@ -166,7 +166,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
         }
 
         public async Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId,
-            OrderStatus? status, bool withRelated,
+            List<OrderStatus> statuses, bool withRelated,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
             int? skip = null, int? take = null, bool isAscending = true)
@@ -174,7 +174,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
             var whereClause = " WHERE 1=1 "
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
-                              + (status == null ? "" : " AND Status=@status")
+                              + (statuses == null || statuses.Count == 0 ? "" : " AND Status IN @statuses")
                               + (withRelated ? "" : " AND ParentOrderId IS NULL")
                               + (createdTimeStart == null ? "": " AND CreatedTimestamp >= @createdTimeStart")
                               + (createdTimeEnd == null ? "": " AND CreatedTimestamp < @createdTimeEnd")
@@ -191,7 +191,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
                     {
                         accountId, 
                         assetPairId, 
-                        status = status?.ToString(),
+                        statuses = statuses?.Select(x => x.ToString()).ToArray(),
                         createdTimeStart,
                         createdTimeEnd,
                         modifiedTimeStart,

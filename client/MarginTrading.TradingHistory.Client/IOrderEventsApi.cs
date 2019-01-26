@@ -33,7 +33,7 @@ namespace MarginTrading.TradingHistory.Client
         Task<PaginatedResponseContract<OrderEventContract>> OrderHistoryByPages(
             [Query, CanBeNull] string accountId = null,
             [Query, CanBeNull] string assetPairId = null,
-            [Query, CanBeNull] OrderStatusContract? status = null,
+            [Query, CanBeNull] List<OrderStatusContract> statuses = null,
             [Query] bool withRelated = true,
             [Query, CanBeNull] DateTime? createdTimeStart = null, [Query, CanBeNull] DateTime? createdTimeEnd = null,
             [Query, CanBeNull] DateTime? modifiedTimeStart = null, [Query, CanBeNull] DateTime? modifiedTimeEnd = null,

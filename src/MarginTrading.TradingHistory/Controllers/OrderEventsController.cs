@@ -54,7 +54,7 @@ namespace MarginTrading.TradingHistory.Controllers
         [HttpGet, Route("by-pages")]
         public async Task<PaginatedResponseContract<OrderEventContract>> OrderHistoryByPages(
             [FromQuery] string accountId = null, [FromQuery] string assetPairId = null, 
-            [FromQuery] OrderStatusContract? status = null, [FromQuery] bool withRelated = true,
+            [FromQuery] List<OrderStatusContract> statuses = null, [FromQuery] bool withRelated = true,
             [FromQuery] DateTime? createdTimeStart = null, [FromQuery] DateTime? createdTimeEnd = null,
             [FromQuery] DateTime? modifiedTimeStart = null, [FromQuery] DateTime? modifiedTimeEnd = null, 
             [FromQuery] int? skip = null, [FromQuery] int? take = null, 
@@ -65,7 +65,7 @@ namespace MarginTrading.TradingHistory.Controllers
             var data = await _ordersHistoryRepository.GetHistoryByPagesAsync(
                 accountId: accountId, 
                 assetPairId: assetPairId,
-                status: status?.ToType<OrderStatus>(),
+                statuses: statuses?.Select(x => x.ToType<OrderStatus>()).ToList(),
                 withRelated: withRelated, 
                 createdTimeStart: createdTimeStart, 
                 createdTimeEnd: createdTimeEnd, 
