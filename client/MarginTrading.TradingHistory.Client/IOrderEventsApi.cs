@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -21,10 +22,12 @@ namespace MarginTrading.TradingHistory.Client
             [Query, CanBeNull] string accountId = null,
             [Query, CanBeNull] string assetPairId = null,
             [Query, CanBeNull] OrderStatusContract? status = null,
-            [Query] bool withRelated = true);
+            [Query] bool withRelated = true,
+            [Query, CanBeNull] DateTime? createdTimeStart = null, [Query, CanBeNull] DateTime? createdTimeEnd = null,
+            [Query, CanBeNull] DateTime? modifiedTimeStart = null, [Query, CanBeNull] DateTime? modifiedTimeEnd = null);
         
         /// <summary>
-        /// Get orders with optional filtering, optionally including related orders, and with pagination
+        /// Get orders with optional filtering, optionally including related orders, and with pagination.
         /// </summary>
         [Get("/api/order-events/by-pages")]
         Task<PaginatedResponseContract<OrderEventContract>> OrderHistoryByPages(
@@ -32,6 +35,8 @@ namespace MarginTrading.TradingHistory.Client
             [Query, CanBeNull] string assetPairId = null,
             [Query, CanBeNull] OrderStatusContract? status = null,
             [Query] bool withRelated = true,
+            [Query, CanBeNull] DateTime? createdTimeStart = null, [Query, CanBeNull] DateTime? createdTimeEnd = null,
+            [Query, CanBeNull] DateTime? modifiedTimeStart = null, [Query, CanBeNull] DateTime? modifiedTimeEnd = null,
             [Query, CanBeNull] int? skip = null, 
             [Query, CanBeNull] int? take = null);
 

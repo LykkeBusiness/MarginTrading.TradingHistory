@@ -31,25 +31,33 @@ namespace MarginTrading.TradingHistory.Controllers
         [HttpGet, Route("")]
         public async Task<List<OrderEventContract>> OrderHistory(
             [FromQuery] string accountId = null, [FromQuery] string assetPairId = null,
-            [FromQuery] OrderStatusContract? status = null, [FromQuery] bool withRelated = true)
+            [FromQuery] OrderStatusContract? status = null, [FromQuery] bool withRelated = true,
+            [FromQuery] DateTime? createdTimeStart = null, [FromQuery] DateTime? createdTimeEnd = null,
+            [FromQuery] DateTime? modifiedTimeStart = null, [FromQuery] DateTime? modifiedTimeEnd = null)
         {
             var history = await _ordersHistoryRepository.GetHistoryAsync(
                 accountId: accountId, 
                 assetPairId: assetPairId,
                 status: status?.ToType<OrderStatus>(),
-                withRelated: withRelated);
+                withRelated: withRelated, 
+                createdTimeStart: createdTimeStart, 
+                createdTimeEnd: createdTimeEnd, 
+                modifiedTimeStart: modifiedTimeStart, 
+                modifiedTimeEnd: modifiedTimeEnd);
 
             return history.Select(Convert).ToList();
         }
 
         /// <summary>
-        /// Get orders with optional filtering, optionally including related orders, and with pagination
+        /// Get orders with optional filtering, optionally including related orders, and with pagination.
         /// </summary>
         [HttpGet, Route("by-pages")]
         public async Task<PaginatedResponseContract<OrderEventContract>> OrderHistoryByPages(
-            [FromQuery] string accountId = null, 
-            [FromQuery] string assetPairId = null, [FromQuery] OrderStatusContract? status = null,
-            [FromQuery] bool withRelated = true, [FromQuery] int? skip = null, [FromQuery] int? take = null)
+            [FromQuery] string accountId = null, [FromQuery] string assetPairId = null, 
+            [FromQuery] OrderStatusContract? status = null, [FromQuery] bool withRelated = true,
+            [FromQuery] DateTime? createdTimeStart = null, [FromQuery] DateTime? createdTimeEnd = null,
+            [FromQuery] DateTime? modifiedTimeStart = null, [FromQuery] DateTime? modifiedTimeEnd = null, 
+            [FromQuery] int? skip = null, [FromQuery] int? take = null)
         {
             ApiValidationHelper.ValidatePagingParams(skip, take);
             
@@ -57,7 +65,11 @@ namespace MarginTrading.TradingHistory.Controllers
                 accountId: accountId, 
                 assetPairId: assetPairId,
                 status: status?.ToType<OrderStatus>(),
-                withRelated: withRelated,
+                withRelated: withRelated, 
+                createdTimeStart: createdTimeStart, 
+                createdTimeEnd: createdTimeEnd, 
+                modifiedTimeStart: modifiedTimeStart, 
+                modifiedTimeEnd: modifiedTimeEnd,
                 skip: skip,
                 take: take);
 
@@ -135,7 +147,7 @@ namespace MarginTrading.TradingHistory.Controllers
                     new RelatedOrderInfoContract {Id = o.Id, Type = o.Type.ToType<OrderTypeContract>()}).ToList(),
                 UpdateType = history.UpdateType.ToType<OrderUpdateTypeContract>(),
                 AdditionalInfo = history.AdditionalInfo,
-                CorrelationId = history.CorrelationId,
+                CorrelationId = history.CorrelationId
             };
         }
     }

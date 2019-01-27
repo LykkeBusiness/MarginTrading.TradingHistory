@@ -30,5 +30,6 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public decimal? OrderExpectedPrice { get; set; }
         public decimal FxRate { get; set; }
         public string AdditionalInfo { get; set; }
+        public string CancelledBy { get; set; }
     }
 }

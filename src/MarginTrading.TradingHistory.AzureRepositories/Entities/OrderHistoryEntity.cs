@@ -105,7 +105,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
                 MatchedOrders = order.MatchedOrders,
                 UpdateType = order.UpdateType,
                 AdditionalInfo = order.AdditionalInfo,
-                CorrelationId = order.CorrelationId,
+                CorrelationId = order.CorrelationId
             };
         }
     }
