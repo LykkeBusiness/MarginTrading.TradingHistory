@@ -30,7 +30,7 @@ namespace MarginTrading.TradingHistory.Client
             [Query, CanBeNull] string accountId, [Query, CanBeNull] string instrument,
             [Query, CanBeNull] DateTime? closeTimeStart = null, [Query, CanBeNull] DateTime? closeTimeEnd = null,
             [Query, CanBeNull] int? skip = null, [Query, CanBeNull] int? take = null,
-            [Query] string order = "ASC");
+            [Query] bool isAscending = false);
         
         /// <summary>
         /// Get deal by Id

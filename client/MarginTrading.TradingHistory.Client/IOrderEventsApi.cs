@@ -29,17 +29,12 @@ namespace MarginTrading.TradingHistory.Client
         /// <summary>
         /// Get orders with optional filtering, optionally including related orders, and with pagination.
         /// </summary>
-        [Get("/api/order-events/by-pages")]
+        [Post("/api/order-events/by-pages")]
         Task<PaginatedResponseContract<OrderEventContract>> OrderHistoryByPages(
-            [Query, CanBeNull] string accountId = null,
-            [Query, CanBeNull] string assetPairId = null,
-            [Query, CanBeNull] List<OrderStatusContract> statuses = null,
-            [Query] bool withRelated = true,
-            [Query, CanBeNull] DateTime? createdTimeStart = null, [Query, CanBeNull] DateTime? createdTimeEnd = null,
-            [Query, CanBeNull] DateTime? modifiedTimeStart = null, [Query, CanBeNull] DateTime? modifiedTimeEnd = null,
+            [Body, CanBeNull] OrderEventsFilterRequest filters,
             [Query, CanBeNull] int? skip = null, 
             [Query, CanBeNull] int? take = null,
-            [Query] string order = "ASC");
+            [Query] bool isAscending = false);
 
         /// <summary>
         /// Get order by Id, optionally including related orders.
