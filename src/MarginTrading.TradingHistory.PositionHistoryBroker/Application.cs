@@ -49,11 +49,7 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
         {
             var tasks = new List<Task>();
             
-            var position = _convertService.Convert<PositionContract, PositionHistory>(
-                    positionHistoryEvent.PositionSnapshot, o => o.ConfigureMap(MemberList.Source));
-            position.HistoryType = positionHistoryEvent.EventType.ToType<PositionHistoryType>();
-            position.HistoryTimestamp = positionHistoryEvent.Timestamp;
-            position.DealId = positionHistoryEvent.Deal?.DealId;
+            var position = Map(positionHistoryEvent);
             
             tasks.Add(_positionsHistoryRepository.AddAsync(position));
 
@@ -62,21 +58,28 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                 && positionHistoryEvent.Deal != null)
             {
                 var deal = new Deal(
-                    positionHistoryEvent.Deal.DealId,
-                    positionHistoryEvent.Deal.Created,
-                    positionHistoryEvent.PositionSnapshot.AccountId,
-                    positionHistoryEvent.PositionSnapshot.AssetPairId,
-                    positionHistoryEvent.Deal.OpenTradeId,
-                    positionHistoryEvent.Deal.CloseTradeId,
-                    positionHistoryEvent.PositionSnapshot.Direction.ToType<PositionDirection>(),
-                    positionHistoryEvent.Deal.Volume,
-                    positionHistoryEvent.Deal.Originator.ToType<OriginatorType>(),
-                    positionHistoryEvent.Deal.OpenPrice,
-                    positionHistoryEvent.Deal.OpenFxPrice,
-                    positionHistoryEvent.Deal.ClosePrice,
-                    positionHistoryEvent.Deal.CloseFxPrice,
-                    positionHistoryEvent.Deal.Fpl,
-                    positionHistoryEvent.Deal.AdditionalInfo);
+                    dealId: positionHistoryEvent.Deal.DealId,
+                    created: positionHistoryEvent.Deal.Created,
+                    accountId: positionHistoryEvent.PositionSnapshot.AccountId,
+                    assetPairId: positionHistoryEvent.PositionSnapshot.AssetPairId,
+                    openTradeId: positionHistoryEvent.Deal.OpenTradeId,
+                    openOrderType: positionHistoryEvent.Deal.OpenOrderType.ToType<OrderType>(),
+                    openOrderVolume: positionHistoryEvent.Deal.OpenOrderVolume,
+                    openOrderExpectedPrice: positionHistoryEvent.Deal.OpenOrderExpectedPrice,
+                    closeTradeId: positionHistoryEvent.Deal.CloseTradeId,
+                    closeOrderType: positionHistoryEvent.Deal.CloseOrderType.ToType<OrderType>(),
+                    closeOrderVolume: positionHistoryEvent.Deal.CloseOrderVolume,
+                    closeOrderExpectedPrice: positionHistoryEvent.Deal.CloseOrderExpectedPrice,
+                    direction: positionHistoryEvent.PositionSnapshot.Direction.ToType<PositionDirection>(),
+                    volume: positionHistoryEvent.Deal.Volume,
+                    originator: positionHistoryEvent.Deal.Originator.ToType<OriginatorType>(),
+                    openPrice: positionHistoryEvent.Deal.OpenPrice,
+                    openFxPrice: positionHistoryEvent.Deal.OpenFxPrice,
+                    closePrice: positionHistoryEvent.Deal.ClosePrice,
+                    closeFxPrice: positionHistoryEvent.Deal.CloseFxPrice,
+                    fpl: positionHistoryEvent.Deal.Fpl,
+                    additionalInfo: positionHistoryEvent.Deal.AdditionalInfo);
+                
                 tasks.Add(_dealsRepository.AddAsync(deal));
             }
 
@@ -91,6 +94,57 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                     await _log.WriteErrorAsync(nameof(HandleMessage), "SwitchThread", "", ex);
                 }
             })));
+        }
+
+        private static PositionHistory Map(PositionHistoryEvent positionHistoryEvent)
+        {
+            return new PositionHistory
+            {
+                Id = positionHistoryEvent.PositionSnapshot.Id,
+                DealId = positionHistoryEvent.Deal?.DealId,
+                Code = positionHistoryEvent.PositionSnapshot.Code,
+                AssetPairId = positionHistoryEvent.PositionSnapshot.AssetPairId,
+                Direction = positionHistoryEvent.PositionSnapshot.Direction.ToType<PositionDirection>(),
+                Volume = positionHistoryEvent.PositionSnapshot.Volume,
+                AccountId = positionHistoryEvent.PositionSnapshot.AccountId,
+                TradingConditionId = positionHistoryEvent.PositionSnapshot.TradingConditionId,
+                AccountAssetId = positionHistoryEvent.PositionSnapshot.AccountAssetId,
+                ExpectedOpenPrice = positionHistoryEvent.PositionSnapshot.ExpectedOpenPrice,
+                OpenMatchingEngineId = positionHistoryEvent.PositionSnapshot.OpenMatchingEngineId,
+                OpenDate = positionHistoryEvent.PositionSnapshot.OpenDate,
+                OpenTradeId = positionHistoryEvent.PositionSnapshot.OpenTradeId,
+                OpenPrice = positionHistoryEvent.PositionSnapshot.OpenPrice,
+                OpenFxPrice = positionHistoryEvent.PositionSnapshot.OpenFxPrice,
+                EquivalentAsset = positionHistoryEvent.PositionSnapshot.EquivalentAsset,
+                OpenPriceEquivalent = positionHistoryEvent.PositionSnapshot.OpenPriceEquivalent,
+                RelatedOrders = positionHistoryEvent.PositionSnapshot.RelatedOrders.Select(ro => new RelatedOrderInfo
+                {
+                    Type = ro.Type.ToType<OrderType>(),
+                    Id = ro.Id,
+                }).ToList(),
+                LegalEntity = positionHistoryEvent.PositionSnapshot.LegalEntity,
+                OpenOriginator = positionHistoryEvent.PositionSnapshot.OpenOriginator.ToType<OriginatorType>(),
+                ExternalProviderId = positionHistoryEvent.PositionSnapshot.ExternalProviderId,
+                SwapCommissionRate = positionHistoryEvent.PositionSnapshot.SwapCommissionRate,
+                OpenCommissionRate = positionHistoryEvent.PositionSnapshot.OpenCommissionRate,
+                CloseCommissionRate = positionHistoryEvent.PositionSnapshot.CloseCommissionRate,
+                CommissionLot = positionHistoryEvent.PositionSnapshot.CommissionLot,
+                CloseMatchingEngineId = positionHistoryEvent.PositionSnapshot.CloseMatchingEngineId,
+                ClosePrice = positionHistoryEvent.PositionSnapshot.ClosePrice,
+                CloseFxPrice = positionHistoryEvent.PositionSnapshot.CloseFxPrice,
+                ClosePriceEquivalent = positionHistoryEvent.PositionSnapshot.ClosePriceEquivalent,
+                StartClosingDate = positionHistoryEvent.PositionSnapshot.StartClosingDate,
+                CloseDate = positionHistoryEvent.PositionSnapshot.CloseDate,
+                CloseOriginator = positionHistoryEvent.PositionSnapshot.CloseOriginator?.ToType<OriginatorType>(),
+                CloseReason = positionHistoryEvent.PositionSnapshot.CloseReason.ToType<OrderCloseReason>(),
+                CloseComment = positionHistoryEvent.PositionSnapshot.CloseComment,
+                CloseTrades = positionHistoryEvent.PositionSnapshot.CloseTrades,
+                LastModified = positionHistoryEvent.PositionSnapshot.LastModified,
+                TotalPnL = positionHistoryEvent.PositionSnapshot.TotalPnL,
+                ChargedPnl = positionHistoryEvent.PositionSnapshot.ChargedPnl,
+                HistoryType = positionHistoryEvent.EventType.ToType<PositionHistoryType>(),
+                HistoryTimestamp = positionHistoryEvent.Timestamp,
+            };
         }
     }
 }
