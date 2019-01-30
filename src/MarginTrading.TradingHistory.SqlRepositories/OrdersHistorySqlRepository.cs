@@ -166,7 +166,8 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
         }
 
         public async Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId,
-            List<OrderStatus> statuses, bool withRelated,
+            List<OrderStatus> statuses, List<OrderType> orderTypes, List<OriginatorType> originatorTypes,
+            bool withRelated,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
             int? skip = null, int? take = null, bool isAscending = true)
@@ -175,6 +176,8 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
                               + (statuses == null || statuses.Count == 0 ? "" : " AND Status IN @statuses")
+                              + (orderTypes == null || orderTypes.Count == 0 ? "" : " AND [Type] IN @orderTypes")
+                              + (originatorTypes == null || originatorTypes.Count == 0 ? "" : " AND Originator IN @originatorTypes")
                               + (withRelated ? "" : " AND ParentOrderId IS NULL")
                               + (createdTimeStart == null ? "": " AND CreatedTimestamp >= @createdTimeStart")
                               + (createdTimeEnd == null ? "": " AND CreatedTimestamp < @createdTimeEnd")
@@ -192,6 +195,8 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
                         accountId, 
                         assetPairId, 
                         statuses = statuses?.Select(x => x.ToString()).ToArray(),
+                        orderTypes = orderTypes?.Select(x => x.ToString()).ToArray(),
+                        originatorTypes = originatorTypes?.Select(x => x.ToString()).ToArray(),
                         createdTimeStart,
                         createdTimeEnd,
                         modifiedTimeStart,

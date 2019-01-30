@@ -60,7 +60,8 @@ namespace MarginTrading.TradingHistory.AzureRepositories
         }
 
         public async Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId,
-            List<OrderStatus> statuses, bool withRelated,
+            List<OrderStatus> statuses, List<OrderType> orderTypes, List<OriginatorType> originatorTypes,
+            bool withRelated,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
             int? skip = null, int? take = null, bool isAscending = true)
@@ -69,6 +70,8 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 (string.IsNullOrWhiteSpace(accountId) || x.AccountId == accountId)
                 && (string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId)
                 && (statuses == null || statuses.Count == 0 || statuses.Any(s => s == x.Status))
+                && (orderTypes == null || orderTypes.Count == 0 || orderTypes.Any(s => s == x.Type))
+                && (originatorTypes == null || originatorTypes.Count == 0 || originatorTypes.Any(s => s == x.Originator))
                 && (createdTimeStart == null || x.CreatedTimestamp >= createdTimeStart)
                 && (createdTimeEnd == null || x.CreatedTimestamp < createdTimeEnd)
                 && (modifiedTimeStart == null || x.ModifiedTimestamp >= modifiedTimeStart)

@@ -18,7 +18,8 @@ namespace MarginTrading.TradingHistory.Core.Repositories
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null);
 
         Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId,
-            List<OrderStatus> statuses, bool withRelated,
+            List<OrderStatus> statuses, List<OrderType> orderTypes, List<OriginatorType> originatorTypes,
+            bool withRelated,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
             int? skip = null, int? take = null, bool isAscending = true);
