@@ -61,13 +61,15 @@ namespace MarginTrading.TradingHistory.Controllers
         /// </summary>
         [HttpGet, Route("by-pages")]
         public async Task<PaginatedResponseContract<TradeContract>> ListByPages([FromQuery] string accountId, 
-            [FromQuery] string assetPairId = null, [FromQuery] int? skip = null, [FromQuery] int? take = null)
+            [FromQuery] string assetPairId = null, [FromQuery] int? skip = null, [FromQuery] int? take = null,
+            [FromQuery] bool isAscending = false)
         {
             accountId.RequiredNotNullOrWhiteSpace(nameof(accountId));
             
             ApiValidationHelper.ValidatePagingParams(skip, take);
             
-            var data = await _tradesRepository.GetByPagesAsync(accountId, assetPairId, skip, take);
+            var data = await _tradesRepository.GetByPagesAsync(accountId, assetPairId, skip, take,
+                isAscending);
 
             return new PaginatedResponseContract<TradeContract>(
                 contents: data.Contents.Select(Convert).ToList(),

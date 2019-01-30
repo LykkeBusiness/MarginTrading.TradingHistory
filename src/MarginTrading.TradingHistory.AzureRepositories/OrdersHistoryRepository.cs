@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AzureStorage;
 using MarginTrading.TradingHistory.AzureRepositories.Entities;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 
@@ -58,17 +59,32 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             return entities;
         }
 
-        public async Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId, 
-            OrderStatus? status, bool withRelated, 
+        public async Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId,
+            List<OrderStatus> statuses, bool withRelated,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
-            int? skip = null, int? take = null)
+            int? skip = null, int? take = null, bool isAscending = true)
         {
-            var allData = await GetHistoryAsync(accountId, assetPairId, status, withRelated, 
-                createdTimeStart, createdTimeEnd, modifiedTimeStart, modifiedTimeEnd);
+            var entities = await _tableStorage.GetDataAsync(x =>
+                (string.IsNullOrWhiteSpace(accountId) || x.AccountId == accountId)
+                && (string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId)
+                && (statuses == null || statuses.Count == 0 || statuses.Any(s => s == x.Status))
+                && (createdTimeStart == null || x.CreatedTimestamp >= createdTimeStart)
+                && (createdTimeEnd == null || x.CreatedTimestamp < createdTimeEnd)
+                && (modifiedTimeStart == null || x.ModifiedTimestamp >= modifiedTimeStart)
+                && (modifiedTimeEnd == null || x.ModifiedTimestamp < modifiedTimeEnd));
+
+            var related = withRelated
+                ? await _tableStorage.GetDataAsync(x => entities.Select(e => e.Id).Contains(x.ParentOrderId))
+                : new List<OrderHistoryEntity>();
+
+            var allData = entities.Concat(related).OrderByDescending(entity => entity.ModifiedTimestamp);
 
             //TODO refactor before using azure impl
-            var data = allData.OrderBy(x => x.CreatedTimestamp).ToList();
+            var data = (isAscending
+                    ? allData.OrderBy(x => x.CreatedTimestamp)
+                    : allData.OrderByDescending(x => x.CreatedTimestamp))
+                .ToList();
             var filtered = take.HasValue ? data.Skip(skip.Value).Take(take.Value).ToList() : data;
             
             return new PaginatedResponse<IOrderHistory>(

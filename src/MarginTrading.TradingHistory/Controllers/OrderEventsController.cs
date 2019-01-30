@@ -51,27 +51,26 @@ namespace MarginTrading.TradingHistory.Controllers
         /// <summary>
         /// Get orders with optional filtering, optionally including related orders, and with pagination.
         /// </summary>
-        [HttpGet, Route("by-pages")]
+        [HttpPost, Route("by-pages")]
         public async Task<PaginatedResponseContract<OrderEventContract>> OrderHistoryByPages(
-            [FromQuery] string accountId = null, [FromQuery] string assetPairId = null, 
-            [FromQuery] OrderStatusContract? status = null, [FromQuery] bool withRelated = true,
-            [FromQuery] DateTime? createdTimeStart = null, [FromQuery] DateTime? createdTimeEnd = null,
-            [FromQuery] DateTime? modifiedTimeStart = null, [FromQuery] DateTime? modifiedTimeEnd = null, 
-            [FromQuery] int? skip = null, [FromQuery] int? take = null)
+            [FromBody] OrderEventsFilterRequest filters, 
+            [FromQuery] int? skip = null, [FromQuery] int? take = null, 
+            [FromQuery] bool isAscending = false)
         {
             ApiValidationHelper.ValidatePagingParams(skip, take);
             
             var data = await _ordersHistoryRepository.GetHistoryByPagesAsync(
-                accountId: accountId, 
-                assetPairId: assetPairId,
-                status: status?.ToType<OrderStatus>(),
-                withRelated: withRelated, 
-                createdTimeStart: createdTimeStart, 
-                createdTimeEnd: createdTimeEnd, 
-                modifiedTimeStart: modifiedTimeStart, 
-                modifiedTimeEnd: modifiedTimeEnd,
+                accountId:filters?.AccountId, 
+                assetPairId: filters?.AssetPairId,
+                statuses: filters?.Statuses?.Select(x => x.ToType<OrderStatus>()).ToList(),
+                withRelated: filters?.WithRelated ?? true, 
+                createdTimeStart: filters?.CreatedTimeStart, 
+                createdTimeEnd: filters?.CreatedTimeEnd, 
+                modifiedTimeStart: filters?.ModifiedTimeStart, 
+                modifiedTimeEnd: filters?.ModifiedTimeEnd,
                 skip: skip,
-                take: take);
+                take: take,
+                isAscending: isAscending);
 
             return new PaginatedResponseContract<OrderEventContract>(
                 contents: data.Contents.Select(Convert).ToList(),

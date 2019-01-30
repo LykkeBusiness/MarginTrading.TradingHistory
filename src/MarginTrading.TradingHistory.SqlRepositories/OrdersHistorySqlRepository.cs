@@ -165,32 +165,33 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
             }
         }
 
-        public async Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId, 
-            OrderStatus? status, bool withRelated, 
+        public async Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId,
+            List<OrderStatus> statuses, bool withRelated,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
-            int? skip = null, int? take = null)
+            int? skip = null, int? take = null, bool isAscending = true)
         {
             var whereClause = " WHERE 1=1 "
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
-                              + (status == null ? "" : " AND Status=@status")
+                              + (statuses == null || statuses.Count == 0 ? "" : " AND Status IN @statuses")
                               + (withRelated ? "" : " AND ParentOrderId IS NULL")
                               + (createdTimeStart == null ? "": " AND CreatedTimestamp >= @createdTimeStart")
                               + (createdTimeEnd == null ? "": " AND CreatedTimestamp < @createdTimeEnd")
                               + (modifiedTimeStart == null ? "": " AND ModifiedTimestamp >= @modifiedTimeStart")
                               + (modifiedTimeEnd == null ? "": " AND ModifiedTimestamp < @modifiedTimeEnd");
+            var order = isAscending ? string.Empty : Constants.DescendingOrder;
+            var paginationClause = $" ORDER BY [CreatedTimestamp] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
             
             using (var conn = new SqlConnection(_connectionString))
-            {
-                var paginationClause = $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+            {    
                 var gridReader = await conn.QueryMultipleAsync(
                     $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
                     new
                     {
                         accountId, 
                         assetPairId, 
-                        status = status?.ToString(),
+                        statuses = statuses?.Select(x => x.ToString()).ToArray(),
                         createdTimeStart,
                         createdTimeEnd,
                         modifiedTimeStart,
@@ -203,7 +204,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
                     contents: orderHistoryEntities, 
                     start: skip ?? 0, 
                     size: orderHistoryEntities.Count, 
-                    totalSize: !take.HasValue ? orderHistoryEntities.Count : totalCount
+                    totalSize: totalCount
                 );
             }
         }

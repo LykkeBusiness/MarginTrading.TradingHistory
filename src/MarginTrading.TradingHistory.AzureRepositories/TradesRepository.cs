@@ -41,13 +41,16 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId);
         }
 
-        public async Task<PaginatedResponse<ITrade>> GetByPagesAsync(string accountId, string assetPairId, 
-            int? skip = null, int? take = null)
+        public async Task<PaginatedResponse<ITrade>> GetByPagesAsync(string accountId, string assetPairId,
+            int? skip = null, int? take = null, bool isAscending = true)
         {
             var allData = await GetByAccountAsync(accountId, assetPairId);
 
             //TODO refactor before using azure impl
-            var data = allData.OrderBy(x => x.OrderCreatedDate).ToList();
+            var data = (isAscending
+                    ? allData.OrderBy(x => x.OrderCreatedDate)
+                    : allData.OrderByDescending(x => x.OrderCreatedDate))
+                .ToList();
             var filtered = take.HasValue ? data.Skip(skip.Value).Take(take.Value).ToList() : data;
             
             return new PaginatedResponse<ITrade>(
