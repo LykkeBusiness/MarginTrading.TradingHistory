@@ -100,7 +100,7 @@ INDEX IX_{0}_Base (DealId, AccountId, AssetPairId, Created)
                     contents: deals, 
                     start: skip ?? 0, 
                     size: deals.Count, 
-                    totalSize: !take.HasValue ? deals.Count : totalCount
+                    totalSize: totalCount
                 );
             }
         }

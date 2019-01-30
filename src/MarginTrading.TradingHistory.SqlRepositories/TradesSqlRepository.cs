@@ -136,7 +136,7 @@ INDEX IX_{0}_Base (AccountId, AssetPairId)
                     contents: trades, 
                     start: skip ?? 0, 
                     size: trades.Count, 
-                    totalSize: !take.HasValue ? trades.Count : totalCount
+                    totalSize: totalCount
                 );
             }
         }

@@ -146,7 +146,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
                     contents: positionsHistoryEntities, 
                     start: skip ?? 0, 
                     size: positionsHistoryEntities.Count, 
-                    totalSize: !take.HasValue ? positionsHistoryEntities.Count : totalCount
+                    totalSize: totalCount
                 );
             }
         }
