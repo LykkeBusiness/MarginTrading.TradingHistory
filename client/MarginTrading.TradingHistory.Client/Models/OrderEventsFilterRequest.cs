@@ -20,5 +20,9 @@ namespace MarginTrading.TradingHistory.Client.Models
         public DateTime? ModifiedTimeStart { get; set; }
         
         public DateTime? ModifiedTimeEnd { get; set; }
+        
+        public List<OrderTypeContract> OrderTypes { get; set; }
+        
+        public List<OriginatorTypeContract> OriginatorTypes { get; set; }
     }
 }
