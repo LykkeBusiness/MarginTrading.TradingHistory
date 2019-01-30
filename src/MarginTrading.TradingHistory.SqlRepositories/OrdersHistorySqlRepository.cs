@@ -204,7 +204,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
                     contents: orderHistoryEntities, 
                     start: skip ?? 0, 
                     size: orderHistoryEntities.Count, 
-                    totalSize: !take.HasValue ? orderHistoryEntities.Count : totalCount
+                    totalSize: totalCount
                 );
             }
         }
