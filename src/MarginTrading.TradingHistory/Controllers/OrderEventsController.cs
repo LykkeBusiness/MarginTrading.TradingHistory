@@ -60,9 +60,11 @@ namespace MarginTrading.TradingHistory.Controllers
             ApiValidationHelper.ValidatePagingParams(skip, take);
             
             var data = await _ordersHistoryRepository.GetHistoryByPagesAsync(
-                accountId:filters?.AccountId, 
+                accountId: filters?.AccountId, 
                 assetPairId: filters?.AssetPairId,
-                statuses: filters?.Statuses?.Select(x => x.ToType<OrderStatus>()).ToList(),
+                statuses: filters?.Statuses?.Select(x => x.ToType<OrderStatus>()).ToList(), 
+                orderTypes: filters?.OrderTypes?.Select(x => x.ToType<OrderType>()).ToList(), 
+                originatorTypes: filters?.OriginatorTypes?.Select(x => x.ToType<OriginatorType>()).ToList(),
                 withRelated: filters?.WithRelated ?? true, 
                 createdTimeStart: filters?.CreatedTimeStart, 
                 createdTimeEnd: filters?.CreatedTimeEnd, 
