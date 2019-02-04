@@ -18,6 +18,7 @@ using MarginTrading.TradingHistory.Modules;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
 using MarginTrading.TradingHistory.Core;
+using MarginTrading.TradingHistory.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -64,7 +65,8 @@ namespace MarginTrading.TradingHistory
                 });
 
                 var builder = new ContainerBuilder();
-                var appSettings = Configuration.LoadSettings<AppSettings>();
+                var appSettings = Configuration.LoadSettings<AppSettings>(
+                    throwExceptionOnCheckError: !Configuration.NotThrowExceptionsOnServiceValidation());
 
                 Log = CreateLogWithSlack(Configuration, services, appSettings);
 
