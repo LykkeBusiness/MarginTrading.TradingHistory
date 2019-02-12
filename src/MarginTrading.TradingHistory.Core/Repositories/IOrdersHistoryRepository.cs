@@ -13,13 +13,14 @@ namespace MarginTrading.TradingHistory.Core.Repositories
             OrderStatus? status = null, bool withRelated = false);
         
         Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId, string assetPairId,
-            OrderStatus? status = null, bool withRelated = false, 
+            OrderStatus? status = null, bool withRelated = false,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null);
 
         Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId,
             List<OrderStatus> statuses, List<OrderType> orderTypes, List<OriginatorType> originatorTypes,
             bool withRelated,
+            string parentOrderId = null,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
             int? skip = null, int? take = null, bool isAscending = true);

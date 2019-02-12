@@ -29,7 +29,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
         }
 
         public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId, string assetPairId,
-            OrderStatus? status = null, bool withRelated = false, 
+            OrderStatus? status = null, bool withRelated = false,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null)
         {
@@ -61,7 +61,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
 
         public async Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId,
             List<OrderStatus> statuses, List<OrderType> orderTypes, List<OriginatorType> originatorTypes,
-            bool withRelated,
+            bool withRelated, string parentOrderId = null,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
             int? skip = null, int? take = null, bool isAscending = true)
@@ -77,11 +77,13 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 && (modifiedTimeStart == null || x.ModifiedTimestamp >= modifiedTimeStart)
                 && (modifiedTimeEnd == null || x.ModifiedTimestamp < modifiedTimeEnd));
 
-            var related = withRelated
+            var related = withRelated || !string.IsNullOrEmpty(parentOrderId)
                 ? await _tableStorage.GetDataAsync(x => entities.Select(e => e.Id).Contains(x.ParentOrderId))
                 : new List<OrderHistoryEntity>();
 
-            var allData = entities.Concat(related).OrderByDescending(entity => entity.ModifiedTimestamp);
+            var allData = entities.Concat(related).OrderByDescending(entity => entity.ModifiedTimestamp).ToList();
+
+            allData = string.IsNullOrEmpty(parentOrderId) ? allData : allData.Where(x => x.ParentOrderId == parentOrderId).ToList();
 
             //TODO refactor before using azure impl
             var data = (isAscending

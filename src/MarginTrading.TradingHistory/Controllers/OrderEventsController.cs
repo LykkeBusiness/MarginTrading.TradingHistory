@@ -50,6 +50,7 @@ namespace MarginTrading.TradingHistory.Controllers
 
         /// <summary>
         /// Get orders with optional filtering, optionally including related orders, and with pagination.
+        /// If parentOrderId is passed, withRelated is ignored.
         /// </summary>
         [HttpPost, Route("by-pages")]
         public async Task<PaginatedResponseContract<OrderEventContract>> OrderHistoryByPages(
@@ -65,7 +66,8 @@ namespace MarginTrading.TradingHistory.Controllers
                 statuses: filters?.Statuses?.Select(x => x.ToType<OrderStatus>()).ToList(), 
                 orderTypes: filters?.OrderTypes?.Select(x => x.ToType<OrderType>()).ToList(), 
                 originatorTypes: filters?.OriginatorTypes?.Select(x => x.ToType<OriginatorType>()).ToList(),
-                withRelated: filters?.WithRelated ?? true, 
+                withRelated: filters?.WithRelated ?? true,
+                parentOrderId: filters?.ParentOrderId,
                 createdTimeStart: filters?.CreatedTimeStart, 
                 createdTimeEnd: filters?.CreatedTimeEnd, 
                 modifiedTimeStart: filters?.ModifiedTimeStart, 
