@@ -115,7 +115,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
         }
 
         public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId, string assetPairId,
-            OrderStatus? status = null, bool withRelated = false, 
+            OrderStatus? status = null, bool withRelated = false,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null)
         {
@@ -167,7 +167,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
 
         public async Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId,
             List<OrderStatus> statuses, List<OrderType> orderTypes, List<OriginatorType> originatorTypes,
-            bool withRelated,
+            bool withRelated, string parentOrderId = null,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
             int? skip = null, int? take = null, bool isAscending = true)
@@ -178,7 +178,8 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
                               + (statuses == null || statuses.Count == 0 ? "" : " AND Status IN @statuses")
                               + (orderTypes == null || orderTypes.Count == 0 ? "" : " AND [Type] IN @orderTypes")
                               + (originatorTypes == null || originatorTypes.Count == 0 ? "" : " AND Originator IN @originatorTypes")
-                              + (withRelated ? "" : " AND ParentOrderId IS NULL")
+                              + (withRelated || !string.IsNullOrEmpty(parentOrderId) ? "" : " AND ParentOrderId IS NULL")
+                              + (string.IsNullOrEmpty(parentOrderId) ? "" : " AND ParentOrderId = @parentOrderId")
                               + (createdTimeStart == null ? "": " AND CreatedTimestamp >= @createdTimeStart")
                               + (createdTimeEnd == null ? "": " AND CreatedTimestamp < @createdTimeEnd")
                               + (modifiedTimeStart == null ? "": " AND ModifiedTimestamp >= @modifiedTimeStart")
@@ -197,6 +198,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
                         statuses = statuses?.Select(x => x.ToString()).ToArray(),
                         orderTypes = orderTypes?.Select(x => x.ToString()).ToArray(),
                         originatorTypes = originatorTypes?.Select(x => x.ToString()).ToArray(),
+                        parentOrderId,
                         createdTimeStart,
                         createdTimeEnd,
                         modifiedTimeStart,
