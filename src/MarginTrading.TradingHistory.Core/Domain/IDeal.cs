@@ -26,5 +26,6 @@ namespace MarginTrading.TradingHistory.Core.Domain
         decimal CloseFxPrice { get; }
         decimal Fpl { get; }
         string AdditionalInfo { get; }
+        decimal PnlOfTheLastDay { get; }
     }
 }
