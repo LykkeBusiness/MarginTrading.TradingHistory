@@ -39,6 +39,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [ClosePrice] [float] NULL,
 [CloseFxPrice] [float] NULL,
 [Fpl] [float] NULL,
+[PnlOfTheLastDay] [float] NULL,
 [AdditionalInfo] [nvarchar](MAX) NULL ,
 INDEX IX_{0}_Base (DealId, AccountId, AssetPairId, Created)
 );";

@@ -78,7 +78,9 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                     closePrice: positionHistoryEvent.Deal.ClosePrice,
                     closeFxPrice: positionHistoryEvent.Deal.CloseFxPrice,
                     fpl: positionHistoryEvent.Deal.Fpl,
-                    additionalInfo: positionHistoryEvent.Deal.AdditionalInfo);
+                    additionalInfo: positionHistoryEvent.Deal.AdditionalInfo,
+                    pnlOfTheLastDay: positionHistoryEvent.Deal.PnlOfTheLastDay
+                    );
                 
                 tasks.Add(_dealsRepository.AddAsync(deal));
             }

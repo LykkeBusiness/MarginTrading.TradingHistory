@@ -110,6 +110,11 @@ namespace MarginTrading.TradingHistory.Client.Models
         public decimal Fpl { get; set; }
         
         /// <summary>
+        /// PnL of the day, when position was closed
+        /// </summary>
+        public decimal PnlOfTheLastDay { get; set; }
+        
+        /// <summary>
         /// Deal additional info
         /// </summary>
         public string AdditionalInfo { get; set; }

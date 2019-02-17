@@ -30,7 +30,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public decimal CloseFxPrice { get; set; }
         public decimal Fpl { get; set; }
         public string AdditionalInfo { get; set; }
-
+        public decimal PnlOfTheLastDay { get; set; }
+        
         public static DealEntity Create(IDeal deal)
         {
             return new DealEntity
@@ -56,6 +57,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 CloseFxPrice = deal.CloseFxPrice,
                 Fpl = deal.Fpl,
                 AdditionalInfo = deal.AdditionalInfo,
+                PnlOfTheLastDay = deal.PnlOfTheLastDay
             };
         }
     }
