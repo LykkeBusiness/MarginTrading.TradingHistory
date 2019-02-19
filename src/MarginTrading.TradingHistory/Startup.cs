@@ -194,21 +194,15 @@ namespace MarginTrading.TradingHistory
 
             aggregateLogger.AddLog(consoleLogger);
 
-            var dbLogConnectionStringManager = settings.Nested(x => x.TradingHistoryService.Db.LogsConnString);
-            var dbLogConnectionString = dbLogConnectionStringManager.CurrentValue;
+            #region Logs settings validation
 
-            if (string.IsNullOrEmpty(dbLogConnectionString))
+            if (!settings.CurrentValue.TradingHistoryService.UseSerilog 
+                && string.IsNullOrWhiteSpace(settings.CurrentValue.TradingHistoryService.Db.LogsConnString))
             {
-                consoleLogger.WriteWarningAsync(nameof(Startup), nameof(CreateLogWithSlack), "Table loggger is not inited").Wait();
-                return aggregateLogger;
+                throw new Exception("Either UseSerilog must be true or LogsConnString must be set");
             }
 
-            if (dbLogConnectionString.StartsWith("${") && dbLogConnectionString.EndsWith("}"))
-                throw new InvalidOperationException($"LogsConnString {dbLogConnectionString} is not filled in settings");
-
-            var persistenceManager = new LykkeLogToAzureStoragePersistenceManager(
-                AzureTableStorage<LogEntity>.Create(dbLogConnectionStringManager, "TradingHistoryServiceLog", consoleLogger),
-                consoleLogger);
+            #endregion Logs settings validation
 
             // Creating slack notification service, which logs own azure queue processing messages to aggregate log
             ILykkeLogToAzureSlackNotificationsManager slackNotificationsManager = null;
@@ -230,6 +224,11 @@ namespace MarginTrading.TradingHistory
             }
             else if (settings.CurrentValue.TradingHistoryService.Db.StorageMode == StorageMode.Azure)
             {
+                var persistenceManager = new LykkeLogToAzureStoragePersistenceManager(
+                    AzureTableStorage<LogEntity>.Create(settings.Nested(x => x.TradingHistoryService.Db.LogsConnString), 
+                        "TradingHistoryServiceLog", consoleLogger),
+                    consoleLogger);
+                
                 // Creating azure storage logger, which logs own messages to concole log
                 var azureStorageLogger = new LykkeLogToAzureStorage(
                     persistenceManager,
