@@ -13,6 +13,8 @@ namespace MarginTrading.TradingHistory.Client.Models
 
         public bool WithRelated { get; set; } = true;
         
+        public string ParentOrderId { get; set; }
+        
         public DateTime? CreatedTimeStart { get; set; }
         
         public DateTime? CreatedTimeEnd { get; set; }
