@@ -40,7 +40,6 @@ namespace MarginTrading.TradingHistory.Client.Models
         public string ExternalProviderId { get; set; }
         public string MatchingEngineId { get; set; }
         public string LegalEntity { get; set; }
-        public List<RelatedOrderInfoContract> RelatedOrderInfos { get; set; }
         public OrderUpdateTypeContract UpdateType { get; set; }
         public string AdditionalInfo { get; set; }
         /// <summary>

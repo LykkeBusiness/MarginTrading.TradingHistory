@@ -114,46 +114,13 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
             }
         }
 
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId, string assetPairId,
-            OrderStatus? status = null, bool withRelated = false,
-            DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
-            DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null)
+        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string orderId,
+            OrderStatus? status = null)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                var clause = " WHERE 1=1 "
-                             + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
-                             + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
-                             + (status == null ? "" : " AND Status=@status")
-                             + (withRelated ? "" : " AND ParentOrderId IS NULL")
-                             + (createdTimeStart == null ? "": " AND CreatedTimestamp >= @createdTimeStart")
-                             + (createdTimeEnd == null ? "": " AND CreatedTimestamp < @createdTimeEnd")
-                             + (modifiedTimeStart == null ? "": " AND ModifiedTimestamp >= @modifiedTimeStart")
-                             + (modifiedTimeEnd == null ? "": " AND ModifiedTimestamp < @modifiedTimeEnd");
-                var query = $"SELECT * FROM {TableName} {clause}";
-                var objects = await conn.QueryAsync<OrderHistoryEntity>(query, new
-                {
-                    accountId, 
-                    assetPairId, 
-                    status = status?.ToString(),
-                    createdTimeStart,
-                    createdTimeEnd,
-                    modifiedTimeStart,
-                    modifiedTimeEnd,
-                });
-                
-                return objects;
-            }
-        }
-
-        public async Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string orderId, 
-            OrderStatus? status = null, bool withRelated = false)
-        {
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                var clause = "WHERE (Id=@orderId "
-                             + (withRelated ? " OR ParentOrderId=@orderId" : "") + ")"
-                             + (status == null ? "" : " AND Status=@status");
+                var clause = "WHERE Id=@orderId"
+                              + (status == null ? "" : " AND Status=@status");
                 var query = $"SELECT * FROM {TableName} {clause}";
                 var objects = await conn.QueryAsync<OrderHistoryEntity>(query, new
                 {
@@ -167,7 +134,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
 
         public async Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId,
             List<OrderStatus> statuses, List<OrderType> orderTypes, List<OriginatorType> originatorTypes,
-            bool withRelated, string parentOrderId = null,
+            string parentOrderId = null,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
             int? skip = null, int? take = null, bool isAscending = true)
@@ -178,7 +145,6 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
                               + (statuses == null || statuses.Count == 0 ? "" : " AND Status IN @statuses")
                               + (orderTypes == null || orderTypes.Count == 0 ? "" : " AND [Type] IN @orderTypes")
                               + (originatorTypes == null || originatorTypes.Count == 0 ? "" : " AND Originator IN @originatorTypes")
-                              + (withRelated || !string.IsNullOrEmpty(parentOrderId) ? "" : " AND ParentOrderId IS NULL")
                               + (string.IsNullOrEmpty(parentOrderId) ? "" : " AND ParentOrderId = @parentOrderId")
                               + (createdTimeStart == null ? "": " AND CreatedTimestamp >= @createdTimeStart")
                               + (createdTimeEnd == null ? "": " AND CreatedTimestamp < @createdTimeEnd")
@@ -188,9 +154,12 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
             var paginationClause = $" ORDER BY [CreatedTimestamp] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
             
             using (var conn = new SqlConnection(_connectionString))
-            {    
+            {
+                var sql =
+                    $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}";
+                
                 var gridReader = await conn.QueryMultipleAsync(
-                    $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
+                    sql,
                     new
                     {
                         accountId, 

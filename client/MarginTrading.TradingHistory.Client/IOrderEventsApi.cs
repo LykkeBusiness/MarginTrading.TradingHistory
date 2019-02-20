@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -15,25 +14,13 @@ namespace MarginTrading.TradingHistory.Client
     public interface IOrderEventsApi
     {
         /// <summary>
-        /// Get orders with optional filtering, optionally including related orders.
+        /// Get orders with optional filtering and with pagination.
         /// </summary>
-        [Get("/api/order-events")]
-        Task<List<OrderEventContract>> OrderHistory(
-            [Query, CanBeNull] string accountId = null,
-            [Query, CanBeNull] string assetPairId = null,
-            [Query, CanBeNull] OrderStatusContract? status = null,
-            [Query] bool withRelated = true,
-            [Query, CanBeNull] DateTime? createdTimeStart = null, [Query, CanBeNull] DateTime? createdTimeEnd = null,
-            [Query, CanBeNull] DateTime? modifiedTimeStart = null, [Query, CanBeNull] DateTime? modifiedTimeEnd = null);
-        
-        /// <summary>
-        /// Get orders with optional filtering, optionally including related orders, and with pagination.
-        /// </summary>
-        [Post("/api/order-events/by-pages")]
+        [Post("/api/order-events")]
         Task<PaginatedResponseContract<OrderEventContract>> OrderHistoryByPages(
             [Body, CanBeNull] OrderEventsFilterRequest filters,
-            [Query, CanBeNull] int? skip = null, 
-            [Query, CanBeNull] int? take = null,
+            [Query, CanBeNull] int? skip = 0, 
+            [Query, CanBeNull] int? take = 20,
             [Query] bool isAscending = false);
 
         /// <summary>
@@ -42,7 +29,6 @@ namespace MarginTrading.TradingHistory.Client
         [Get("/api/order-events/{orderId}")]
         Task<List<OrderEventContract>> OrderById(
             [NotNull] string orderId,
-            [Query, CanBeNull] OrderStatusContract? status = null,
-            [Query] bool withRelated = true);
+            [Query, CanBeNull] OrderStatusContract? status = null);
     }
 }
