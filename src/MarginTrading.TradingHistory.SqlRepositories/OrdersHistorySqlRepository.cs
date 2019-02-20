@@ -67,7 +67,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
 @"OUTER APPLY (
     SELECT
         TakeProfit = (
-            SELECT TOP 1 Id, Type, ExpectedOpenPrice
+            SELECT TOP 1 Id, Type, ExpectedOpenPrice, Status, ModifiedTimestamp
             FROM OrdersHistory AS takeProfitHistory
             WHERE takeProfitHistory.ParentOrderID = history.ID AND takeProfitHistory.Type = 'TakeProfit'
             ORDER BY ModifiedTimestamp DESC
@@ -77,7 +77,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
 OUTER APPLY (
     SELECT
         StopLoss = (
-            SELECT TOP 1 Id, Type, ExpectedOpenPrice
+            SELECT TOP 1 Id, Type, ExpectedOpenPrice, Status, ModifiedTimestamp
             FROM OrdersHistory AS stopLossHistory
             WHERE stopLossHistory.ParentOrderID = history.ID AND stopLossHistory.Type in ('StopLoss','TrailingStop')
             ORDER BY ModifiedTimestamp DESC

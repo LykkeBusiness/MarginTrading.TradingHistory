@@ -131,16 +131,18 @@ namespace MarginTrading.TradingHistory.Controllers
             };
         }
 
-        private static RelatedOrderInfoWithPriceContract Map(RelatedOrderInfoWithPrice order)
+        private static RelatedOrderExtendedInfoContract Map(RelatedOrderExtendedInfo order)
         {
             if (order == null)
                 return null;
             
-            return new RelatedOrderInfoWithPriceContract()
+            return new RelatedOrderExtendedInfoContract
             {
                 Id = order.Id,
                 Type = order.Type.ToType<OrderTypeContract>(),
-                Price = order.ExpectedOpenPrice
+                Price = order.ExpectedOpenPrice,
+                Status = order.Status.ToType<OrderStatusContract>(),
+                ModifiedTimestamp = order.ModifiedTimestamp
             };
         }
     }
