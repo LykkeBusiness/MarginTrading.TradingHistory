@@ -10,8 +10,6 @@ namespace MarginTrading.TradingHistory.Client.Models
         public string AssetPairId {get; set; }
 
         public List<OrderStatusContract> Statuses { get; set; }
-
-        public bool WithRelated { get; set; } = true;
         
         public string ParentOrderId { get; set; }
         
