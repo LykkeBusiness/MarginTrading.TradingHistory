@@ -31,7 +31,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// </summary>
         [HttpPost, Route("")]
         [HttpPost, Route("by-pages")]
-        public async Task<PaginatedResponseContract<OrderEventContract>> OrderHistoryByPages(
+        public async Task<PaginatedResponseContract<OrderEventWithRelatedContract>> OrderHistoryByPages(
             [FromBody] OrderEventsFilterRequest filters, 
             [FromQuery] int? skip = 0, [FromQuery] int? take = 20, 
             [FromQuery] bool isAscending = false)
@@ -53,7 +53,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 take: take,
                 isAscending: isAscending);
 
-            return new PaginatedResponseContract<OrderEventContract>(
+            return new PaginatedResponseContract<OrderEventWithRelatedContract>(
                 contents: data.Contents.Select(Convert).ToList(),
                 start: data.Start,
                 size: data.Size,
@@ -68,7 +68,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// <param name="status"></param>
         /// <returns></returns>
         [HttpGet, Route("{orderId}")]
-        public async Task<List<OrderEventContract>> OrderById(string orderId,
+        public async Task<List<OrderEventWithRelatedContract>> OrderById(string orderId,
             [FromQuery] OrderStatusContract? status = null)
         {
             if (string.IsNullOrWhiteSpace(orderId))
@@ -81,12 +81,12 @@ namespace MarginTrading.TradingHistory.Controllers
             return history.Select(Convert).ToList();
         }
 
-        private static OrderEventContract Convert(IOrderHistory history)
+        private static OrderEventWithRelatedContract Convert(IOrderHistoryWithRelated history)
         {
             if (history == null)
                 return null;
 
-            return new OrderEventContract
+            return new OrderEventWithRelatedContract
             {
                 Id = history.Id,
                 AccountId = history.AccountId,
@@ -125,7 +125,22 @@ namespace MarginTrading.TradingHistory.Controllers
                 LegalEntity = history.LegalEntity,
                 UpdateType = history.UpdateType.ToType<OrderUpdateTypeContract>(),
                 AdditionalInfo = history.AdditionalInfo,
-                CorrelationId = history.CorrelationId
+                CorrelationId = history.CorrelationId,
+                StopLoss = Map(history.StopLoss),
+                TakeProfit = Map(history.TakeProfit)
+            };
+        }
+
+        private static RelatedOrderInfoWithPriceContract Map(RelatedOrderInfoWithPrice order)
+        {
+            if (order == null)
+                return null;
+            
+            return new RelatedOrderInfoWithPriceContract()
+            {
+                Id = order.Id,
+                Type = order.Type.ToType<OrderTypeContract>(),
+                Price = order.ExpectedOpenPrice
             };
         }
     }
