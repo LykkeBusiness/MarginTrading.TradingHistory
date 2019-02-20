@@ -10,14 +10,14 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
     {
         public string TakeProfit { get; set; }
 
-        RelatedOrderInfoWithPrice IOrderHistoryWithRelated.TakeProfit => string.IsNullOrEmpty(TakeProfit)
+        RelatedOrderExtendedInfo IOrderHistoryWithRelated.TakeProfit => string.IsNullOrEmpty(TakeProfit)
             ? null
-            : TakeProfit.DeserializeJson<RelatedOrderInfoWithPrice[]>().FirstOrDefault();
+            : TakeProfit.DeserializeJson<RelatedOrderExtendedInfo[]>().FirstOrDefault();
         
         public string StopLoss { get; set; }
         
-        RelatedOrderInfoWithPrice IOrderHistoryWithRelated.StopLoss=> string.IsNullOrEmpty(StopLoss)
+        RelatedOrderExtendedInfo IOrderHistoryWithRelated.StopLoss=> string.IsNullOrEmpty(StopLoss)
             ? null
-            : StopLoss.DeserializeJson<RelatedOrderInfoWithPrice[]>().FirstOrDefault();
+            : StopLoss.DeserializeJson<RelatedOrderExtendedInfo[]>().FirstOrDefault();
     }
 }

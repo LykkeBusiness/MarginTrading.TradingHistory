@@ -9,11 +9,11 @@ namespace MarginTrading.TradingHistory.Core.Domain
         /// <summary>
         /// Info about take profit order
         /// </summary>
-        RelatedOrderInfoWithPrice TakeProfit { get; }
+        RelatedOrderExtendedInfo TakeProfit { get; }
         
         /// <summary>
         /// Info about stop loss order
         /// </summary>
-        RelatedOrderInfoWithPrice StopLoss { get; }
+        RelatedOrderExtendedInfo StopLoss { get; }
     }
 }
