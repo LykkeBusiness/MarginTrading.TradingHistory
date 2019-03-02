@@ -26,13 +26,19 @@ namespace MarginTrading.TradingHistory.Core.Domain
         public decimal CloseFxPrice { get; }
         public decimal Fpl { get; }
         public decimal PnlOfTheLastDay { get; }
+        
+        public decimal? OvernightFees { get; }
+        public decimal? Commission { get; }
+        public decimal? OnBehalfFee { get; }
+        public decimal? Taxes { get; }
         [NotNull] public string AdditionalInfo { get; }
 
         public Deal([NotNull] string dealId, DateTime created, [NotNull] string accountId, [NotNull] string assetPairId,
             [NotNull] string openTradeId, OrderType openOrderType, decimal openOrderVolume, decimal? openOrderExpectedPrice, 
             [NotNull] string closeTradeId, OrderType closeOrderType, decimal closeOrderVolume, decimal? closeOrderExpectedPrice, 
             PositionDirection direction, decimal volume, OriginatorType originator, decimal openPrice, 
-            decimal openFxPrice, decimal closePrice, decimal closeFxPrice, decimal fpl, string additionalInfo, decimal pnlOfTheLastDay)
+            decimal openFxPrice, decimal closePrice, decimal closeFxPrice, decimal fpl, string additionalInfo, decimal pnlOfTheLastDay, 
+            decimal? overnightFees = null, decimal? commission = null, decimal? onBehalfFee = null, decimal? taxes = null)
         {
             DealId = dealId ?? throw new ArgumentNullException(nameof(dealId));
             Created = created;
@@ -56,6 +62,11 @@ namespace MarginTrading.TradingHistory.Core.Domain
             Fpl = fpl;
             AdditionalInfo = additionalInfo;
             PnlOfTheLastDay = pnlOfTheLastDay;
+            
+            OvernightFees = overnightFees;
+            Commission = commission;
+            OnBehalfFee = onBehalfFee;
+            Taxes = taxes;
         }
     }
 }

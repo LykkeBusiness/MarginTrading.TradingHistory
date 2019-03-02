@@ -40,5 +40,10 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public decimal Fpl { get; set; }
         public decimal PnlOfTheLastDay { get; set; }
         public string AdditionalInfo { get; set; }
+        
+        public decimal? OvernightFees { get; set; }
+        public decimal? Commission { get; set; }
+        public decimal? OnBehalfFee { get; set; }
+        public decimal? Taxes { get; set; }
     }
 }
