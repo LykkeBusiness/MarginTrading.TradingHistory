@@ -27,5 +27,10 @@ namespace MarginTrading.TradingHistory.Core.Domain
         decimal Fpl { get; }
         string AdditionalInfo { get; }
         decimal PnlOfTheLastDay { get; }
+        
+        decimal? OvernightFees { get; }
+        decimal? Commission { get; }
+        decimal? OnBehalfFee { get; }
+        decimal? Taxes { get; }
     }
 }
