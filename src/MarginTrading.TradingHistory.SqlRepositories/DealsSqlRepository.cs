@@ -103,19 +103,18 @@ AS
             SELECT CONVERT(DECIMAL(24,13), ((ISNULL(openingCommission.ChangeAmount, 0.0) / openTrade.Volume
                                               + ISNULL(closingCommission.ChangeAmount, 0.0) / closeTrade.Volume)
                                               * ABS(deal.Volume)))
-          FROM dbo.[Deals] AS deal
-          INNER JOIN selectedTrades AS openTrade
-            ON deal.OpenTradeId = openTrade.Id
-          INNER JOIN selectedTrades AS closeTrade
-            ON deal.CloseTradeId = closeTrade.Id
-          INNER JOIN selectedAccounts openingCommission
-            ON deal.OpenTradeId = openingCommission.EventSourceId AND openingCommission.ReasonType = 'Commission'
-          LEFT OUTER JOIN selectedAccounts closingCommission
-            ON deal.CloseTradeId = closingCommission.EventSourceId AND closingCommission.ReasonType = 'Commission'
-          WHERE deal.DealId = position.DealId AND position.Id = @eventSourceId
+            FROM dbo.[Deals] AS deal
+            INNER JOIN selectedTrades AS openTrade
+              ON deal.OpenTradeId = openTrade.Id
+            INNER JOIN selectedTrades AS closeTrade
+              ON deal.CloseTradeId = closeTrade.Id
+            INNER JOIN selectedAccounts openingCommission
+              ON deal.OpenTradeId = openingCommission.EventSourceId AND openingCommission.ReasonType = 'Commission'
+            LEFT OUTER JOIN selectedAccounts closingCommission
+              ON deal.CloseTradeId = closingCommission.EventSourceId AND closingCommission.ReasonType = 'Commission'
+            WHERE deal.OpenTradeId = @eventSourceId OR deal.CloseTradeId = @eventSourceId
           )
-        FROM dbo.PositionsHistory AS position
-        WHERE [Deals].DealId = position.DealId AND position.Id = @eventSourceId
+        WHERE [Deals].OpenTradeId = @eventSourceId OR [Deals].CloseTradeId = @eventSourceId
       END
 
     IF @processAll = 1 OR @reasonType = 'OnBehalf'
@@ -150,10 +149,9 @@ AS
               ON deal.OpenTradeId = openingOnBehalf.EventSourceId AND openingOnBehalf.ReasonType = 'OnBehalf'
             LEFT OUTER JOIN selectedAccounts closingOnBehalf
               ON deal.CloseTradeId = closingOnBehalf.EventSourceId AND closingOnBehalf.ReasonType = 'OnBehalf'
-            WHERE deal.DealId = position.DealId AND position.Id = @eventSourceId
+            WHERE deal.OpenTradeId = @eventSourceId OR deal.CloseTradeId = @eventSourceId
           )
-        FROM dbo.PositionsHistory AS position
-        WHERE [Deals].DealId = position.DealId AND position.Id = @eventSourceId
+        WHERE [Deals].OpenTradeId = @eventSourceId OR [Deals].CloseTradeId = @eventSourceId
       END
 
     IF @processAll = 1 OR @reasonType = 'Tax'
@@ -165,8 +163,7 @@ AS
             FROM [dbo].[Deals] deal, [dbo].[AccountHistory] account
             WHERE account.EventSourceId IN (deal.OpenTradeId, deal.CloseTradeId) AND account.ReasonType = 'Tax'
           )
-        FROM dbo.PositionsHistory AS position
-        WHERE [Deals].DealId = position.DealId AND position.Id = @eventSourceId
+        WHERE [Deals].DealId = @eventSourceId -- it could also be CompensationId, so it is automatically skipped
       END
   END
 GO
@@ -213,6 +210,7 @@ AS
     EXEC [dbo].[SP_UpdateDealCommissionInfo] @eventSourceId, '', 1
   END
 GO
+
 "; 
         
         #endregion SQL
