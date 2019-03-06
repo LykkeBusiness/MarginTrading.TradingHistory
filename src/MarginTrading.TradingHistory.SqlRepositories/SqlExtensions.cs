@@ -32,7 +32,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             connection.Open();
             try
             {
-                connection.Query(query);
+                connection.ExecuteScalar(query);
             }
             finally
             {
