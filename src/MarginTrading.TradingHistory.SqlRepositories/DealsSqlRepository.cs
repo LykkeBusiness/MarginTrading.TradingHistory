@@ -238,11 +238,21 @@ GO
             {
                 try 
                 { 
-                    conn.CreateTableIfDoesntExists(CreateTableScript + ProcedureAndTriggersScript, TableName);
+                    conn.CreateTableIfDoesntExists(CreateTableScript, TableName);
                 }
                 catch (Exception ex)
                 {
-                    _log?.WriteErrorAsync(nameof(DealsSqlRepository), "CreateTableIfDoesntExists", null, ex);
+                    _log?.WriteErrorAsync(nameof(DealsSqlRepository), nameof(SqlExtensions.CreateTableIfDoesntExists), null, ex);
+                    throw;
+                }
+
+                try
+                {
+                    conn.ExecuteCreateOrAlter(ProcedureAndTriggersScript);
+                }
+                catch (Exception ex)
+                {
+                    _log?.WriteErrorAsync(nameof(DealsSqlRepository), nameof(SqlExtensions.ExecuteCreateOrAlter), null, ex);
                     throw;
                 }
             }

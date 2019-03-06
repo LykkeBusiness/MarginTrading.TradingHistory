@@ -26,5 +26,18 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 connection.Close();
             }
         }
+
+        public static void ExecuteCreateOrAlter(this IDbConnection connection, string query)
+        {
+            connection.Open();
+            try
+            {
+                connection.Query(query);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
     }
 }
