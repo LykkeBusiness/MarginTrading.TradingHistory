@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
@@ -17,6 +18,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
     {
         private const string TableName = "Deals";
 
+        #region SQL
+        
         private const string CreateTableScript = "CREATE TABLE [{0}](" +
                                                  @"[OID] [bigint] NOT NULL IDENTITY (1,1) PRIMARY KEY,
 [DealId] [nvarchar](64) NOT NULL,
@@ -41,20 +44,191 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [Fpl] [float] NULL,
 [PnlOfTheLastDay] [float] NULL,
 [AdditionalInfo] [nvarchar](MAX) NULL ,
+[OvernightFees] [float] NULL,
+[Commission] [float] NULL,
+[OnBehalfFee] [float] NULL,
+[Taxes] [float] NULL,
 INDEX IX_{0}_Base (DealId, AccountId, AssetPairId, Created)
-);";
+);
+GO
+
+";
+
+        private const string ProcedureScript = @"
+CREATE OR ALTER PROCEDURE [dbo].[SP_UpdateDealCommissionInfo] (
+  @eventSourceId nvarchar(64),
+  @reasonType nvarchar(64),
+  @processAll bit
+)
+AS
+  BEGIN
+    SET NOCOUNT ON;
+
+    IF @processAll = 1 OR @reasonType = 'Swap'
+      BEGIN
+        UPDATE [dbo].[Deals]
+        SET [OvernightFees] =
+          (SELECT CONVERT(DECIMAL(24,13), Sum(swapHistory.SwapValue / ABS(swapHistory.Volume)) * ABS(deal.Volume))
+            FROM dbo.[Deals] AS deal,
+                 dbo.PositionsHistory AS position,
+                 dbo.OvernightSwapHistory AS swapHistory
+            WHERE position.Id = @eventSourceId
+              AND deal.DealId = position.DealId
+              AND position.Id = swapHistory.PositionId AND swapHistory.IsSuccess = 1
+            GROUP BY deal.DealId, ABS(deal.Volume)
+          )
+        FROM dbo.PositionsHistory AS position
+        WHERE [Deals].DealId = position.DealId AND position.Id = @eventSourceId
+      END
+
+    IF @processAll = 1 OR @reasonType = 'Commission'
+      BEGIN
+        WITH selectedTrades AS
+        (
+          SELECT deal.DealId, trade.Id, Volume = ABS(trade.Volume)
+          FROM dbo.[Deals] AS deal
+          INNER JOIN dbo.Trades AS trade
+            ON trade.Id IN (deal.OpenTradeId, deal.CloseTradeId)
+        )
+        ,selectedAccounts AS
+        (
+          SELECT account.EventSourceId,
+            account.ReasonType,
+            account.ChangeAmount
+          FROM dbo.[Deals] AS deal, dbo.AccountHistory AS account
+          WHERE(account.EventSourceId IN (deal.OpenTradeId, deal.CloseTradeId) AND account.ReasonType = 'Commission')
+        )
+        UPDATE [dbo].[Deals]
+        SET [Commission] =
+          (
+            SELECT CONVERT(DECIMAL(24,13), ((ISNULL(openingCommission.ChangeAmount, 0.0) / openTrade.Volume
+                                              + ISNULL(closingCommission.ChangeAmount, 0.0) / closeTrade.Volume)
+                                              * ABS(deal.Volume)))
+            FROM dbo.[Deals] AS deal
+            INNER JOIN selectedTrades AS openTrade
+              ON deal.OpenTradeId = openTrade.Id
+            INNER JOIN selectedTrades AS closeTrade
+              ON deal.CloseTradeId = closeTrade.Id
+            INNER JOIN selectedAccounts openingCommission
+              ON deal.OpenTradeId = openingCommission.EventSourceId AND openingCommission.ReasonType = 'Commission'
+            LEFT OUTER JOIN selectedAccounts closingCommission
+              ON deal.CloseTradeId = closingCommission.EventSourceId AND closingCommission.ReasonType = 'Commission'
+            WHERE deal.OpenTradeId = @eventSourceId OR deal.CloseTradeId = @eventSourceId
+          )
+        WHERE [Deals].OpenTradeId = @eventSourceId OR [Deals].CloseTradeId = @eventSourceId
+      END
+
+    IF @processAll = 1 OR @reasonType = 'OnBehalf'
+      BEGIN
+        WITH selectedTrades AS
+        (
+          SELECT deal.DealId, trade.Id, Volume = ABS(trade.Volume)
+          FROM dbo.[Deals] AS deal
+          INNER JOIN dbo.Trades AS trade
+            ON trade.Id IN (deal.OpenTradeId, deal.CloseTradeId)
+        )
+        ,selectedAccounts AS
+        (
+          SELECT account.EventSourceId,
+            account.ReasonType,
+            account.ChangeAmount
+          FROM dbo.[Deals] AS deal, dbo.AccountHistory AS account
+          WHERE(account.EventSourceId IN (deal.OpenTradeId, deal.CloseTradeId) AND account.ReasonType = 'OnBehalf')
+        )
+        UPDATE [dbo].[Deals]
+        SET [OnBehalfFee] =
+          (
+            SELECT CONVERT(DECIMAL(24,13), ((ISNULL(openingOnBehalf.ChangeAmount, 0.0) / openTrade.Volume
+                                               + ISNULL(closingOnBehalf.ChangeAmount, 0.0) / closeTrade.Volume)
+                                              * ABS(deal.Volume)))
+            FROM [dbo].[Deals] deal
+            INNER JOIN selectedTrades AS openTrade
+              ON deal.OpenTradeId = openTrade.Id
+            INNER JOIN selectedTrades AS closeTrade
+              ON deal.CloseTradeId = closeTrade.Id
+            LEFT OUTER JOIN selectedAccounts openingOnBehalf
+              ON deal.OpenTradeId = openingOnBehalf.EventSourceId AND openingOnBehalf.ReasonType = 'OnBehalf'
+            LEFT OUTER JOIN selectedAccounts closingOnBehalf
+              ON deal.CloseTradeId = closingOnBehalf.EventSourceId AND closingOnBehalf.ReasonType = 'OnBehalf'
+            WHERE deal.OpenTradeId = @eventSourceId OR deal.CloseTradeId = @eventSourceId
+          )
+        WHERE [Deals].OpenTradeId = @eventSourceId OR [Deals].CloseTradeId = @eventSourceId
+      END
+
+    IF @processAll = 1 OR @reasonType = 'Tax'
+      BEGIN
+        UPDATE [dbo].[Deals]
+        SET [Taxes] =
+          (
+            SELECT CONVERT(DECIMAL(24,13), ISNULL(account.ChangeAmount, 0.0))
+            FROM [dbo].[Deals] deal, [dbo].[AccountHistory] account
+            WHERE account.EventSourceId = deal.DealId AND account.ReasonType = 'Tax'
+            AND deal.DealId = @eventSourceId
+          )
+        WHERE [Deals].DealId = @eventSourceId -- it could also be CompensationId, so it is automatically skipped
+      END
+  END;
+";
+
+        private const string AccountTriggerScript = @" 
+CREATE OR ALTER TRIGGER [dbo].[T_InsertAccountTransaction] ON [dbo].[AccountHistory]
+  AFTER INSERT
+AS
+  BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @eventSourceId nvarchar(64)
+    DECLARE @reasonType nvarchar(64)
+
+    SELECT @eventSourceId = [EventSourceId], @reasonType = [ReasonType]
+    FROM INSERTED
+
+    IF @eventSourceId IS NULL
+      RAISERROR('EventSourceId was null, reason type [%s]', 16, 1, @reasonType);
+
+    EXEC [dbo].[SP_UpdateDealCommissionInfo] @eventSourceId, @reasonType, 0
+  END;
+";
+
+
+        private const string DealTriggerScript = @" 
+CREATE OR ALTER TRIGGER [dbo].[T_InsertDeal] ON [dbo].[Deals]
+  AFTER INSERT
+AS
+  BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @eventSourceId nvarchar(64), @dealId nvarchar(64)
+
+    SELECT @dealId = [DealId]
+    FROM INSERTED
+
+    SELECT @eventSourceId = ph.Id
+    FROM [dbo].[PositionsHistory] ph, [dbo].[Deals] d
+    WHERE d.DealId = ph.DealId AND d.DealId = @dealId
+
+    IF @eventSourceId IS NULL
+      RAISERROR('Position was not found by deal id [%s]', 16, 1, @dealId);
+
+    EXEC [dbo].[SP_UpdateDealCommissionInfo] @eventSourceId, '', 1
+  END;
+
+"; 
+        
+        #endregion SQL
 
         private readonly string _connectionString;
         private readonly ILog _log;
 
-        private static readonly string GetColumns =
-            string.Join(",", typeof(IDeal).GetProperties().Select(x => x.Name));
+        private static readonly Func<PropertyInfo, bool> FilterTriggerInjectedFieldsPredicate = pi => 
+            !new [] {nameof(IDeal.OvernightFees), nameof(IDeal.Commission), nameof(IDeal.OnBehalfFee), 
+                nameof(IDeal.Taxes)}.Contains(pi.Name);
+        
+        private static readonly string GetColumns = string.Join(",", 
+            typeof(IDeal).GetProperties().Where(FilterTriggerInjectedFieldsPredicate).Select(x => x.Name));
 
-        private static readonly string GetFields =
-            string.Join(",", typeof(IDeal).GetProperties().Select(x => "@" + x.Name));
-
-        private static readonly string GetUpdateClause = string.Join(",",
-            typeof(IDeal).GetProperties().Select(x => "[" + x.Name + "]=@" + x.Name));
+        private static readonly string GetFields = string.Join(",", 
+            typeof(IDeal).GetProperties().Where(FilterTriggerInjectedFieldsPredicate).Select(x => "@" + x.Name));
 
         public DealsSqlRepository(string connectionString, ILog log)
         {
@@ -63,10 +237,16 @@ INDEX IX_{0}_Base (DealId, AccountId, AssetPairId, Created)
             
             using (var conn = new SqlConnection(connectionString))
             {
-                try { conn.CreateTableIfDoesntExists(CreateTableScript, TableName); }
+                try 
+                { 
+                    conn.CreateTableIfDoesntExists(CreateTableScript, TableName);
+                    conn.ExecuteCreateOrAlter(ProcedureScript);
+                    conn.ExecuteCreateOrAlter(AccountTriggerScript);
+                    conn.ExecuteCreateOrAlter(DealTriggerScript);
+                }
                 catch (Exception ex)
                 {
-                    _log?.WriteErrorAsync(nameof(DealsSqlRepository), "CreateTableIfDoesntExists", null, ex);
+                  _log?.WriteErrorAsync(nameof(DealsSqlRepository), "Create table and triggers", null, ex);
                     throw;
                 }
             }
@@ -142,7 +322,7 @@ INDEX IX_{0}_Base (DealId, AccountId, AssetPairId, Created)
                 catch (Exception ex)
                 {
                     var msg = $"Error {ex.Message} \n" +
-                              "Entity <IDealHistory>: \n" +
+                              $"Entity <{nameof(IDeal)}>: \n" +
                               obj.ToJson();
                     
                     _log?.WriteWarning(nameof(DealsSqlRepository), nameof(AddAsync), msg);
@@ -153,3 +333,4 @@ INDEX IX_{0}_Base (DealId, AccountId, AssetPairId, Created)
         }
     }
 }
+
