@@ -61,7 +61,9 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [CorrelationId] [nvarchar](64) NULL,
 CONSTRAINT PK_{0}_OID PRIMARY KEY CLUSTERED (OID DESC),
 INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTimestamp, CreatedTimestamp, ModifiedTimestamp, Type, Originator)
-);";
+);
+
+CREATE INDEX IX_{0}_Child ON {0} (ParentOrderId, Type) include (Id, Status, ExpectedOpenPrice, ModifiedTimestamp)";
 
         private const string GetRelatedOrdersScript = "SELECT * FROM history " + 
 @"OUTER APPLY (
