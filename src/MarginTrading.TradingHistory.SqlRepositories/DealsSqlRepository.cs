@@ -161,7 +161,8 @@ AS
           (
             SELECT CONVERT(DECIMAL(24,13), ISNULL(account.ChangeAmount, 0.0))
             FROM [dbo].[Deals] deal, [dbo].[AccountHistory] account
-            WHERE account.EventSourceId IN (deal.OpenTradeId, deal.CloseTradeId) AND account.ReasonType = 'Tax'
+            WHERE account.EventSourceId = deal.DealId AND account.ReasonType = 'Tax'
+            AND deal.DealId = @eventSourceId
           )
         WHERE [Deals].DealId = @eventSourceId -- it could also be CompensationId, so it is automatically skipped
       END
