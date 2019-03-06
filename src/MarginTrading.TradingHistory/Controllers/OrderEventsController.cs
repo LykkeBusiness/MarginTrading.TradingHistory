@@ -26,36 +26,14 @@ namespace MarginTrading.TradingHistory.Controllers
         }
 
         /// <summary>
-        /// Get orders with optional filtering, optionally including related orders.
-        /// </summary>
-        [HttpGet, Route("")]
-        public async Task<List<OrderEventContract>> OrderHistory(
-            [FromQuery] string accountId = null, [FromQuery] string assetPairId = null,
-            [FromQuery] OrderStatusContract? status = null, [FromQuery] bool withRelated = true,
-            [FromQuery] DateTime? createdTimeStart = null, [FromQuery] DateTime? createdTimeEnd = null,
-            [FromQuery] DateTime? modifiedTimeStart = null, [FromQuery] DateTime? modifiedTimeEnd = null)
-        {
-            var history = await _ordersHistoryRepository.GetHistoryAsync(
-                accountId: accountId, 
-                assetPairId: assetPairId,
-                status: status?.ToType<OrderStatus>(),
-                withRelated: withRelated, 
-                createdTimeStart: createdTimeStart, 
-                createdTimeEnd: createdTimeEnd, 
-                modifiedTimeStart: modifiedTimeStart, 
-                modifiedTimeEnd: modifiedTimeEnd);
-
-            return history.Select(Convert).ToList();
-        }
-
-        /// <summary>
         /// Get orders with optional filtering, optionally including related orders, and with pagination.
         /// If parentOrderId is passed, withRelated is ignored.
         /// </summary>
+        [HttpPost, Route("")]
         [HttpPost, Route("by-pages")]
-        public async Task<PaginatedResponseContract<OrderEventContract>> OrderHistoryByPages(
+        public async Task<PaginatedResponseContract<OrderEventWithRelatedContract>> OrderHistoryByPages(
             [FromBody] OrderEventsFilterRequest filters, 
-            [FromQuery] int? skip = null, [FromQuery] int? take = null, 
+            [FromQuery] int? skip = 0, [FromQuery] int? take = 20, 
             [FromQuery] bool isAscending = false)
         {
             ApiValidationHelper.ValidatePagingParams(skip, take);
@@ -66,7 +44,6 @@ namespace MarginTrading.TradingHistory.Controllers
                 statuses: filters?.Statuses?.Select(x => x.ToType<OrderStatus>()).ToList(), 
                 orderTypes: filters?.OrderTypes?.Select(x => x.ToType<OrderType>()).ToList(), 
                 originatorTypes: filters?.OriginatorTypes?.Select(x => x.ToType<OriginatorType>()).ToList(),
-                withRelated: filters?.WithRelated ?? true,
                 parentOrderId: filters?.ParentOrderId,
                 createdTimeStart: filters?.CreatedTimeStart, 
                 createdTimeEnd: filters?.CreatedTimeEnd, 
@@ -76,7 +53,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 take: take,
                 isAscending: isAscending);
 
-            return new PaginatedResponseContract<OrderEventContract>(
+            return new PaginatedResponseContract<OrderEventWithRelatedContract>(
                 contents: data.Contents.Select(Convert).ToList(),
                 start: data.Start,
                 size: data.Size,
@@ -88,28 +65,28 @@ namespace MarginTrading.TradingHistory.Controllers
         /// Get order by Id, optionally including related orders.
         /// </summary>
         /// <param name="orderId"></param>
-        /// <param name="withRelated"></param>
+        /// <param name="status"></param>
         /// <returns></returns>
         [HttpGet, Route("{orderId}")]
-        public async Task<List<OrderEventContract>> OrderById(string orderId, 
-            [FromQuery] OrderStatusContract? status = null, [FromQuery] bool withRelated = true)
+        public async Task<List<OrderEventWithRelatedContract>> OrderById(string orderId,
+            [FromQuery] OrderStatusContract? status = null)
         {
             if (string.IsNullOrWhiteSpace(orderId))
             {
                 throw new ArgumentException("Order id must be set", nameof(orderId));
             }
 
-            var history = await _ordersHistoryRepository.GetHistoryAsync(orderId, status?.ToType<OrderStatus>(), withRelated);
+            var history = await _ordersHistoryRepository.GetHistoryAsync(orderId, status?.ToType<OrderStatus>());
 
             return history.Select(Convert).ToList();
         }
 
-        private static OrderEventContract Convert(IOrderHistory history)
+        private static OrderEventWithRelatedContract Convert(IOrderHistoryWithRelated history)
         {
             if (history == null)
                 return null;
 
-            return new OrderEventContract
+            return new OrderEventWithRelatedContract
             {
                 Id = history.Id,
                 AccountId = history.AccountId,
@@ -146,11 +123,26 @@ namespace MarginTrading.TradingHistory.Controllers
                 ExternalProviderId = history.ExternalProviderId,
                 MatchingEngineId = history.MatchingEngineId,
                 LegalEntity = history.LegalEntity,
-                RelatedOrderInfos = history.RelatedOrderInfos.Select(o =>
-                    new RelatedOrderInfoContract {Id = o.Id, Type = o.Type.ToType<OrderTypeContract>()}).ToList(),
                 UpdateType = history.UpdateType.ToType<OrderUpdateTypeContract>(),
                 AdditionalInfo = history.AdditionalInfo,
-                CorrelationId = history.CorrelationId
+                CorrelationId = history.CorrelationId,
+                StopLoss = Map(history.StopLoss),
+                TakeProfit = Map(history.TakeProfit)
+            };
+        }
+
+        private static RelatedOrderExtendedInfoContract Map(RelatedOrderExtendedInfo order)
+        {
+            if (order == null)
+                return null;
+            
+            return new RelatedOrderExtendedInfoContract
+            {
+                Id = order.Id,
+                Type = order.Type.ToType<OrderTypeContract>(),
+                Price = order.ExpectedOpenPrice,
+                Status = order.Status.ToType<OrderStatusContract>(),
+                ModifiedTimestamp = order.ModifiedTimestamp
             };
         }
     }

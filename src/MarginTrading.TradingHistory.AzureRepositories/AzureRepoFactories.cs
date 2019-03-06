@@ -16,7 +16,9 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 ILog log, IConvertService convertService)
             {
                 return new OrdersHistoryRepository(AzureTableStorage<OrderHistoryEntity>.Create(connString,
-                    "OrdersHistory", log));
+                        "OrdersHistory", log),
+                    AzureTableStorage<OrderHistoryWithRelatedEntity>.Create(connString,
+                        "OrdersHistory", log));
             }
 
             public static IPositionsHistoryRepository CreatePositionsHistoryRepository(IReloadingManager<string> connString, ILog log,

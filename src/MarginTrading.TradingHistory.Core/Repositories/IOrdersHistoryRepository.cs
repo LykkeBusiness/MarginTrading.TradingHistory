@@ -9,18 +9,12 @@ namespace MarginTrading.TradingHistory.Core.Repositories
     {
         Task AddAsync(IOrderHistory order);
         
-        Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string orderId, 
-            OrderStatus? status = null, bool withRelated = false);
-        
-        Task<IEnumerable<IOrderHistory>> GetHistoryAsync(string accountId, string assetPairId,
-            OrderStatus? status = null, bool withRelated = false,
-            DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
-            DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null);
+        Task<IEnumerable<IOrderHistoryWithRelated>> GetHistoryAsync(string orderId, 
+            OrderStatus? status = null);
 
-        Task<PaginatedResponse<IOrderHistory>> GetHistoryByPagesAsync(string accountId, string assetPairId,
+        Task<PaginatedResponse<IOrderHistoryWithRelated>> GetHistoryByPagesAsync(string accountId, string assetPairId,
             List<OrderStatus> statuses, List<OrderType> orderTypes, List<OriginatorType> originatorTypes,
-            bool withRelated,
-            string parentOrderId = null,
+			string parentOrderId = null,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
             int? skip = null, int? take = null, bool isAscending = true);
