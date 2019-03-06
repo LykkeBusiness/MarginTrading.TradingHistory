@@ -1,4 +1,5 @@
-﻿using MarginTrading.TradingHistory.Core;
+﻿using Lykke.SettingsReader.Attributes;
+using MarginTrading.TradingHistory.Core;
 
 namespace MarginTrading.TradingHistory.Settings.ServiceSettings
 {
@@ -6,7 +7,7 @@ namespace MarginTrading.TradingHistory.Settings.ServiceSettings
     {
         public StorageMode StorageMode { get; set; }
         
-        //[AzureTableCheck]
+        [Optional]
         public string LogsConnString { get; set; }
         
         //[AzureTableCheck]
