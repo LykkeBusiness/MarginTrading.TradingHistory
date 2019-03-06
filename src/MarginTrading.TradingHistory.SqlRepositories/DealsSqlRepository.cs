@@ -54,7 +54,8 @@ GO
 
 ";
 
-        private const string ProcedureAndTriggersScript = @"CREATE OR ALTER PROCEDURE [dbo].[SP_UpdateDealCommissionInfo] (
+        private const string ProcedureScript = @"
+CREATE OR ALTER PROCEDURE [dbo].[SP_UpdateDealCommissionInfo] (
   @eventSourceId nvarchar(64),
   @reasonType nvarchar(64),
   @processAll bit
@@ -166,10 +167,10 @@ AS
           )
         WHERE [Deals].DealId = @eventSourceId -- it could also be CompensationId, so it is automatically skipped
       END
-  END
-GO
+  END;
+";
 
-
+        private const string AccountTriggerScript = @" 
 CREATE OR ALTER TRIGGER [dbo].[T_InsertAccountTransaction] ON [dbo].[AccountHistory]
   AFTER INSERT
 AS
@@ -186,10 +187,11 @@ AS
       RAISERROR('EventSourceId was null, reason type [%s]', 16, 1, @reasonType);
 
     EXEC [dbo].[SP_UpdateDealCommissionInfo] @eventSourceId, @reasonType, 0
-  END
-GO
+  END;
+";
 
 
+        private const string DealTriggerScript = @" 
 CREATE OR ALTER TRIGGER [dbo].[T_InsertDeal] ON [dbo].[Deals]
   AFTER INSERT
 AS
@@ -209,8 +211,7 @@ AS
       RAISERROR('Position was not found by deal id [%s]', 16, 1, @dealId);
 
     EXEC [dbo].[SP_UpdateDealCommissionInfo] @eventSourceId, '', 1
-  END
-GO
+  END;
 
 "; 
         
@@ -239,20 +240,13 @@ GO
                 try 
                 { 
                     conn.CreateTableIfDoesntExists(CreateTableScript, TableName);
+                    conn.ExecuteCreateOrAlter(ProcedureScript);
+                    conn.ExecuteCreateOrAlter(AccountTriggerScript);
+                    conn.ExecuteCreateOrAlter(DealTriggerScript);
                 }
                 catch (Exception ex)
                 {
-                    _log?.WriteErrorAsync(nameof(DealsSqlRepository), nameof(SqlExtensions.CreateTableIfDoesntExists), null, ex);
-                    throw;
-                }
-
-                try
-                {
-                    conn.ExecuteCreateOrAlter(ProcedureAndTriggersScript);
-                }
-                catch (Exception ex)
-                {
-                    _log?.WriteErrorAsync(nameof(DealsSqlRepository), nameof(SqlExtensions.ExecuteCreateOrAlter), null, ex);
+                  _log?.WriteErrorAsync(nameof(DealsSqlRepository), "Create table and triggers", null, ex);
                     throw;
                 }
             }
@@ -339,3 +333,4 @@ GO
         }
     }
 }
+
