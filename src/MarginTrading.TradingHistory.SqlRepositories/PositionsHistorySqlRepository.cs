@@ -92,6 +92,7 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
+                await conn.OpenAsync();
                 var transaction = conn.BeginTransaction();
                 
                 try
