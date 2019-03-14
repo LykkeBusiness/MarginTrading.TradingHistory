@@ -16,7 +16,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 {
     public class DealsSqlRepository : IDealsRepository
     {
-        private const string TableName = "Deals";
+        public const string TableName = "Deals";
 
         #region SQL
         
@@ -224,10 +224,10 @@ AS
             !new [] {nameof(IDeal.OvernightFees), nameof(IDeal.Commission), nameof(IDeal.OnBehalfFee), 
                 nameof(IDeal.Taxes)}.Contains(pi.Name);
         
-        private static readonly string GetColumns = string.Join(",", 
+        public static readonly string GetColumns = string.Join(",", 
             typeof(IDeal).GetProperties().Where(FilterTriggerInjectedFieldsPredicate).Select(x => x.Name));
 
-        private static readonly string GetFields = string.Join(",", 
+        public static readonly string GetFields = string.Join(",", 
             typeof(IDeal).GetProperties().Where(FilterTriggerInjectedFieldsPredicate).Select(x => "@" + x.Name));
 
         public DealsSqlRepository(string connectionString, ILog log)
