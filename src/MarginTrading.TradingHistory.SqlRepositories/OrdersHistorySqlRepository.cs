@@ -126,14 +126,17 @@ OUTER APPLY (
                 {
                     var orderHistoryEntity = OrderHistoryEntity.Create(order);
                     await conn.ExecuteAsync(
-                        $"insert into {TableName} ({GetColumns}) values ({GetFields})", orderHistoryEntity);
+                        $"insert into {TableName} ({GetColumns}) values ({GetFields})", 
+                        orderHistoryEntity,
+                        transaction);
 
                     if (trade != null)
                     {
                         var tradeEntity = TradeEntity.Create(trade);
                         await conn.ExecuteAsync(
                             $"insert into {TradesSqlRepository.TableName} ({TradesSqlRepository.GetColumns}) values ({TradesSqlRepository.GetFields})", 
-                            tradeEntity);
+                            tradeEntity,
+                            transaction);
                     }
                     
                     transaction.Commit();
