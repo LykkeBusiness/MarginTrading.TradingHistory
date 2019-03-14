@@ -98,14 +98,17 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
                 try
                 {
                     var positionEntity = PositionsHistoryEntity.Create(positionHistory);                    
-                    await conn.ExecuteAsync($"insert into {TableName} ({GetColumns}) values ({GetFields})", positionEntity);
+                    await conn.ExecuteAsync($"insert into {TableName} ({GetColumns}) values ({GetFields})", 
+                        positionEntity,
+                        transaction);
 
                     if (deal != null)
                     {
                         var dealEntity = DealEntity.Create(deal);
                         await conn.ExecuteAsync(
                             $"insert into {DealsSqlRepository.TableName} ({DealsSqlRepository.GetColumns}) values ({DealsSqlRepository.GetFields})", 
-                            dealEntity);
+                            dealEntity,
+                            transaction);
                     }
                     
                     transaction.Commit();
