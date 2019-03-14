@@ -82,13 +82,13 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
                 try { conn.CreateTableIfDoesntExists(CreateTableScript, TableName); }
                 catch (Exception ex)
                 {
-                    _log?.WriteErrorAsync("OrdersChangeHistory", "CreateTableIfDoesntExists", null, ex);
+                    _log?.WriteErrorAsync("PositionHistory", "CreateTableIfDoesntExists", null, ex);
                     throw;
                 }
             }
         }
 
-        public async Task AddAsync(IPositionHistory positionHistory)
+        public async Task TryAddAsync(IPositionHistory positionHistory)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
@@ -100,8 +100,22 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
                 }
                 catch (Exception ex)
                 {
+                    var objects = await conn.QueryAsync<PositionsHistoryEntity>(
+                        $"SELECT * FROM {TableName} Where Id = @id AND HistoryType = @historyType AND HistoryTimestamp = @historyTimestamp", 
+                        new 
+                        { 
+                            id = positionHistory.Id, 
+                            historyType = positionHistory.HistoryType.ToString(),
+                            historyTimestamp = positionHistory.HistoryTimestamp,
+                        });
+
+                    if (objects.Any())
+                    {
+                        return;
+                    }
+                    
                     var msg = $"Error {ex.Message} \n" +
-                              "Entity <IOrderHistory>: \n" +
+                              $"Entity <{nameof(IPositionHistory)}>: \n" +
                               positionHistory.ToJson();
                     
                     _log?.WriteWarning("PositionsHistorySqlRepository", "AddAsync", msg);

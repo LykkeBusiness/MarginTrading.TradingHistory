@@ -39,12 +39,19 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         protected override string ExchangeName => _settings.RabbitMqQueues.OrderHistory.ExchangeName;
         protected override string RoutingKey => null;
 
-        protected override Task HandleMessage(OrderHistoryEvent historyEvent)
+        protected override async Task HandleMessage(OrderHistoryEvent historyEvent)
         {
-            var tasks = new List<Task>();
-
             var orderHistory = historyEvent.OrderSnapshot.ToOrderHistoryDomain(historyEvent.Type);
-            tasks.Add(_ordersHistoryRepository.AddAsync(orderHistory));
+            
+            try
+            {
+                await _ordersHistoryRepository.TryAddAsync(orderHistory);
+            }
+            catch (Exception ex)
+            {
+                await _log.WriteErrorAsync(nameof(HandleMessage), "Insert order history", "", ex);
+                throw;
+            }
 
             if (historyEvent.Type == OrderHistoryTypeContract.Executed)
             {
@@ -65,28 +72,31 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                     historyEvent.OrderSnapshot.AdditionalInfo
                 );
 
-                tasks.Add(_tradesRepository.AddAsync(trade));
+                try
+                {
+                    await _tradesRepository.AddAsync(trade);
+                }
+                catch (Exception ex)
+                {
+                    await _log.WriteErrorAsync(nameof(HandleMessage), "Insert trade", "", ex);
+                    throw;
+                }
 
                 var cancelledTradeId = TryGetCancelledTradeId(historyEvent.OrderSnapshot);
 
                 if (!string.IsNullOrEmpty(cancelledTradeId))
                 {
-                    tasks.Add(_tradesRepository.SetCancelledByAsync(cancelledTradeId,
-                        historyEvent.OrderSnapshot.Id));
+                    try
+                    {
+                        await _tradesRepository.SetCancelledByAsync(cancelledTradeId, 
+                            historyEvent.OrderSnapshot.Id);
+                    }
+                    catch (Exception ex)
+                    {
+                        await _log.WriteErrorAsync(nameof(HandleMessage), "SetCancelledByAsync", "", ex);
+                    }
                 }
             }
-
-            return Task.WhenAll(tasks.Select(t => Task.Run(async () =>
-            {
-                try
-                {
-                    await t;
-                }
-                catch (Exception ex)
-                {
-                    await _log.WriteErrorAsync(nameof(HandleMessage), "SwitchThread", "", ex);
-                }
-            })));
         }
 
         private string TryGetCancelledTradeId(OrderContract order)
