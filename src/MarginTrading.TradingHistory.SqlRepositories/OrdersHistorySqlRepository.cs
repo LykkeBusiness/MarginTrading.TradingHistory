@@ -115,7 +115,7 @@ OUTER APPLY (
             }
         }
 
-        public async Task AddAsync(IOrderHistory order)
+        public async Task TryAddAsync(IOrderHistory order)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
@@ -127,11 +127,27 @@ OUTER APPLY (
                 }
                 catch (Exception ex)
                 {
+                    var objects = await conn.QueryAsync<OrderHistoryEntity>(
+                        $"SELECT * FROM {TableName} Where Id = @id AND [Type] = @type AND CreatedTimestamp = @createdTimestamp AND ModifiedTimestamp = @modifiedTimestamp AND ExecutedTimestamp = @executedTimestamp", 
+                        new
+                        {
+                            id = order.Id,
+                            type = order.Type.ToString(),
+                            createdTimestamp = order.CreatedTimestamp,
+                            modifiedTimestamp = order.ModifiedTimestamp,
+                            executedTimestamp = order.ExecutedTimestamp,
+                        });
+
+                    if (objects.Any())
+                    {
+                        return;
+                    }
+                    
                     var msg = $"Error {ex.Message} \n" +
-                              "Entity <IOrderHistory>: \n" +
+                              $"Entity <{nameof(IOrderHistory)}>: \n" +
                               order.ToJson();
                     
-                    _log?.WriteWarning("AccountTransactionsReportsSqlRepository", "InsertOrReplaceAsync", msg);
+                    _log?.WriteWarning(nameof(OrdersHistorySqlRepository), nameof(TryAddAsync), msg);
                     
                     throw new Exception(msg);
                 }
