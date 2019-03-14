@@ -119,6 +119,7 @@ OUTER APPLY (
         {
             using (var conn = new SqlConnection(_connectionString))
             {
+                await conn.OpenAsync();
                 var transaction = conn.BeginTransaction();
                 
                 try
