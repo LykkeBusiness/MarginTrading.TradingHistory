@@ -115,39 +115,39 @@ OUTER APPLY (
             }
         }
 
-        public async Task TryAddAsync(IOrderHistory order)
+        public async Task AddAsync(IOrderHistory order, ITrade trade)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
+                var transaction = conn.BeginTransaction();
+                
                 try
                 {
-                    var entity = OrderHistoryEntity.Create(order);
+                    var orderHistoryEntity = OrderHistoryEntity.Create(order);
                     await conn.ExecuteAsync(
-                        $"insert into {TableName} ({GetColumns}) values ({GetFields})", entity);
+                        $"insert into {TableName} ({GetColumns}) values ({GetFields})", orderHistoryEntity);
+
+                    if (trade != null)
+                    {
+                        var tradeEntity = TradeEntity.Create(trade);
+                        await conn.ExecuteAsync(
+                            $"insert into {TradesSqlRepository.TableName} ({TradesSqlRepository.GetColumns}) values ({TradesSqlRepository.GetFields})", 
+                            tradeEntity);
+                    }
+                    
+                    transaction.Commit();
                 }
                 catch (Exception ex)
                 {
-                    var objects = await conn.QueryAsync<OrderHistoryEntity>(
-                        $"SELECT * FROM {TableName} Where Id = @id AND [Type] = @type AND CreatedTimestamp = @createdTimestamp AND ModifiedTimestamp = @modifiedTimestamp AND ExecutedTimestamp = @executedTimestamp", 
-                        new
-                        {
-                            id = order.Id,
-                            type = order.Type.ToString(),
-                            createdTimestamp = order.CreatedTimestamp,
-                            modifiedTimestamp = order.ModifiedTimestamp,
-                            executedTimestamp = order.ExecutedTimestamp,
-                        });
+                    transaction.Rollback();
 
-                    if (objects.Any())
-                    {
-                        return;
-                    }
-                    
                     var msg = $"Error {ex.Message} \n" +
                               $"Entity <{nameof(IOrderHistory)}>: \n" +
-                              order.ToJson();
+                              order.ToJson() + " \n" +
+                              $"Entity <{nameof(ITrade)}>: \n" +
+                              trade?.ToJson();
                     
-                    _log?.WriteWarning(nameof(OrdersHistorySqlRepository), nameof(TryAddAsync), msg);
+                    _log?.WriteWarning(nameof(OrdersHistorySqlRepository), nameof(AddAsync), msg);
                     
                     throw new Exception(msg);
                 }

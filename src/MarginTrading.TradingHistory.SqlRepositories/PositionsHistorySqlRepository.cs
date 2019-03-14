@@ -88,35 +88,36 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
             }
         }
 
-        public async Task TryAddAsync(IPositionHistory positionHistory)
+        public async Task AddAsync(IPositionHistory positionHistory, IDeal deal)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
+                var transaction = conn.BeginTransaction();
+                
                 try
                 {
-                    var entity = PositionsHistoryEntity.Create(positionHistory);
-                    await conn.ExecuteAsync(
-                        $"insert into {TableName} ({GetColumns}) values ({GetFields})", entity);
+                    var positionEntity = PositionsHistoryEntity.Create(positionHistory);                    
+                    await conn.ExecuteAsync($"insert into {TableName} ({GetColumns}) values ({GetFields})", positionEntity);
+
+                    if (deal != null)
+                    {
+                        var dealEntity = DealEntity.Create(deal);
+                        await conn.ExecuteAsync(
+                            $"insert into {DealsSqlRepository.TableName} ({DealsSqlRepository.GetColumns}) values ({DealsSqlRepository.GetFields})", 
+                            dealEntity);
+                    }
+                    
+                    transaction.Commit();
                 }
                 catch (Exception ex)
                 {
-                    var objects = await conn.QueryAsync<PositionsHistoryEntity>(
-                        $"SELECT * FROM {TableName} Where Id = @id AND HistoryType = @historyType AND HistoryTimestamp = @historyTimestamp", 
-                        new 
-                        { 
-                            id = positionHistory.Id, 
-                            historyType = positionHistory.HistoryType.ToString(),
-                            historyTimestamp = positionHistory.HistoryTimestamp,
-                        });
+                    transaction.Rollback();
 
-                    if (objects.Any())
-                    {
-                        return;
-                    }
-                    
                     var msg = $"Error {ex.Message} \n" +
                               $"Entity <{nameof(IPositionHistory)}>: \n" +
-                              positionHistory.ToJson();
+                              positionHistory.ToJson() + " \n" +
+                              $"Entity <{nameof(IDeal)}>: \n" +
+                              deal?.ToJson();
                     
                     _log?.WriteWarning("PositionsHistorySqlRepository", "AddAsync", msg);
                     

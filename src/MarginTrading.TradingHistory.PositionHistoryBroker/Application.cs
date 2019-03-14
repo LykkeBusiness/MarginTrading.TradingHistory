@@ -48,16 +48,6 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
         protected override async Task HandleMessage(PositionHistoryEvent positionHistoryEvent)
         {
             var position = Map(positionHistoryEvent);
-
-            try
-            {
-                await _positionsHistoryRepository.TryAddAsync(position);
-            }
-            catch (Exception ex)
-            {
-                await _log.WriteErrorAsync(nameof(HandleMessage), "Insert position history", "", ex);
-                throw;
-            }
             
             var deal = (positionHistoryEvent.EventType == PositionHistoryTypeContract.Close
                         || positionHistoryEvent.EventType == PositionHistoryTypeContract.PartiallyClose)
@@ -88,18 +78,7 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                 )
                 : null;
             
-            try
-            {
-                if (deal != null)
-                {
-                    await _dealsRepository.AddAsync(deal);
-                }
-            }
-            catch (Exception ex)
-            {
-                await _log.WriteErrorAsync(nameof(HandleMessage), "Insert deal", "", ex);
-                throw;
-            }
+            await _positionsHistoryRepository.AddAsync(position, deal);
         }
 
         private static PositionHistory Map(PositionHistoryEvent positionHistoryEvent)

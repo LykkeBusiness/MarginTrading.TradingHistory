@@ -58,7 +58,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 .Cast<IPositionHistory>().ToList();
         }
 
-        public async Task TryAddAsync(IPositionHistory positionHistory)
+        public async Task AddAsync(IPositionHistory positionHistory, IDeal deal)
         {
             var entity =
                 _convertService.Convert<IPositionHistory, PositionHistoryEntity>(positionHistory,

@@ -42,20 +42,9 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         protected override async Task HandleMessage(OrderHistoryEvent historyEvent)
         {
             var orderHistory = historyEvent.OrderSnapshot.ToOrderHistoryDomain(historyEvent.Type);
-            
-            try
-            {
-                await _ordersHistoryRepository.TryAddAsync(orderHistory);
-            }
-            catch (Exception ex)
-            {
-                await _log.WriteErrorAsync(nameof(HandleMessage), "Insert order history", "", ex);
-                throw;
-            }
 
-            if (historyEvent.Type == OrderHistoryTypeContract.Executed)
-            {
-                var trade = new Trade(
+            var trade = historyEvent.Type == OrderHistoryTypeContract.Executed
+                ? new Trade(
                     historyEvent.OrderSnapshot.Id,
                     historyEvent.OrderSnapshot.AccountId,
                     historyEvent.OrderSnapshot.Id,
@@ -70,31 +59,28 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                     historyEvent.OrderSnapshot.ExpectedOpenPrice,
                     historyEvent.OrderSnapshot.FxRate,
                     historyEvent.OrderSnapshot.AdditionalInfo
-                );
+                )
+                : null;
+            
+            await _ordersHistoryRepository.AddAsync(orderHistory, trade);
 
+            if (trade == null)
+            {
+                return;
+            }
+            
+            var cancelledTradeId = TryGetCancelledTradeId(historyEvent.OrderSnapshot);
+
+            if (!string.IsNullOrEmpty(cancelledTradeId))
+            {
                 try
                 {
-                    await _tradesRepository.AddAsync(trade);
+                    await _tradesRepository.SetCancelledByAsync(cancelledTradeId, 
+                        historyEvent.OrderSnapshot.Id);
                 }
                 catch (Exception ex)
                 {
-                    await _log.WriteErrorAsync(nameof(HandleMessage), "Insert trade", "", ex);
-                    throw;
-                }
-
-                var cancelledTradeId = TryGetCancelledTradeId(historyEvent.OrderSnapshot);
-
-                if (!string.IsNullOrEmpty(cancelledTradeId))
-                {
-                    try
-                    {
-                        await _tradesRepository.SetCancelledByAsync(cancelledTradeId, 
-                            historyEvent.OrderSnapshot.Id);
-                    }
-                    catch (Exception ex)
-                    {
-                        await _log.WriteErrorAsync(nameof(HandleMessage), "SetCancelledByAsync", "", ex);
-                    }
+                    await _log.WriteErrorAsync(nameof(HandleMessage), "SetCancelledByAsync", "", ex);
                 }
             }
         }

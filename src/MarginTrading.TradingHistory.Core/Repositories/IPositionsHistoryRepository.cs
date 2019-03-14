@@ -14,6 +14,6 @@ namespace MarginTrading.TradingHistory.Core.Repositories
         
         Task<List<IPositionHistory>> GetAsync(string id);
         
-        Task TryAddAsync(IPositionHistory obj);
+        Task AddAsync(IPositionHistory positionHistory, IDeal deal);
     }
 }
