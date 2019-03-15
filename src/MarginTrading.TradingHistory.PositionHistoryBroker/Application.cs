@@ -45,19 +45,14 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
         protected override string RoutingKey => null;
         protected override string QueuePostfix => ".PositionsHistory";
 
-        protected override Task HandleMessage(PositionHistoryEvent positionHistoryEvent)
+        protected override async Task HandleMessage(PositionHistoryEvent positionHistoryEvent)
         {
-            var tasks = new List<Task>();
-            
             var position = Map(positionHistoryEvent);
             
-            tasks.Add(_positionsHistoryRepository.AddAsync(position));
-
-            if ((positionHistoryEvent.EventType == PositionHistoryTypeContract.Close
-                 || positionHistoryEvent.EventType == PositionHistoryTypeContract.PartiallyClose)
-                && positionHistoryEvent.Deal != null)
-            {
-                var deal = new Deal(
+            var deal = (positionHistoryEvent.EventType == PositionHistoryTypeContract.Close
+                        || positionHistoryEvent.EventType == PositionHistoryTypeContract.PartiallyClose)
+                       && positionHistoryEvent.Deal != null
+                ? new Deal(
                     dealId: positionHistoryEvent.Deal.DealId,
                     created: positionHistoryEvent.Deal.Created,
                     accountId: positionHistoryEvent.PositionSnapshot.AccountId,
@@ -80,22 +75,10 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                     fpl: positionHistoryEvent.Deal.Fpl,
                     additionalInfo: positionHistoryEvent.Deal.AdditionalInfo,
                     pnlOfTheLastDay: positionHistoryEvent.Deal.PnlOfTheLastDay
-                    );
-                
-                tasks.Add(_dealsRepository.AddAsync(deal));
-            }
-
-            return Task.WhenAll(tasks.Select(t => Task.Run(async () =>
-            {
-                try
-                {
-                    await t;
-                }
-                catch (Exception ex)
-                {
-                    await _log.WriteErrorAsync(nameof(HandleMessage), "SwitchThread", "", ex);
-                }
-            })));
+                )
+                : null;
+            
+            await _positionsHistoryRepository.AddAsync(position, deal);
         }
 
         private static PositionHistory Map(PositionHistoryEvent positionHistoryEvent)

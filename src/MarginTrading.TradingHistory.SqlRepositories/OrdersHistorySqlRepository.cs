@@ -115,23 +115,43 @@ OUTER APPLY (
             }
         }
 
-        public async Task AddAsync(IOrderHistory order)
+        public async Task AddAsync(IOrderHistory order, ITrade trade)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
+                await conn.OpenAsync();
+                var transaction = conn.BeginTransaction();
+                
                 try
                 {
-                    var entity = OrderHistoryEntity.Create(order);
+                    var orderHistoryEntity = OrderHistoryEntity.Create(order);
                     await conn.ExecuteAsync(
-                        $"insert into {TableName} ({GetColumns}) values ({GetFields})", entity);
+                        $"insert into {TableName} ({GetColumns}) values ({GetFields})", 
+                        orderHistoryEntity,
+                        transaction);
+
+                    if (trade != null)
+                    {
+                        var tradeEntity = TradeEntity.Create(trade);
+                        await conn.ExecuteAsync(
+                            $"insert into {TradesSqlRepository.TableName} ({TradesSqlRepository.GetColumns}) values ({TradesSqlRepository.GetFields})", 
+                            tradeEntity,
+                            transaction);
+                    }
+                    
+                    transaction.Commit();
                 }
                 catch (Exception ex)
                 {
+                    transaction.Rollback();
+
                     var msg = $"Error {ex.Message} \n" +
-                              "Entity <IOrderHistory>: \n" +
-                              order.ToJson();
+                              $"Entity <{nameof(IOrderHistory)}>: \n" +
+                              order.ToJson() + " \n" +
+                              $"Entity <{nameof(ITrade)}>: \n" +
+                              trade?.ToJson();
                     
-                    _log?.WriteWarning("AccountTransactionsReportsSqlRepository", "InsertOrReplaceAsync", msg);
+                    _log?.WriteWarning(nameof(OrdersHistorySqlRepository), nameof(AddAsync), msg);
                     
                     throw new Exception(msg);
                 }

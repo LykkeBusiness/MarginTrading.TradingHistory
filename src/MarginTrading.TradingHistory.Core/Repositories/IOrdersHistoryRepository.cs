@@ -7,7 +7,7 @@ namespace MarginTrading.TradingHistory.Core.Repositories
 {
     public interface IOrdersHistoryRepository
     {
-        Task AddAsync(IOrderHistory order);
+        Task AddAsync(IOrderHistory order, ITrade trade);
         
         Task<IEnumerable<IOrderHistoryWithRelated>> GetHistoryAsync(string orderId, 
             OrderStatus? status = null);

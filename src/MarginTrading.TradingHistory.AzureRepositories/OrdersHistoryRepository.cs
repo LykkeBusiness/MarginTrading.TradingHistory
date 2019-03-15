@@ -22,7 +22,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             _readTableStorage = readTableStorage;
         }
 
-        public Task AddAsync(IOrderHistory order)
+        public Task AddAsync(IOrderHistory order, ITrade trade)
         {
             var entity = OrderHistoryEntity.Create(order);
             // ReSharper disable once RedundantArgumentDefaultValue

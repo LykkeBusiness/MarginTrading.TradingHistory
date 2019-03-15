@@ -15,7 +15,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 {
     public class TradesSqlRepository : ITradesRepository
     {
-        private const string TableName = "Trades";
+        public const string TableName = "Trades";
 
         private const string CreateTableScript = "CREATE TABLE [{0}](" +
                                                  @"[OID] [bigint] NOT NULL IDENTITY (1,1) PRIMARY KEY,
@@ -40,10 +40,10 @@ INDEX IX_{0}_Base (AccountId, AssetPairId)
         private readonly string _connectionString;
         private readonly ILog _log;
 
-        private static readonly string GetColumns =
+        public static readonly string GetColumns =
             string.Join(",", typeof(ITrade).GetProperties().Select(x => x.Name));
 
-        private static readonly string GetFields =
+        public static readonly string GetFields =
             string.Join(",", typeof(ITrade).GetProperties().Select(x => "@" + x.Name));
 
         private static readonly string GetUpdateClause = string.Join(",",
