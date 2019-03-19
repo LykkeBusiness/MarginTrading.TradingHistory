@@ -175,6 +175,7 @@ CREATE OR ALTER TRIGGER [dbo].[T_InsertAccountTransaction] ON [dbo].[AccountHist
   AFTER INSERT
 AS
   BEGIN
+    SET XACT_ABORT OFF;
     SET NOCOUNT ON;
 
     DECLARE @eventSourceId nvarchar(64)
@@ -192,10 +193,12 @@ AS
     BEGIN CATCH
       DECLARE @ErrorMessage NVARCHAR(4000);
   
-      SELECT @ErrorMessage = ERROR_MESSAGE();
+      SELECT @ErrorMessage = 'Failed to update deal commissions' + ERROR_MESSAGE();
         
       PRINT @ErrorMessage; --no exception on client
     END CATCH
+    
+    SET XACT_ABORT ON;
   END;
 ";
 
@@ -205,6 +208,7 @@ CREATE OR ALTER TRIGGER [dbo].[T_InsertDeal] ON [dbo].[Deals]
   AFTER INSERT
 AS
   BEGIN
+    SET XACT_ABORT OFF;
     SET NOCOUNT ON;
 
     DECLARE @eventSourceId nvarchar(64), @dealId nvarchar(64)
@@ -224,12 +228,13 @@ AS
     END TRY
     BEGIN CATCH
       DECLARE @ErrorMessage NVARCHAR(4000);
-      DECLARE @ErrorState INT;
 
-      SELECT @ErrorMessage = 'CommissionUpdateFailed: ' + ERROR_MESSAGE(), @ErrorState = ERROR_STATE();
+      SELECT @ErrorMessage = 'Failed to update deal commissions' + ERROR_MESSAGE();
 
-      RAISERROR (@ErrorMessage, 1, @ErrorState);--severity changed to 1
+      PRINT @ErrorMessage; --no exception on client
     END CATCH
+
+    SET XACT_ABORT ON;
   END;
 "; 
         

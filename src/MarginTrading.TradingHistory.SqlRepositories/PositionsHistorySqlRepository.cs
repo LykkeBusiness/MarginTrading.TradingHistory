@@ -113,13 +113,6 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
 
                     transaction.Commit();
                 }
-                catch (SqlException sqlException) when (sqlException.Message.StartsWith("CommissionUpdateFailed: "))
-                {
-                    await _log.WriteErrorAsync(nameof(PositionsHistorySqlRepository), nameof(AddAsync), 
-                        sqlException);
-
-                    transaction.Commit();
-                }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
