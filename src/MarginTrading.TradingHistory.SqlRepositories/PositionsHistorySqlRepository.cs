@@ -94,11 +94,11 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
             {
                 await conn.OpenAsync();
                 var transaction = conn.BeginTransaction();
-                
+
                 try
                 {
-                    var positionEntity = PositionsHistoryEntity.Create(positionHistory);                    
-                    await conn.ExecuteAsync($"insert into {TableName} ({GetColumns}) values ({GetFields})", 
+                    var positionEntity = PositionsHistoryEntity.Create(positionHistory);
+                    await conn.ExecuteAsync($"insert into {TableName} ({GetColumns}) values ({GetFields})",
                         positionEntity,
                         transaction);
 
@@ -106,12 +106,17 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
                     {
                         var dealEntity = DealEntity.Create(deal);
                         await conn.ExecuteAsync(
-                            $"insert into {DealsSqlRepository.TableName} ({DealsSqlRepository.GetColumns}) values ({DealsSqlRepository.GetFields})", 
+                            $"insert into {DealsSqlRepository.TableName} ({DealsSqlRepository.GetColumns}) values ({DealsSqlRepository.GetFields})",
                             dealEntity,
                             transaction);
                     }
-                    
+
                     transaction.Commit();
+                }
+                catch (SqlException sqlException) when (sqlException.Message.StartsWith("CommissionUpdateFailed: "))
+                {
+                    await _log.WriteErrorAsync(nameof(PositionsHistorySqlRepository), nameof(AddAsync), 
+                        sqlException);
                 }
                 catch (Exception ex)
                 {
