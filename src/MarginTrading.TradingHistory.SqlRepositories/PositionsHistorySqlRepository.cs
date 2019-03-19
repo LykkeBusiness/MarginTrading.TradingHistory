@@ -117,6 +117,8 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
                 {
                     await _log.WriteErrorAsync(nameof(PositionsHistorySqlRepository), nameof(AddAsync), 
                         sqlException);
+
+                    transaction.Commit();
                 }
                 catch (Exception ex)
                 {
