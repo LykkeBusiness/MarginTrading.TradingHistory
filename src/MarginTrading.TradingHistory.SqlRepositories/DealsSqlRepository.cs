@@ -57,14 +57,13 @@ GO
         private const string ProcedureScript = @"
 CREATE OR ALTER PROCEDURE [dbo].[SP_UpdateDealCommissionInfo] (
   @eventSourceId nvarchar(64),
-  @reasonType nvarchar(64),
-  @processAll bit
+  @reasonType nvarchar(64)
 )
 AS
   BEGIN
     SET NOCOUNT ON;
 
-    IF @processAll = 1 OR @reasonType = 'Swap'
+    IF @reasonType = 'Swap'
       BEGIN
         UPDATE [dbo].[Deals]
         SET [OvernightFees] =
@@ -81,16 +80,9 @@ AS
         WHERE [Deals].DealId = position.DealId AND position.Id = @eventSourceId
       END
 
-    IF @processAll = 1 OR @reasonType = 'Commission'
+    IF @reasonType = 'Commission'
       BEGIN
-        WITH selectedTrades AS
-        (
-          SELECT deal.DealId, trade.Id, Volume = ABS(trade.Volume)
-          FROM dbo.[Deals] AS deal
-          INNER JOIN dbo.Trades AS trade
-            ON trade.Id IN (deal.OpenTradeId, deal.CloseTradeId)
-        )
-        ,selectedAccounts AS
+        WITH selectedAccounts AS
         (
           SELECT account.EventSourceId,
             account.ReasonType,
@@ -101,14 +93,10 @@ AS
         UPDATE [dbo].[Deals]
         SET [Commission] = data.amount
         FROM (
-            SELECT DISTINCT deal.DealId, CONVERT(DECIMAL(24,13), ((ISNULL(openingCommission.ChangeAmount, 0.0) / openTrade.Volume
-                                              + ISNULL(closingCommission.ChangeAmount, 0.0) / closeTrade.Volume)
+            SELECT DISTINCT deal.DealId, CONVERT(DECIMAL(24,13), ((ISNULL(openingCommission.ChangeAmount, 0.0) / ABS(deal.OpenOrderVolume)
+                                              + ISNULL(closingCommission.ChangeAmount, 0.0) / ABS(deal.CloseOrderVolume))
                                               * ABS(deal.Volume))) amount
             FROM dbo.[Deals] AS deal
-            INNER JOIN selectedTrades AS openTrade
-              ON deal.OpenTradeId = openTrade.Id
-            INNER JOIN selectedTrades AS closeTrade
-              ON deal.CloseTradeId = closeTrade.Id
             INNER JOIN selectedAccounts openingCommission
               ON deal.OpenTradeId = openingCommission.EventSourceId AND openingCommission.ReasonType = 'Commission'
             LEFT OUTER JOIN selectedAccounts closingCommission
@@ -118,16 +106,9 @@ AS
         WHERE [dbo].[Deals].DealId = data.DealId
       END
 
-    IF @processAll = 1 OR @reasonType = 'OnBehalf'
+    IF @reasonType = 'OnBehalf'
       BEGIN
-        WITH selectedTrades AS
-        (
-          SELECT deal.DealId, trade.Id, Volume = ABS(trade.Volume)
-          FROM dbo.[Deals] AS deal
-          INNER JOIN dbo.Trades AS trade
-            ON trade.Id IN (deal.OpenTradeId, deal.CloseTradeId)
-        )
-        ,selectedAccounts AS
+        WITH selectedAccounts AS
         (
           SELECT DISTINCT account.EventSourceId,
             account.ReasonType,
@@ -138,14 +119,10 @@ AS
         UPDATE [dbo].[Deals]
         SET [OnBehalfFee] = data.amount
         FROM (
-            SELECT DISTINCT deal.DealId, CONVERT(DECIMAL(24,13), ((ISNULL(openingOnBehalf.ChangeAmount, 0.0) / openTrade.Volume
-                                               + ISNULL(closingOnBehalf.ChangeAmount, 0.0) / closeTrade.Volume)
+            SELECT DISTINCT deal.DealId, CONVERT(DECIMAL(24,13), ((ISNULL(openingOnBehalf.ChangeAmount, 0.0) / ABS(deal.OpenOrderVolume)
+                                               + ISNULL(closingOnBehalf.ChangeAmount, 0.0) / ABS(deal.CloseOrderVolume))
                                               * ABS(deal.Volume))) amount
             FROM [dbo].[Deals] deal
-            INNER JOIN selectedTrades AS openTrade
-              ON deal.OpenTradeId = openTrade.Id
-            INNER JOIN selectedTrades AS closeTrade
-              ON deal.CloseTradeId = closeTrade.Id
             LEFT OUTER JOIN selectedAccounts openingOnBehalf
               ON deal.OpenTradeId = openingOnBehalf.EventSourceId AND openingOnBehalf.ReasonType = 'OnBehalf'
             LEFT OUTER JOIN selectedAccounts closingOnBehalf
@@ -155,7 +132,7 @@ AS
         WHERE [dbo].[Deals].DealId = data.DealId
       END
 
-    IF @processAll = 1 OR @reasonType = 'Tax'
+    IF @reasonType = 'Tax'
       BEGIN
         UPDATE [dbo].[Deals]
         SET [Taxes] =
@@ -167,7 +144,7 @@ AS
           )
         WHERE [Deals].DealId = @eventSourceId -- it could also be CompensationId, so it is automatically skipped
       END
-  END;
+  END
 ";
 
         private const string AccountTriggerScript = @" 
@@ -178,8 +155,7 @@ AS
     SET XACT_ABORT OFF;
     SET NOCOUNT ON;
 
-    DECLARE @eventSourceId nvarchar(64)
-    DECLARE @reasonType nvarchar(64)
+    DECLARE @eventSourceId nvarchar(64), @reasonType nvarchar(64)
 
     SELECT @eventSourceId = [EventSourceId], @reasonType = [ReasonType]
     FROM INSERTED
@@ -188,16 +164,16 @@ AS
       RAISERROR('EventSourceId was null, reason type [%s]', 1, 1, @reasonType);
 
     BEGIN TRY
-      EXEC [dbo].[SP_UpdateDealCommissionInfo] @eventSourceId, @reasonType, 0
+      EXEC [dbo].[SP_UpdateDealCommissionInfo] @eventSourceId, @reasonType
     END TRY
     BEGIN CATCH
       DECLARE @ErrorMessage NVARCHAR(4000);
-  
-      SELECT @ErrorMessage = 'Failed to update deal commissions' + ERROR_MESSAGE();
-        
-      PRINT @ErrorMessage; --no exception on client
+
+      SELECT @ErrorMessage = 'Failed to update deal ' + @reasonType + ERROR_MESSAGE();
+
+      RAISERROR(@ErrorMessage, 1, 1);
     END CATCH
-    
+
     SET XACT_ABORT ON;
   END;
 ";
@@ -211,28 +187,50 @@ AS
     SET XACT_ABORT OFF;
     SET NOCOUNT ON;
 
-    DECLARE @eventSourceId nvarchar(64), @dealId nvarchar(64)
+    DECLARE @positionId nvarchar(64), @dealId nvarchar(64), @closeTradeId nvarchar(64), @ErrorMessage NVARCHAR(4000)
 
-    SELECT @dealId = [DealId]
+    SELECT @dealId = [DealId], @closeTradeId = [CloseTradeId]
     FROM INSERTED
 
-    SELECT @eventSourceId = ph.Id
-    FROM [dbo].[PositionsHistory] ph, [dbo].[Deals] d
-    WHERE d.DealId = ph.DealId AND d.DealId = @dealId
-
-    IF @eventSourceId IS NULL
-      RAISERROR('Position was not found by deal id [%s]', 1, 1, @dealId);
-
     BEGIN TRY
-      EXEC [dbo].[SP_UpdateDealCommissionInfo] @eventSourceId, '', 1
+      SET @positionId = (SELECT TOP 1 ph.Id
+      FROM [dbo].[PositionsHistory] ph, [dbo].[Deals] d
+      WHERE d.DealId = ph.DealId AND d.DealId = @dealId);
+
+      IF @positionId IS NULL
+        RAISERROR('Position was not found by deal id [%s]', 1, 1, @dealId);
+
+      EXEC [dbo].[SP_UpdateDealCommissionInfo] @positionId, 'Swap'
     END TRY
     BEGIN CATCH
-      DECLARE @ErrorMessage NVARCHAR(4000);
-
-      SELECT @ErrorMessage = 'Failed to update deal commissions' + ERROR_MESSAGE();
-
-      PRINT @ErrorMessage; --no exception on client
+      SELECT @ErrorMessage = 'Failed to update [%s] deal Swap. ' + ERROR_MESSAGE();
     END CATCH
+
+    BEGIN TRY
+      EXEC [dbo].[SP_UpdateDealCommissionInfo] @closeTradeId, 'Commission'
+    END TRY
+    BEGIN CATCH
+      SELECT @ErrorMessage = 'Failed to update [%s] deal Commission. ' + ERROR_MESSAGE();
+    END CATCH
+
+    BEGIN TRY
+      EXEC [dbo].[SP_UpdateDealCommissionInfo] @closeTradeId, 'OnBehalf'
+    END TRY
+    BEGIN CATCH
+      SELECT @ErrorMessage = 'Failed to update [%s] deal OnBehalf. ' + ERROR_MESSAGE();
+    END CATCH
+
+    BEGIN TRY
+      EXEC [dbo].[SP_UpdateDealCommissionInfo] @dealId, 'Tax'
+    END TRY
+    BEGIN CATCH
+      SELECT @ErrorMessage = 'Failed to update deal Tax. ' + ERROR_MESSAGE();
+    END CATCH
+
+    IF @ErrorMessage IS NOT NULL
+      BEGIN
+        RAISERROR(@ErrorMessage, 1, 1);
+      END
 
     SET XACT_ABORT ON;
   END;
