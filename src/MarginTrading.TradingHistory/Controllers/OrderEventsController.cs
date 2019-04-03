@@ -127,7 +127,8 @@ namespace MarginTrading.TradingHistory.Controllers
                 AdditionalInfo = history.AdditionalInfo,
                 CorrelationId = history.CorrelationId,
                 StopLoss = Map(history.StopLoss),
-                TakeProfit = Map(history.TakeProfit)
+                TakeProfit = Map(history.TakeProfit),
+                PendingOrderRetriesCount = history.PendingOrderRetriesCount,
             };
         }
 

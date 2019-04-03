@@ -205,5 +205,10 @@ namespace MarginTrading.TradingHistory.Core.Domain
         /// If there is no inbound identifier then one should be created eg. on the service layer boundary (API).  
         /// </summary>
         string CorrelationId { get; }
+        
+        /// <summary>
+        /// Number of pending order retries passed
+        /// </summary>
+        int PendingOrderRetriesCount { get; }
     }
 }
