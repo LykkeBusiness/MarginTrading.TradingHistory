@@ -131,6 +131,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 Spread = history.Spread,
                 Commission = history.Commission,
                 OnBehalf = history.OnBehalf,
+                PendingOrderRetriesCount = history.PendingOrderRetriesCount,
             };
         }
 
