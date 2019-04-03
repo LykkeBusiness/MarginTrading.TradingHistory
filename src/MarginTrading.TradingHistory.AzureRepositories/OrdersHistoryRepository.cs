@@ -12,10 +12,10 @@ namespace MarginTrading.TradingHistory.AzureRepositories
     public class OrdersHistoryRepository : IOrdersHistoryRepository
     {
         private readonly INoSQLTableStorage<OrderHistoryEntity> _tableStorage;
-        private readonly INoSQLTableStorage<OrderHistoryWithRelatedEntity> _readTableStorage;
+        private readonly INoSQLTableStorage<OrderHistoryWithAdditionalEntity> _readTableStorage;
 
         public OrdersHistoryRepository(INoSQLTableStorage<OrderHistoryEntity> tableStorage,
-            INoSQLTableStorage<OrderHistoryWithRelatedEntity> readTableStorage)
+            INoSQLTableStorage<OrderHistoryWithAdditionalEntity> readTableStorage)
         {
             throw new NotImplementedException("Need to be refactored!");
             _tableStorage = tableStorage;
@@ -31,7 +31,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 DateTime.UtcNow, RowKeyDateTimeFormat.Iso);
         }
 
-        public async Task<IEnumerable<IOrderHistoryWithRelated>> GetHistoryAsync(string orderId,
+        public async Task<IEnumerable<IOrderHistoryWithAdditional>> GetHistoryAsync(string orderId,
             OrderStatus? status = null)
         {
             var entities = await _readTableStorage.GetDataAsync(x => x.Id == orderId
@@ -40,7 +40,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             return entities;
         }
 
-        public async Task<PaginatedResponse<IOrderHistoryWithRelated>> GetHistoryByPagesAsync(string accountId, string assetPairId,
+        public async Task<PaginatedResponse<IOrderHistoryWithAdditional>> GetHistoryByPagesAsync(string accountId, string assetPairId,
             List<OrderStatus> statuses, List<OrderType> orderTypes, List<OriginatorType> originatorTypes,
             string parentOrderId = null,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
@@ -67,7 +67,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 .ToList();
             var filtered = take.HasValue ? data.Skip(skip.Value).Take(take.Value).ToList() : data;
             
-            return new PaginatedResponse<IOrderHistoryWithRelated>(
+            return new PaginatedResponse<IOrderHistoryWithAdditional>(
                 contents: filtered,
                 start: skip ?? 0,
                 size: filtered.Count,
