@@ -19,6 +19,13 @@ namespace MarginTrading.TradingHistory.Core.Domain
         InvalidAccount,
         InvalidParent,
         TradingConditionError,
-        TechnicalError
+        InvalidValidity,
+        TechnicalError,
+        ParentPositionDoesNotExist,
+        ParentPositionIsNotActive,
+        ShortPositionsDisabled,
+        MaxPositionLimit,
+        MinOrderSizeLimit,
+        MaxOrderSizeLimit,
     }
 }
