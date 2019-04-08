@@ -17,8 +17,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
     {
         private const string TableName = "OrdersHistory";
 
-        private const string CreateTableScript = "CREATE TABLE [{0}](" +
-                                                 @"[OID] [bigint] NOT NULL IDENTITY (1,1),
+        private const string CreateTableScript = @"CREATE TABLE [{0}](
+[OID] [bigint] NOT NULL IDENTITY (1,1),
 [Id] [nvarchar](64) NOT NULL,
 [Code] [bigint] NULL,
 [AccountId] [nvarchar] (64) NULL,
@@ -28,12 +28,15 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [Direction] [nvarchar] (64) NULL,
 [Type] [nvarchar] (64) NULL,
 [Status] [nvarchar] (64) NULL,
+[FillType] [nvarchar] (64) NULL,
 [Originator] [nvarchar] (64) NULL,
 [CancellationOriginator] [nvarchar] (64) NULL,
 [Volume] [float] NULL,
 [ExpectedOpenPrice] [float] NULL,
 [ExecutionPrice] [float] NULL,
 [FxRate] [float] NULL,
+[FxAssetPairId] [nvarchar] (64) NULL,
+[FxToAssetPairDirection] [nvarchar] (64) NULL,
 [ForceOpen] [bit] NULL,
 [ValidityTime] [datetime] NULL,
 [CreatedTimestamp] [datetime] NULL,
@@ -55,10 +58,10 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [MatchingEngineId] [nvarchar] (64) NULL,
 [LegalEntity] [nvarchar] (64) NULL,
 [UpdateType] [nvarchar] (64) NULL,
-[MatchedOrders] [nvarchar](MAX) NULL,
-[RelatedOrderInfos] [nvarchar](MAX) NULL,
-[AdditionalInfo] [nvarchar](MAX) NULL,
-[CorrelationId] [nvarchar](64) NULL,
+[MatchedOrders] [nvarchar] (MAX) NULL,
+[RelatedOrderInfos] [nvarchar] (MAX) NULL,
+[AdditionalInfo] [nvarchar] (MAX) NULL,
+[CorrelationId] [nvarchar] (64) NULL,
 [PendingOrderRetriesCount] [int] NULL,
 CONSTRAINT PK_{0}_OID PRIMARY KEY CLUSTERED (OID DESC),
 INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTimestamp, CreatedTimestamp, ModifiedTimestamp, Type, Originator)
