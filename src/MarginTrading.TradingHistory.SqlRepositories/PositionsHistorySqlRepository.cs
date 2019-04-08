@@ -17,8 +17,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
     {
         private const string TableName = "PositionsHistory";
 
-        private const string CreateTableScript = "CREATE TABLE [{0}](" +
-                                                 @"[OID] [bigint] NOT NULL IDENTITY (1,1) PRIMARY KEY,
+        private const string CreateTableScript = @"CREATE TABLE [{0}](
+[OID] [bigint] NOT NULL IDENTITY (1,1) PRIMARY KEY,
 [Id] [nvarchar](64) NOT NULL,
 [DealId] [nvarchar](128) NULL,
 [Code] [bigint] NULL,
@@ -32,6 +32,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [OpenMatchingEngineId] [nvarchar] (64) NULL,
 [OpenDate] [datetime] NULL,
 [OpenTradeId] [nvarchar] (64) NULL,
+[OpenOrderType] [nvarchar] (64) NULL,
+[OpenOrderVolume] [float] NULL,
 [OpenPrice] [float] NULL,
 [OpenFxPrice] [float] NULL,
 [EquivalentAsset] [nvarchar] (64) NULL,
@@ -54,9 +56,12 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [CloseReason] [nvarchar] (256) NULL,
 [CloseComment] [nvarchar] (256) NULL,
 [CloseTrades] [nvarchar] (1024) NULL,
+[FxAssetPairId] [nvarchar] (64) NULL,
+[FxToAssetPairDirection] [nvarchar] (64) NULL,
 [LastModified] [datetime] NULL,
 [TotalPnL] [float] NULL,
 [ChargedPnl] [float] NULL,
+[AdditionalInfo] [nvarchar] (MAX) NULL,
 [HistoryType] [nvarchar] (64) NULL,
 [DealInfo] [nvarchar] (1024) NULL,
 [HistoryTimestamp] [datetime] NULL,

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using MarginTrading.Backend.Contracts.Orders;
 
 namespace MarginTrading.TradingHistory.Core.Domain
 {
@@ -47,6 +48,11 @@ namespace MarginTrading.TradingHistory.Core.Domain
         /// The order status (Active, Inactive, Executed, Canceled, Rejected or Expired)
         /// </summary>
         OrderStatus Status { get; }
+        
+        /// <summary>
+        /// Order fill type
+        /// </summary>
+        OrderFillType FillType { get; }
 
         /// <summary>
         /// Who created the order (Investor, System or OnBehalf)
@@ -77,6 +83,18 @@ namespace MarginTrading.TradingHistory.Core.Domain
         /// Current FxRate
         /// </summary>
         decimal FxRate { get; }
+        
+        /// <summary>
+        /// FX asset pair id
+        /// </summary>
+        string FxAssetPairId { get; }
+        
+        /// <summary>
+        /// Shows if account asset id is directly related on asset pair quote asset.
+        /// I.e. AssetPair is {BaseId, QuoteId} and FxAssetPair is {QuoteId, AccountAssetId} => Straight
+        /// If AssetPair is {BaseId, QuoteId} and FxAssetPair is {AccountAssetId, QuoteId} => Reverse
+        /// </summary>
+        FxToAssetPairDirection FxToAssetPairDirection { get; }
 
         /// <summary>
         /// Force open separate position for the order, ignoring existing ones

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MarginTrading.Backend.Contracts.Orders;
 
 namespace MarginTrading.TradingHistory.Core.Domain
 {
@@ -13,12 +14,15 @@ namespace MarginTrading.TradingHistory.Core.Domain
         public OrderDirection Direction { get; set; }
         public OrderType Type { get; set; }
         public OrderStatus Status { get; set; }
+        public OrderFillType FillType { get; set; }
         public OriginatorType Originator { get; set; }
         public OriginatorType? CancellationOriginator { get; set; }
         public decimal Volume { get; set; }
         public decimal? ExpectedOpenPrice { get; set; }
         public decimal? ExecutionPrice { get; set; }
         public decimal FxRate { get; set; }
+        public string FxAssetPairId { get; set; }
+        public FxToAssetPairDirection FxToAssetPairDirection { get; set; }
         public bool ForceOpen { get; set; }
         public DateTime? ValidityTime { get; set; }
         public DateTime CreatedTimestamp { get; set; }
