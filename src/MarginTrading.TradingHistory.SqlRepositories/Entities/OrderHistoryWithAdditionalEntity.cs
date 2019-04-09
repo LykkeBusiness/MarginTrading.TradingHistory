@@ -6,18 +6,25 @@ using MarginTrading.TradingHistory.Core.Domain;
 namespace MarginTrading.TradingHistory.SqlRepositories.Entities
 {
     [UsedImplicitly]
-    public class OrderHistoryWithRelatedEntity : OrderHistoryEntity, IOrderHistoryWithRelated
+    public class OrderHistoryWithAdditionalEntity : OrderHistoryEntity, IOrderHistoryWithAdditional
     {
         public string TakeProfit { get; set; }
 
-        RelatedOrderExtendedInfo IOrderHistoryWithRelated.TakeProfit => string.IsNullOrEmpty(TakeProfit)
+        RelatedOrderExtendedInfo IOrderHistoryWithAdditional.TakeProfit => string.IsNullOrEmpty(TakeProfit)
             ? null
             : TakeProfit.DeserializeJson<RelatedOrderExtendedInfo[]>().FirstOrDefault();
         
         public string StopLoss { get; set; }
-        
-        RelatedOrderExtendedInfo IOrderHistoryWithRelated.StopLoss=> string.IsNullOrEmpty(StopLoss)
+       
+        RelatedOrderExtendedInfo IOrderHistoryWithAdditional.StopLoss=> string.IsNullOrEmpty(StopLoss)
             ? null
             : StopLoss.DeserializeJson<RelatedOrderExtendedInfo[]>().FirstOrDefault();
+        
+        
+        public decimal Spread { get; set; }
+        
+        public decimal Commission { get; set; }
+        
+        public decimal OnBehalf { get; set; }
     }
 }

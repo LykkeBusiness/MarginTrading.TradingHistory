@@ -170,7 +170,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
         string ExternalOrderId { get; }
         
         /// <summary>
-        /// ID of exernal LP (for STP mode)
+        /// ID of external LP (for STP mode)
         /// </summary>
         string ExternalProviderId { get; }
         

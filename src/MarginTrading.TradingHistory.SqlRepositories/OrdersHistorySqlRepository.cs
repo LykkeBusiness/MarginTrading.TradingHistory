@@ -66,8 +66,8 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTi
 
 CREATE INDEX IX_{0}_Child ON {0} (ParentOrderId, Type) include (Id, Status, ExpectedOpenPrice, ModifiedTimestamp)";
 
-        private const string GetRelatedOrdersScript = "SELECT * FROM history " + 
-@"OUTER APPLY (
+        private const string GetAdditionalFieldsScript = @"SELECT * FROM history 
+OUTER APPLY (
     SELECT
         TakeProfit = (
             SELECT TOP 1 Id, Type, ExpectedOpenPrice, Status, ModifiedTimestamp
@@ -86,7 +86,31 @@ OUTER APPLY (
             ORDER BY ModifiedTimestamp DESC
             FOR JSON AUTO
         )
-) AS StopLoss";
+) AS StopLoss
+OUTER APPLY (
+  SELECT
+    Spread = (
+      SELECT TOP 1 Spread
+      FROM dbo.ExecutionOrderBooks as eob
+      WHERE eob.OrderId = history.Id
+    )
+) AS Spread
+OUTER APPLY (
+  SELECT
+    Commission = (
+      SELECT SUM(ah.ChangeAmount)
+      FROM dbo.AccountHistory ah
+      WHERE ah.ReasonType = 'Commission' AND ah.EventSourceId = history.Id
+    )
+) AS Commission
+OUTER APPLY (
+  SELECT
+    OnBehalf = (
+      SELECT SUM(ah.ChangeAmount)
+      FROM dbo.AccountHistory ah
+      WHERE ah.ReasonType = 'OnBehalf' AND ah.EventSourceId = history.Id
+    )
+) AS OnBehalf";
 
         private readonly string _connectionString;
         private readonly ILog _log;
@@ -159,16 +183,16 @@ OUTER APPLY (
             }
         }
 
-        public async Task<IEnumerable<IOrderHistoryWithRelated>> GetHistoryAsync(string orderId,
+        public async Task<IEnumerable<IOrderHistoryWithAdditional>> GetHistoryAsync(string orderId,
             OrderStatus? status = null)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                var clause = "WHERE Id=@orderId"
+                var whereClause = "WHERE Id=@orderId"
                               + (status == null ? "" : " AND Status=@status");
                 var query =
-                    $"WITH history AS (SELECT * FROM {TableName} {clause}) {GetRelatedOrdersScript} ORDER BY [ModifiedTimestamp] DESC";
-                var objects = await conn.QueryAsync<OrderHistoryWithRelatedEntity>(query, new
+                    $"WITH history AS (SELECT * FROM {TableName} {whereClause}) {GetAdditionalFieldsScript} ORDER BY [ModifiedTimestamp] DESC";
+                var objects = await conn.QueryAsync<OrderHistoryWithAdditionalEntity>(query, new
                 {
                     orderId,
                     status = status?.ToString(),
@@ -178,7 +202,7 @@ OUTER APPLY (
             }
         }
 
-        public async Task<PaginatedResponse<IOrderHistoryWithRelated>> GetHistoryByPagesAsync(string accountId, string assetPairId,
+        public async Task<PaginatedResponse<IOrderHistoryWithAdditional>> GetHistoryByPagesAsync(string accountId, string assetPairId,
             List<OrderStatus> statuses, List<OrderType> orderTypes, List<OriginatorType> originatorTypes,
             string parentOrderId = null,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
@@ -202,7 +226,7 @@ OUTER APPLY (
             using (var conn = new SqlConnection(_connectionString))
             {
                 var sql =
-                    $"WITH history AS (SELECT * FROM {TableName} {whereClause} {paginationClause}) {GetRelatedOrdersScript}; SELECT COUNT(*) FROM {TableName} {whereClause}";
+                    $"WITH history AS (SELECT * FROM {TableName} {whereClause} {paginationClause}) {GetAdditionalFieldsScript}; SELECT COUNT(*) FROM {TableName} {whereClause}";
                 
                 var gridReader = await conn.QueryMultipleAsync(
                     sql,
@@ -219,10 +243,10 @@ OUTER APPLY (
                         modifiedTimeStart,
                         modifiedTimeEnd,
                     });
-                var orderHistoryEntities = (await gridReader.ReadAsync<OrderHistoryWithRelatedEntity>()).ToList();
+                var orderHistoryEntities = (await gridReader.ReadAsync<OrderHistoryWithAdditionalEntity>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
             
-                return new PaginatedResponse<IOrderHistoryWithRelated>(
+                return new PaginatedResponse<IOrderHistoryWithAdditional>(
                     contents: orderHistoryEntities, 
                     start: skip ?? 0, 
                     size: orderHistoryEntities.Count, 
