@@ -19,6 +19,13 @@ namespace MarginTrading.TradingHistory.Client.Models
         InvalidAccount,
         InvalidParent,
         TradingConditionError,
-        TechnicalError
+        InvalidValidity,
+        TechnicalError,
+        ParentPositionDoesNotExist,
+        ParentPositionIsNotActive,
+        ShortPositionsDisabled,
+        MaxPositionLimit,
+        MinOrderSizeLimit,
+        MaxOrderSizeLimit,
     }
 }

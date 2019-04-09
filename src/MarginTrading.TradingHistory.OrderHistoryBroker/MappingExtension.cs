@@ -56,7 +56,8 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                 UpdateType = historyType.ToType<OrderUpdateType>(),
                 MatchedOrders = new List<MatchedOrder>(),
                 AdditionalInfo = order.AdditionalInfo,
-                CorrelationId = order.CorrelationId
+                CorrelationId = order.CorrelationId,
+                PendingOrderRetriesCount = order.PendingOrderRetriesCount,
             };
 
             foreach (var mo in order.MatchedOrders)

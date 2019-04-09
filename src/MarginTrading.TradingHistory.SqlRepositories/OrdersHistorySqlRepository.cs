@@ -59,6 +59,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [RelatedOrderInfos] [nvarchar](MAX) NULL,
 [AdditionalInfo] [nvarchar](MAX) NULL,
 [CorrelationId] [nvarchar](64) NULL,
+[PendingOrderRetriesCount] [int] NULL,
 CONSTRAINT PK_{0}_OID PRIMARY KEY CLUSTERED (OID DESC),
 INDEX IX_{0}_Base (Id, AccountId, AssetPairId, Status, ParentOrderId, ExecutedTimestamp, CreatedTimestamp, ModifiedTimestamp, Type, Originator)
 );
