@@ -17,7 +17,7 @@ namespace MarginTrading.TradingHistory.Client
         /// Get orders with optional filtering and with pagination.
         /// </summary>
         [Post("/api/order-events")]
-        Task<PaginatedResponseContract<OrderEventWithRelatedContract>> OrderHistoryByPages(
+        Task<PaginatedResponseContract<OrderEventWithAdditionalContract>> OrderHistoryByPages(
             [Body] [CanBeNull] OrderEventsFilterRequest filters,
             [Query] [CanBeNull] int? skip = 0,
             [Query] [CanBeNull] int? take = 20,
@@ -27,7 +27,7 @@ namespace MarginTrading.TradingHistory.Client
         /// Get order by Id, optionally including related orders.
         /// </summary>
         [Get("/api/order-events/{orderId}")]
-        Task<List<OrderEventWithRelatedContract>> OrderById([NotNull] string orderId,
+        Task<List<OrderEventWithAdditionalContract>> OrderById([NotNull] string orderId,
             [Query] [CanBeNull] OrderStatusContract? status = null);
     }
 }

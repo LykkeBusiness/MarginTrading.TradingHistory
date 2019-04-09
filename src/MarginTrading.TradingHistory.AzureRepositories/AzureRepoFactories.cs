@@ -17,7 +17,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             {
                 return new OrdersHistoryRepository(AzureTableStorage<OrderHistoryEntity>.Create(connString,
                         "OrdersHistory", log),
-                    AzureTableStorage<OrderHistoryWithRelatedEntity>.Create(connString,
+                    AzureTableStorage<OrderHistoryWithAdditionalEntity>.Create(connString,
                         "OrdersHistory", log));
             }
 

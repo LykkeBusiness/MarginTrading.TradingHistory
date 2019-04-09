@@ -55,10 +55,12 @@ namespace MarginTrading.TradingHistory.TestClient
                 OrderStatusContract.Executed,
                 OrderStatusContract.ExecutionStarted,
             }.ToList();
-            var someOrderEvents = await api.OrderHistoryByPages(null, null, statuses,
-                withRelated: false,
-                createdTimeStart: DateTime.Parse("2019-01-27T05:27:02.133"),
-                createdTimeEnd: DateTime.Parse("2019-01-28T05:27:02.133"));
+            var someOrderEvents = await api.OrderHistoryByPages(new OrderEventsFilterRequest
+                {
+                    CreatedTimeStart = DateTime.Parse("2019-01-27T05:27:02.133"),
+                    CreatedTimeEnd = DateTime.Parse("2019-01-28T05:27:02.133"),
+                    Statuses = statuses,
+                }, null);
 
             var countFalse = someOrderEvents.Contents.Count(x => !statuses.Contains(x.Status));
             if (countFalse != 0)

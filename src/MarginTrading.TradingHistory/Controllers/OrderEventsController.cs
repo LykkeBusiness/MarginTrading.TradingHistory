@@ -31,7 +31,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// </summary>
         [HttpPost, Route("")]
         [HttpPost, Route("by-pages")]
-        public async Task<PaginatedResponseContract<OrderEventWithRelatedContract>> OrderHistoryByPages(
+        public async Task<PaginatedResponseContract<OrderEventWithAdditionalContract>> OrderHistoryByPages(
             [FromBody] OrderEventsFilterRequest filters, 
             [FromQuery] int? skip = 0, [FromQuery] int? take = 20, 
             [FromQuery] bool isAscending = false)
@@ -53,7 +53,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 take: take,
                 isAscending: isAscending);
 
-            return new PaginatedResponseContract<OrderEventWithRelatedContract>(
+            return new PaginatedResponseContract<OrderEventWithAdditionalContract>(
                 contents: data.Contents.Select(Convert).ToList(),
                 start: data.Start,
                 size: data.Size,
@@ -68,7 +68,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// <param name="status"></param>
         /// <returns></returns>
         [HttpGet, Route("{orderId}")]
-        public async Task<List<OrderEventWithRelatedContract>> OrderById(string orderId,
+        public async Task<List<OrderEventWithAdditionalContract>> OrderById(string orderId,
             [FromQuery] OrderStatusContract? status = null)
         {
             if (string.IsNullOrWhiteSpace(orderId))
@@ -81,12 +81,12 @@ namespace MarginTrading.TradingHistory.Controllers
             return history.Select(Convert).ToList();
         }
 
-        private static OrderEventWithRelatedContract Convert(IOrderHistoryWithRelated history)
+        private static OrderEventWithAdditionalContract Convert(IOrderHistoryWithAdditional history)
         {
             if (history == null)
                 return null;
 
-            return new OrderEventWithRelatedContract
+            return new OrderEventWithAdditionalContract
             {
                 Id = history.Id,
                 AccountId = history.AccountId,
@@ -131,6 +131,9 @@ namespace MarginTrading.TradingHistory.Controllers
                 CorrelationId = history.CorrelationId,
                 StopLoss = Map(history.StopLoss),
                 TakeProfit = Map(history.TakeProfit),
+                Spread = history.Spread,
+                Commission = history.Commission,
+                OnBehalf = history.OnBehalf,
                 PendingOrderRetriesCount = history.PendingOrderRetriesCount,
             };
         }
