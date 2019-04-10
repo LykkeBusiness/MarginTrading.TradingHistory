@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <OutputType>Exe</OutputType>
-    <Version>1.12.0</Version>
+    <Version>1.12.1</Version>
     <AssemblyName>MarginTrading.TradingHistory</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory</RootNamespace>
     <LangVersion>7.2</LangVersion>
