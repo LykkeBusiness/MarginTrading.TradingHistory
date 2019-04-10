@@ -23,12 +23,15 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public OrderDirection Direction { get; set; }
         public OrderType Type { get; set; }
         public OrderStatus Status { get; set; }
+        public OrderFillType FillType { get; set; }
         public OriginatorType Originator { get; set; }
         public OriginatorType? CancellationOriginator { get; set; }
         public decimal Volume { get; set; }
         public decimal? ExpectedOpenPrice { get; set; }
         public decimal? ExecutionPrice { get; set; }
         public decimal FxRate { get; set; }
+        public string FxAssetPairId { get; set; }
+        public FxToAssetPairDirection FxToAssetPairDirection { get; set; }
         public bool ForceOpen { get; set; }
         public DateTime? ValidityTime { get; set; }
         public DateTime CreatedTimestamp { get; set; }
@@ -73,6 +76,8 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
                 Direction = order.Direction,
                 ExecutionPrice = order.ExecutionPrice,
                 FxRate = order.FxRate,
+                FxAssetPairId = order.FxAssetPairId,
+                FxToAssetPairDirection = order.FxToAssetPairDirection,
                 ExpectedOpenPrice = order.ExpectedOpenPrice,
                 ForceOpen = order.ForceOpen,
                 ModifiedTimestamp = order.ModifiedTimestamp,
@@ -81,6 +86,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
                 ParentOrderId = order.ParentOrderId,
                 PositionId = order.PositionId,
                 Status = order.Status,
+                FillType = order.FillType,
                 Type = order.Type,
                 ValidityTime = order.ValidityTime,
                 Volume = order.Volume,

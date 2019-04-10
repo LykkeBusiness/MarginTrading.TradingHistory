@@ -13,12 +13,15 @@ namespace MarginTrading.TradingHistory.Client.Models
         public OrderDirectionContract Direction { get; set; }
         public OrderTypeContract Type { get; set; }
         public OrderStatusContract Status { get; set; }
+        public OrderFillTypeContract FillType { get; set; }
         public OriginatorTypeContract Originator { get; set; }
         public OriginatorTypeContract? CancellationOriginator { get; set; }
         public decimal Volume { get; set; }
         public decimal? ExpectedOpenPrice { get; set; }
         public decimal? ExecutionPrice { get; set; }
         public decimal FxRate { get; set; }
+        public string FxAssetPairId { get; set; }
+        public FxToAssetPairDirectionContract FxToAssetPairDirection { get; set; }
         public bool ForceOpen { get; set; }
         public DateTime? ValidityTime { get; set; }
         public DateTime CreatedTimestamp { get; set; }

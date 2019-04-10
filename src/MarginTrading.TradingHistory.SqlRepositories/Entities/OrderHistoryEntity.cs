@@ -17,6 +17,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         OrderType IOrderHistory.Type => Type.ParseEnum<OrderType>();
         public string Type { get; set; }
         OrderStatus IOrderHistory.Status => Status.ParseEnum<OrderStatus>();
+        public string FillType { get; set; }
+        OrderFillType IOrderHistory.FillType => FillType.ParseEnum<OrderFillType>();
         public string Status { get; set; }
         OriginatorType IOrderHistory.Originator => Originator.ParseEnum<OriginatorType>();
         public string Originator { get; set; }
@@ -26,6 +28,10 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public decimal? ExpectedOpenPrice { get; set; }
         public decimal? ExecutionPrice { get; set; }
         public decimal FxRate { get; set; }
+        public string FxAssetPairId { get; set; }
+        public string FxToAssetPairDirection { get; set; }
+
+        FxToAssetPairDirection IOrderHistory.FxToAssetPairDirection => FxToAssetPairDirection.ParseEnum<FxToAssetPairDirection>();
         public bool ForceOpen { get; set; }
         public DateTime? ValidityTime { get; set; }
         public DateTime CreatedTimestamp { get; set; }
@@ -76,6 +82,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 Direction = order.Direction.ToString(),
                 ExecutionPrice = order.ExecutionPrice,
                 FxRate = order.FxRate,
+                FxAssetPairId = order.FxAssetPairId,
+                FxToAssetPairDirection = order.FxToAssetPairDirection.ToString(),
                 ExpectedOpenPrice = order.ExpectedOpenPrice,
                 ForceOpen = order.ForceOpen,
                 ModifiedTimestamp = order.ModifiedTimestamp,
@@ -84,6 +92,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 ParentOrderId = order.ParentOrderId,
                 PositionId = order.PositionId,
                 Status = order.Status.ToString(),
+                FillType = order.FillType.ToString(),
                 Type = order.Type.ToString(),
                 ValidityTime = order.ValidityTime,
                 Volume = order.Volume,

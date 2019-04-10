@@ -21,6 +21,9 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public string OpenMatchingEngineId { get; set; }
         public DateTime OpenDate { get; set; }
         public string OpenTradeId { get; set; }
+        public string OpenOrderType { get; set; }
+        OrderType IPositionHistory.OpenOrderType => OpenOrderType.ParseEnum<OrderType>();
+        public decimal OpenOrderVolume { get; set; }
         public decimal OpenPrice { get; set; }
         public decimal OpenFxPrice { get; set; }
         public string EquivalentAsset { get; set; }
@@ -49,6 +52,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public DateTime? LastModified { get; set; }
         public decimal TotalPnL { get; set; }
         public decimal ChargedPnl { get; set; }
+        public string AdditionalInfo { get; set; }
         PositionHistoryType IPositionHistory.HistoryType => HistoryType.ParseEnum<PositionHistoryType>();
         public string HistoryType { get; set; }
 
@@ -61,7 +65,11 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         List<string> IPositionHistory.CloseTrades => string.IsNullOrEmpty(CloseTrades)
             ? new List<string>()
             : CloseTrades.DeserializeJson<List<string>>();
-        
+
+        public string FxAssetPairId { get; set; }
+        public string FxToAssetPairDirection { get; set; }
+        FxToAssetPairDirection IPositionHistory.FxToAssetPairDirection => FxToAssetPairDirection.ParseEnum<FxToAssetPairDirection>();
+
         public string RelatedOrders { get; set; }
         public string CloseTrades { get; set; }
 
@@ -83,6 +91,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 ClosePriceEquivalent = history.ClosePriceEquivalent,
                 CloseReason = history.CloseReason.ToString(),
                 CloseTrades = history.CloseTrades.ToJson(),
+                FxAssetPairId = history.FxAssetPairId,
+                FxToAssetPairDirection = history.FxToAssetPairDirection.ToString(),
                 Code = history.Code,
                 CommissionLot = history.CommissionLot,
                 Direction = history.Direction.ToString(),
@@ -101,13 +111,17 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 OpenPrice = history.OpenPrice,
                 OpenPriceEquivalent = history.OpenPriceEquivalent,
                 OpenTradeId = history.OpenTradeId,
+                OpenOrderType = history.OpenOrderType.ToString(),
+                OpenOrderVolume = history.OpenOrderVolume,
                 RelatedOrders = history.RelatedOrders.ToJson(),
                 StartClosingDate = history.CloseDate,
                 SwapCommissionRate = history.SwapCommissionRate,
                 TotalPnL = history.TotalPnL,
+                ChargedPnl = history.ChargedPnl,
+                AdditionalInfo = history.AdditionalInfo,
                 TradingConditionId = history.TradingConditionId,
                 Volume = history.Volume,
-                HistoryTimestamp = history.HistoryTimestamp
+                HistoryTimestamp = history.HistoryTimestamp,
             };
         }
     }
