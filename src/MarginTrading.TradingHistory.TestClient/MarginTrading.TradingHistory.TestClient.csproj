@@ -9,7 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Lykke.HttpClientGenerator" Version="2.3.0" />
-    <PackageReference Include="MarginTrading.TradingHistory.Client" Version="3.4.4" />
+    <PackageReference Include="MarginTrading.TradingHistory.Client" Version="3.4.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 </Project>
