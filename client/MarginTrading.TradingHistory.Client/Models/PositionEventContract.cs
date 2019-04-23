@@ -79,6 +79,6 @@ namespace MarginTrading.TradingHistory.Client.Models
  
         public decimal ChargedPnl { get; set; }
 
-        public PositionHistoryType HistoryType { get; set; }
+        public PositionHistoryTypeContract HistoryType { get; set; }
     }
 }

@@ -39,7 +39,7 @@ namespace MarginTrading.TradingHistory.Controllers
             [FromQuery] string accountId, [FromQuery] string instrument)
         {
             var positions = (await _positionsHistoryRepository.GetAsync(accountId, instrument))
-                .Where(x => x.HistoryType == Core.Domain.PositionHistoryType.Close || x.HistoryType == Core.Domain.PositionHistoryType.PartiallyClose)
+                .Where(x => x.HistoryType == PositionHistoryType.Close || x.HistoryType == PositionHistoryType.PartiallyClose)
                 .ToDictionary(x => x.DealId);
             var deals = (await _dealsRepository.GetAsync(accountId, instrument))
                 .ToDictionary(x => x.DealId);

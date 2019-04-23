@@ -1,6 +1,6 @@
 ﻿namespace MarginTrading.TradingHistory.Client.Models
 {
-    public enum PositionHistoryType
+    public enum PositionHistoryTypeContract
     {
         Open,
         PartiallyClose,
