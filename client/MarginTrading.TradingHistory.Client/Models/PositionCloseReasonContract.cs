@@ -1,4 +1,4 @@
-namespace MarginTrading.TradingHistory.Client.Models
+﻿namespace MarginTrading.TradingHistory.Client.Models
 {
     public enum PositionCloseReasonContract
     {

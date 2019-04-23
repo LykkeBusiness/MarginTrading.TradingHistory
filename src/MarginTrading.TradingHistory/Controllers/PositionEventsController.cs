@@ -120,6 +120,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 LastModified = positionHistory.LastModified,
                 TotalPnL = positionHistory.TotalPnL,
                 ChargedPnl = positionHistory.ChargedPnl,
+                HistoryType = positionHistory.HistoryType.ToType<PositionHistoryTypeContract>()
             };
         }
 
