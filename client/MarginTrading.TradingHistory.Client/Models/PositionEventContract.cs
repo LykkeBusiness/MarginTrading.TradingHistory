@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
  
 namespace MarginTrading.TradingHistory.Client.Models
@@ -78,5 +78,9 @@ namespace MarginTrading.TradingHistory.Client.Models
         public decimal TotalPnL { get; set; }
  
         public decimal ChargedPnl { get; set; }
+
+        public PositionHistoryTypeContract HistoryType { get; set; }
+
+        public string DealId { get; set; }
     }
 }

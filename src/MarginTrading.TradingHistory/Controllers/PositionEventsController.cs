@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MarginTrading.TradingHistory.Client;
 using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
@@ -13,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MarginTrading.TradingHistory.Controllers
 {
     [Route("api/position-events")]
-    public class PositionEventsController : Controller
+    public class PositionEventsController : Controller, IPositionEventsApi
     {
         private readonly IPositionsHistoryRepository _positionsHistoryRepository;
         private readonly IConvertService _convertService;
@@ -25,10 +26,10 @@ namespace MarginTrading.TradingHistory.Controllers
             _positionsHistoryRepository = positionsHistoryRepository;
             _convertService = convertService;
         }
-        
-        /// <summary> 
-        /// Get positions with optional filtering 
-        /// </summary> 
+
+        /// <summary>
+        /// Get all position events with optional filtering by accountId and instrument.
+        /// </summary>
         [HttpGet, Route("")] 
         public async Task<List<PositionEventContract>> PositionHistory(
             [FromQuery] string accountId, [FromQuery] string instrument)
@@ -37,9 +38,9 @@ namespace MarginTrading.TradingHistory.Controllers
 
             return orders.Select(Convert).Where(d => d != null).ToList();
         }
-        
+
         /// <summary> 
-        /// Get positions with optional filtering and pagination
+        /// Get paginated position events with optional filtering by accountId and instrument.
         /// </summary> 
         [HttpGet, Route("by-pages")] 
         public async Task<PaginatedResponseContract<PositionEventContract>> PositionHistoryByPages(
@@ -59,7 +60,7 @@ namespace MarginTrading.TradingHistory.Controllers
         }
 
         /// <summary>
-        /// Get position events by Id
+        /// Get position events by PositionId.
         /// </summary>
         /// <param name="positionId"></param>
         /// <returns></returns>
@@ -120,6 +121,8 @@ namespace MarginTrading.TradingHistory.Controllers
                 LastModified = positionHistory.LastModified,
                 TotalPnL = positionHistory.TotalPnL,
                 ChargedPnl = positionHistory.ChargedPnl,
+                HistoryType = positionHistory.HistoryType.ToType<PositionHistoryTypeContract>(),
+                DealId = positionHistory.DealId
             };
         }
 
