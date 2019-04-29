@@ -40,10 +40,29 @@ namespace MarginTrading.TradingHistory.TestClient
             var generator = HttpClientGenerator.BuildForUrl("http://localhost:5040")
                 .WithRetriesStrategy(retryStrategy).Create();
 
+            //var generator = HttpClientGenerator.BuildForUrl("http://mt-tradinghistory.mt.svc.cluster.local")
+            //    .WithRetriesStrategy(retryStrategy).Create();
+
             await CheckOrderEventsPaginatedApiAsync(generator);
             //await CheckDealsApiAsync(generator);
+            await CheckPositionEventsPaginatedApiAsync(generator);
 
             Console.WriteLine("Successfully finished");
+        }
+
+        private static async Task CheckPositionEventsPaginatedApiAsync(HttpClientGenerator generator)
+        {
+            var api = generator.Generate<IPositionEventsApi>();
+
+            var accountId = "AA0012";
+            var assetId = "ADIDAS_AG";
+
+            var positionEvents = await api.PositionHistoryByPages(accountId, assetId, skip: 0, take: 20);
+
+            if (!positionEvents.Contents.Any())
+            {
+                throw new Exception("Failed to retrieve position history events.");
+            }
         }
 
         private static async Task CheckOrderEventsPaginatedApiAsync(HttpClientGenerator generator)
