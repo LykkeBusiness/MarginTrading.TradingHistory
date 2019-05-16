@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace MarginTrading.TradingHistory
 {
@@ -15,6 +15,16 @@ namespace MarginTrading.TradingHistory
             {
                 throw new ArgumentOutOfRangeException(nameof(skip), "Skip must be >= 0, take must be > 0");
             }
+        }
+
+        public static void ValidateAggregatedParams(string accountId, int? skip, int? take)
+        {
+            if (string.IsNullOrWhiteSpace(accountId))
+            {
+                throw new ArgumentNullException(nameof(accountId), $"{nameof(accountId)} must be provided");
+            }
+
+            ValidatePagingParams(skip, take);
         }
     }
 }
