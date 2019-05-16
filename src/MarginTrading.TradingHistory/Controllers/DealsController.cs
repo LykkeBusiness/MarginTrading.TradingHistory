@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -61,6 +61,29 @@ namespace MarginTrading.TradingHistory.Controllers
             );
         }
 
+        /// <summary> 
+        /// Get deals with optional filtering and pagination 
+        /// </summary>
+        [HttpGet, Route("aggregated")]
+        public async Task<PaginatedResponseContract<AggregatedDealContract>> GetAggregated(
+            [FromQuery] string accountId, [FromQuery] string instrument,
+            [FromQuery] DateTime? closeTimeStart = null, [FromQuery] DateTime? closeTimeEnd = null,
+            [FromQuery] int? skip = null, [FromQuery] int? take = null,
+            [FromQuery] bool isAscending = false)
+        {
+            ApiValidationHelper.ValidateAggregatedParams(accountId, skip, take);
+
+            var data = await _dealsRepository.GetAggregated(accountId, instrument,
+                closeTimeStart, closeTimeEnd, skip: skip, take: take, isAscending: isAscending);
+
+            return new PaginatedResponseContract<AggregatedDealContract>(
+                contents: data.Contents.Select(Convert).ToList(),
+                start: data.Start,
+                size: data.Size,
+                totalSize: data.TotalSize
+            );
+        }
+
         /// <summary>
         /// Get deal by Id
         /// </summary>
@@ -84,6 +107,11 @@ namespace MarginTrading.TradingHistory.Controllers
             return _convertService.Convert<IDeal, DealContract>(deal, opts => opts.ConfigureMap()
                 .ForMember(x => x.Direction, 
                     o => o.ResolveUsing(z => z.Direction.ToType<PositionDirectionContract>())));
+        }
+
+        private AggregatedDealContract Convert(IAggregatedDeal aggregate)
+        {
+            return _convertService.Convert<IAggregatedDeal, AggregatedDealContract>(aggregate, opts => opts.ConfigureMap());
         }
     }
 }

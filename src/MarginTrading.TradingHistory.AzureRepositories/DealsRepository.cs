@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AzureStorage;
 using MarginTrading.TradingHistory.AzureRepositories.Entities;
+using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
@@ -64,6 +65,35 @@ namespace MarginTrading.TradingHistory.AzureRepositories
         public Task AddAsync(IDeal obj)
         {
             return _tableStorage.InsertAsync(_convertService.Convert<IDeal, DealEntity>(obj));
+        }
+
+        public async Task<PaginatedResponse<IAggregatedDeal>> GetAggregated(string accountId, string assetPairId, DateTime? closeTimeStart, DateTime? closeTimeEnd, int? skip = null, int? take = null, bool isAscending = true)
+        {
+            var allData = await GetAsync(accountId, assetPairId, closeTimeStart, closeTimeEnd);
+
+            var groupedData = allData
+                .GroupBy(k => new { k.AccountId, k.AssetPairId })
+                .Select(g => new AggregatedDeal(
+                    g.Key.AccountId,
+                    g.Key.AssetPairId,
+                    g.Sum(v => v.Volume),
+                    g.Sum(v => v.Fpl),
+                    g.Sum(v => v.Fpl / v.CloseFxPrice),
+                    g.Sum(v => v.PnlOfTheLastDay),
+                    g.Sum(v => v.OvernightFees),
+                    g.Sum(v => v.Commission),
+                    g.Sum(v => v.OnBehalfFee),
+                    g.Sum(v => v.Taxes)));
+
+            skip = skip ?? 0;
+
+            var filtered = take.HasValue ? groupedData.Skip(skip.Value).Take(take.Value).ToList() : groupedData.ToList();
+
+            return new PaginatedResponse<IAggregatedDeal>(
+                contents: filtered,
+                start: skip.Value,
+                size: filtered.Count,
+                totalSize: groupedData.Count());
         }
     }
 }
