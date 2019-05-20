@@ -1,35 +1,16 @@
-﻿using System;
-using JetBrains.Annotations;
-
-namespace MarginTrading.TradingHistory.Core
+﻿namespace MarginTrading.TradingHistory.Core
 {
     public class AggregatedDeal : IAggregatedDeal
     {
-        public string AccountId { get; }
-        public string AssetPairId { get; }
-        public decimal Volume { get; }
-        public decimal Fpl { get; }
-        public decimal FplTc { get; }
-        public decimal PnlOfTheLastDay { get; }
-        public decimal? OvernightFees { get; }
-        public decimal? Commission { get; }
-        public decimal? OnBehalfFee { get; }
-        public decimal? Taxes { get; }
-
-        public AggregatedDeal([NotNull] string accountId, [NotNull] string assetPairId,
-            decimal volume, decimal fpl, decimal fplTc, decimal pnlOfTheLastDay,
-            decimal? overnightFees = null, decimal? commission = null, decimal? onBehalfFee = null, decimal? taxes = null)
-        {
-            AccountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
-            AssetPairId = assetPairId ?? throw new ArgumentNullException(nameof(assetPairId));
-            Volume = volume;
-            Fpl = fpl;
-            FplTc = fplTc;
-            PnlOfTheLastDay = pnlOfTheLastDay;
-            OvernightFees = overnightFees;
-            Commission = commission;
-            OnBehalfFee = onBehalfFee;
-            Taxes = taxes;
-        }
+        public string AccountId { get; set; }
+        public string AssetPairId { get; set; }
+        public decimal Volume { get; set; }
+        public decimal Fpl { get; set; }
+        public decimal FplTc { get; set; }
+        public decimal PnlOfTheLastDay { get; set; }
+        public decimal? OvernightFees { get; set; }
+        public decimal? Commission { get; set; }
+        public decimal? OnBehalfFee { get; set; }
+        public decimal? Taxes { get; set; }
     }
 }
