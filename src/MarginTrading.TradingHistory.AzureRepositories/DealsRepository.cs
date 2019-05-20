@@ -73,17 +73,19 @@ namespace MarginTrading.TradingHistory.AzureRepositories
 
             var groupedData = allData
                 .GroupBy(k => new { k.AccountId, k.AssetPairId })
-                .Select(g => new AggregatedDeal(
-                    g.Key.AccountId,
-                    g.Key.AssetPairId,
-                    g.Sum(v => v.Volume),
-                    g.Sum(v => v.Fpl),
-                    g.Sum(v => v.Fpl / v.CloseFxPrice),
-                    g.Sum(v => v.PnlOfTheLastDay),
-                    g.Sum(v => v.OvernightFees),
-                    g.Sum(v => v.Commission),
-                    g.Sum(v => v.OnBehalfFee),
-                    g.Sum(v => v.Taxes)));
+                .Select(g => new AggregatedDeal
+                {
+                    AccountId = g.Key.AccountId,
+                    AssetPairId = g.Key.AssetPairId,
+                    Volume = g.Sum(v => v.Volume),
+                    Fpl = g.Sum(v => v.Fpl),
+                    FplTc = g.Sum(v => v.Fpl / v.CloseFxPrice),
+                    PnlOfTheLastDay = g.Sum(v => v.PnlOfTheLastDay),
+                    OvernightFees = g.Sum(v => v.OvernightFees),
+                    Commission = g.Sum(v => v.Commission),
+                    OnBehalfFee = g.Sum(v => v.OnBehalfFee),
+                    Taxes = g.Sum(v => v.Taxes)
+                });
 
             skip = skip ?? 0;
 

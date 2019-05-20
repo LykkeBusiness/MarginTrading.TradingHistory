@@ -329,14 +329,14 @@ AS
                 var gridReader = await conn.QueryMultipleAsync(
                     $@"SELECT {nameof(IAggregatedDeal.AccountId)},
                         {nameof(IAggregatedDeal.AssetPairId)},
-                        CONVERT(DECIMAL(24, 13), SUM({nameof(IDeal.Volume)})) AS {nameof(IAggregatedDeal.Volume)},
-                        CONVERT(DECIMAL(24, 13), SUM({nameof(IDeal.Fpl)})) AS {nameof(IAggregatedDeal.Fpl)},
-                        CONVERT(DECIMAL(24, 13), SUM({nameof(IDeal.Fpl)} / {nameof(IDeal.CloseFxPrice)})) AS {nameof(IAggregatedDeal.FplTc)},
-                        CONVERT(DECIMAL(24, 13), SUM({nameof(IDeal.PnlOfTheLastDay)})) AS {nameof(IAggregatedDeal.PnlOfTheLastDay)},
-                        CONVERT(DECIMAL(24, 13), SUM({nameof(IDeal.OvernightFees)})) AS {nameof(IAggregatedDeal.OvernightFees)},
-                        CONVERT(DECIMAL(24, 13), SUM({nameof(IDeal.Commission)})) AS {nameof(IAggregatedDeal.Commission)},
-                        CONVERT(DECIMAL(24, 13), SUM({nameof(IDeal.OnBehalfFee)})) AS {nameof(IAggregatedDeal.OnBehalfFee)},
-                        CONVERT(DECIMAL(24, 13), SUM({nameof(IDeal.Taxes)})) AS {nameof(IAggregatedDeal.Taxes)}
+                        SUM({nameof(IDeal.Volume)}) AS {nameof(IAggregatedDeal.Volume)},
+                        SUM({nameof(IDeal.Fpl)}) AS {nameof(IAggregatedDeal.Fpl)},
+                        SUM({nameof(IDeal.Fpl)} / {nameof(IDeal.CloseFxPrice)}) AS {nameof(IAggregatedDeal.FplTc)},
+                        SUM({nameof(IDeal.PnlOfTheLastDay)}) AS {nameof(IAggregatedDeal.PnlOfTheLastDay)},
+                        SUM({nameof(IDeal.OvernightFees)}) AS {nameof(IAggregatedDeal.OvernightFees)},
+                        SUM({nameof(IDeal.Commission)}) AS {nameof(IAggregatedDeal.Commission)},
+                        SUM({nameof(IDeal.OnBehalfFee)}) AS {nameof(IAggregatedDeal.OnBehalfFee)},
+                        SUM({nameof(IDeal.Taxes)}) AS {nameof(IAggregatedDeal.Taxes)}
                       FROM {TableName}
                       {whereClause}
                       GROUP BY {nameof(IAggregatedDeal.AccountId)}, {nameof(IAggregatedDeal.AssetPairId)}
