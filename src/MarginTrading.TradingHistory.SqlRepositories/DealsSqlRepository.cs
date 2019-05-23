@@ -331,7 +331,7 @@ AS
                         {nameof(IAggregatedDeal.AssetPairId)},
                         SUM({nameof(IDeal.Volume)}) AS {nameof(IAggregatedDeal.Volume)},
                         SUM({nameof(IDeal.Fpl)}) AS {nameof(IAggregatedDeal.Fpl)},
-                        SUM({nameof(IDeal.Fpl)} / {nameof(IDeal.CloseFxPrice)}) AS {nameof(IAggregatedDeal.FplTc)},
+                        SUM(ROUND({nameof(IDeal.Fpl)} / {nameof(IDeal.CloseFxPrice)}, 2)) AS {nameof(IAggregatedDeal.FplTc)},
                         SUM({nameof(IDeal.PnlOfTheLastDay)}) AS {nameof(IAggregatedDeal.PnlOfTheLastDay)},
                         SUM({nameof(IDeal.OvernightFees)}) AS {nameof(IAggregatedDeal.OvernightFees)},
                         SUM({nameof(IDeal.Commission)}) AS {nameof(IAggregatedDeal.Commission)},
