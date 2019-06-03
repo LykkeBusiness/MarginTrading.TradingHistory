@@ -8,6 +8,7 @@ using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarginTrading.TradingHistory.Controllers
@@ -15,6 +16,7 @@ namespace MarginTrading.TradingHistory.Controllers
     /// <summary>
     /// Expose all events associated with orders, optionally including related orders.
     /// </summary>
+    [Authorize]
     [Route("api/order-events")]
     public class OrderEventsController : Controller, IOrderEventsApi
     {
