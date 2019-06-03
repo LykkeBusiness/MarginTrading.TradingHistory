@@ -17,6 +17,8 @@ using MarginTrading.TradingHistory.Settings;
 using MarginTrading.TradingHistory.Modules;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
+using Lykke.Snow.Common.Startup;
+using Lykke.Snow.Common.Startup.ApiKey;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Extensions;
 using Microsoft.AspNetCore.Builder;
@@ -58,15 +60,22 @@ namespace MarginTrading.TradingHistory
                     {
                         options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                     });
+                
+                var appSettings = Configuration.LoadSettings<AppSettings>(
+                    throwExceptionOnCheckError: !Configuration.NotThrowExceptionsOnServiceValidation());
+                
+                services.AddApiKeyAuth(appSettings.CurrentValue.TradingHistoryClient);
 
                 services.AddSwaggerGen(options =>
                 {
                     options.DefaultLykkeConfiguration("v1", "TradingHistory API");
+                    if (!string.IsNullOrWhiteSpace(appSettings.CurrentValue.TradingHistoryClient?.ApiKey))
+                    {
+                        options.OperationFilter<ApiKeyHeaderOperationFilter>();
+                    }
                 });
 
                 var builder = new ContainerBuilder();
-                var appSettings = Configuration.LoadSettings<AppSettings>(
-                    throwExceptionOnCheckError: !Configuration.NotThrowExceptionsOnServiceValidation());
 
                 Log = CreateLogWithSlack(Configuration, services, appSettings);
 
@@ -105,6 +114,7 @@ namespace MarginTrading.TradingHistory
                 app.UseLykkeMiddleware(ServiceName, ex => new ErrorResponse {ErrorMessage = ex.Message});
 #endif
                 
+                app.UseAuthentication();
                 app.UseMvc();
                 app.UseSwagger(c =>
                 {

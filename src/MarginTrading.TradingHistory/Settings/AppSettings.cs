@@ -2,6 +2,7 @@
 using MarginTrading.TradingHistory.Settings.ServiceSettings;
 using MarginTrading.TradingHistory.Settings.SlackNotifications;
 using Lykke.SettingsReader.Attributes;
+using Lykke.Snow.Common.Startup.ApiKey;
 
 namespace MarginTrading.TradingHistory.Settings
 {
@@ -12,5 +13,8 @@ namespace MarginTrading.TradingHistory.Settings
 
         [Optional, CanBeNull]
         public SlackNotificationsSettings SlackNotifications { get; set; }
+
+        [Optional]
+        public ClientSettings TradingHistoryClient { get; set; } = new ClientSettings();
     }
 }
