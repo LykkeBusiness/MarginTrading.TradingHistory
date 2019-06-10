@@ -9,10 +9,12 @@ using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarginTrading.TradingHistory.Controllers
 {
+    [Authorize]
     [Route("api/deals")]
     public class DealsController : Controller, IDealsApi
     {
