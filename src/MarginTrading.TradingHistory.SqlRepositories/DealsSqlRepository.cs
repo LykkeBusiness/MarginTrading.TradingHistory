@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -308,6 +308,47 @@ AS
                     contents: deals, 
                     start: skip ?? 0, 
                     size: deals.Count, 
+                    totalSize: totalCount
+                );
+            }
+        }
+
+        public async Task<PaginatedResponse<IAggregatedDeal>> GetAggregated(string accountId, string assetPairId,
+            DateTime? closeTimeStart, DateTime? closeTimeEnd,
+            int? skip = null, int? take = null, bool isAscending = true)
+        {
+            var whereClause = "WHERE AccountId=@accountId"
+                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
+                              + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
+                              + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
+            var order = isAscending ? string.Empty : Constants.DescendingOrder;
+            var paginationClause = $" ORDER BY [AssetPairId] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                var gridReader = await conn.QueryMultipleAsync(
+                    $@"SELECT {nameof(IAggregatedDeal.AccountId)},
+                        {nameof(IAggregatedDeal.AssetPairId)},
+                        SUM({nameof(IDeal.Volume)}) AS {nameof(IAggregatedDeal.Volume)},
+                        SUM({nameof(IDeal.Fpl)}) AS {nameof(IAggregatedDeal.Fpl)},
+                        SUM(ROUND({nameof(IDeal.Fpl)} / {nameof(IDeal.CloseFxPrice)}, 2)) AS {nameof(IAggregatedDeal.FplTc)},
+                        SUM({nameof(IDeal.PnlOfTheLastDay)}) AS {nameof(IAggregatedDeal.PnlOfTheLastDay)},
+                        SUM({nameof(IDeal.OvernightFees)}) AS {nameof(IAggregatedDeal.OvernightFees)},
+                        SUM({nameof(IDeal.Commission)}) AS {nameof(IAggregatedDeal.Commission)},
+                        SUM({nameof(IDeal.OnBehalfFee)}) AS {nameof(IAggregatedDeal.OnBehalfFee)},
+                        SUM({nameof(IDeal.Taxes)}) AS {nameof(IAggregatedDeal.Taxes)}
+                      FROM {TableName}
+                      {whereClause}
+                      GROUP BY {nameof(IAggregatedDeal.AccountId)}, {nameof(IAggregatedDeal.AssetPairId)}
+                      {paginationClause}; SELECT COUNT(DISTINCT {nameof(IAggregatedDeal.AssetPairId)}) FROM {TableName} {whereClause}",
+                    new { accountId, assetPairId, closeTimeStart, closeTimeEnd });
+                var deals = (await gridReader.ReadAsync<AggregatedDeal>()).ToList();
+                var totalCount = await gridReader.ReadSingleAsync<int>();
+
+                return new PaginatedResponse<IAggregatedDeal>(
+                    contents: deals,
+                    start: skip ?? 0,
+                    size: deals.Count,
                     totalSize: totalCount
                 );
             }
