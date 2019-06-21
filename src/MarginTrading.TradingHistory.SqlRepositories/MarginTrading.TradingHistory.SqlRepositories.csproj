@@ -3,7 +3,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>MarginTrading.TradingHistory.SqlRepositories</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.SqlRepositories</RootNamespace>
-    <Version>1.12.3</Version>
+    <Version>1.12.4</Version>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
