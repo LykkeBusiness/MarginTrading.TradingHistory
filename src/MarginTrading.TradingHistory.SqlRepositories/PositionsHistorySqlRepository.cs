@@ -54,7 +54,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 [CloseDate] [datetime] NULL,
 [CloseOriginator] [nvarchar] (64) NULL,
 [CloseReason] [nvarchar] (256) NULL,
-[CloseComment] [nvarchar] (256) NULL,
+[CloseComment] [nvarchar] (MAX) NULL,
 [CloseTrades] [nvarchar] (1024) NULL,
 [FxAssetPairId] [nvarchar] (64) NULL,
 [FxToAssetPairDirection] [nvarchar] (64) NULL,
