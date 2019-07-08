@@ -1,4 +1,7 @@
-﻿using JetBrains.Annotations;
+﻿// Copyright (c) 2019 Lykke Corp.
+// See the LICENSE file in the project root for more information.
+
+using JetBrains.Annotations;
 using MarginTrading.TradingHistory.Settings.ServiceSettings;
 using MarginTrading.TradingHistory.Settings.SlackNotifications;
 using Lykke.SettingsReader.Attributes;
