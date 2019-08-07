@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -100,11 +101,16 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                await conn.OpenAsync();
-                var transaction = conn.BeginTransaction();
-
+                SqlTransaction transaction = null;
                 try
                 {
+                    if (conn.State == ConnectionState.Closed)
+                    {
+                        await conn.OpenAsync();
+                    }
+                    //Deal insertion trigger needs Snapshot level of isolation
+                    transaction = conn.BeginTransaction(IsolationLevel.Snapshot);
+                    
                     var positionEntity = PositionsHistoryEntity.Create(positionHistory);
                     await conn.ExecuteAsync($"insert into {TableName} ({GetColumns}) values ({GetFields})",
                         positionEntity,
@@ -123,8 +129,6 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
                 }
                 catch (Exception ex)
                 {
-                    transaction.Rollback();
-
                     var msg = $"Error {ex.Message} \n" +
                               $"Entity <{nameof(IPositionHistory)}>: \n" +
                               positionHistory.ToJson() + " \n" +
@@ -132,6 +136,8 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
                               deal?.ToJson();
                     
                     _log?.WriteWarning("PositionsHistorySqlRepository", "AddAsync", msg);
+                 
+                    transaction?.Rollback();
                     
                     throw new Exception(msg);
                 }
