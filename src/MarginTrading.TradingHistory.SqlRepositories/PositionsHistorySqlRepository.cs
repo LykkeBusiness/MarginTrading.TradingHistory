@@ -12,6 +12,7 @@ using Common.Log;
 using Dapper;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
+using MarginTrading.TradingHistory.Core.Extensions;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
 
@@ -44,7 +45,10 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                await conn.OpenAsync();
+                if (conn.State == ConnectionState.Closed)
+                {
+                    await conn.OpenAsync();
+                }
                 var transaction = conn.BeginTransaction();
 
                 try
@@ -56,10 +60,34 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
                     if (deal != null)
                     {
-                        var entity = DealEntity.Create(deal) as dynamic;
-                        entity.PositionId = positionHistory.Id;
+                        var entity = DealEntity.Create(deal);
                         await conn.ExecuteAsync("[dbo].[SP_InsertDeal]",
-                            (object) entity,
+                            new
+                            {
+                                DealId = entity.DealId,
+                                Created = entity.Created,
+                                AccountId = entity.AccountId,
+                                AssetPairId = entity.AssetPairId,
+                                OpenTradeId = entity.OpenTradeId,
+                                OpenOrderType = entity.OpenOrderType,
+                                OpenOrderVolume = entity.OpenOrderVolume,
+                                OpenOrderExpectedPrice = entity.OpenOrderExpectedPrice,
+                                CloseTradeId = entity.CloseTradeId,
+                                CloseOrderType = entity.CloseOrderType,
+                                CloseOrderVolume = entity.CloseOrderVolume,
+                                CloseOrderExpectedPrice = entity.CloseOrderExpectedPrice,
+                                Direction = entity.Direction,
+                                Volume = entity.Volume,
+                                Originator = entity.Originator,
+                                OpenPrice = entity.OpenPrice,
+                                OpenFxPrice = entity.OpenFxPrice,
+                                ClosePrice = entity.ClosePrice,
+                                CloseFxPrice = entity.CloseFxPrice,
+                                Fpl = entity.Fpl,
+                                AdditionalInfo = entity.AdditionalInfo,
+                                PnlOfTheLastDay = entity.PnlOfTheLastDay,
+                                PositionId = positionHistory.Id
+                            },
                             transaction,
                             commandType: CommandType.StoredProcedure);
                     }
@@ -76,7 +104,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                               $"Entity <{nameof(IDeal)}>: \n" +
                               deal?.ToJson();
                     
-                    _log?.WriteWarning(nameof(PositionsHistorySqlRepository), nameof(AddAsync), msg);
+                    _log?.WriteError(nameof(PositionsHistorySqlRepository), nameof(AddAsync), 
+                        new Exception(msg));
                     
                     throw;
                 }

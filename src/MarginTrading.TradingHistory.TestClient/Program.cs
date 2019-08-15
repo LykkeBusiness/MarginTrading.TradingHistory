@@ -5,10 +5,15 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AsyncFriendlyStackTrace;
+using Common.Log;
 using Lykke.HttpClientGenerator;
 using Lykke.HttpClientGenerator.Retries;
 using MarginTrading.TradingHistory.Client;
 using MarginTrading.TradingHistory.Client.Models;
+using MarginTrading.TradingHistory.Core.Domain;
+using MarginTrading.TradingHistory.SqlRepositories;
+using Microsoft.Extensions.Configuration;
+using Moq;
 using Newtonsoft.Json;
 using Refit;
 
@@ -40,17 +45,25 @@ namespace MarginTrading.TradingHistory.TestClient
         private static async Task Run()
         {
             var retryStrategy = new LinearRetryStrategy(TimeSpan.FromSeconds(10), 50);
-            var generator = HttpClientGenerator.BuildForUrl("http://localhost:5040")
-                .WithRetriesStrategy(retryStrategy).Create();
+//            var generator = HttpClientGenerator.BuildForUrl("http://localhost:5040")
+//                .WithRetriesStrategy(retryStrategy).Create();
 
             //var generator = HttpClientGenerator.BuildForUrl("http://mt-tradinghistory.mt.svc.cluster.local")
             //    .WithRetriesStrategy(retryStrategy).Create();
 
-            await CheckOrderEventsPaginatedApiAsync(generator);
+//            await CheckOrderEventsPaginatedApiAsync(generator);
             //await CheckDealsApiAsync(generator);
-            await CheckPositionEventsPaginatedApiAsync(generator);
+//            await CheckPositionEventsPaginatedApiAsync(generator);
+            await CheckPositionHistoryRepoAsync();
 
             Console.WriteLine("Successfully finished");
+        }
+
+        private static async Task CheckPositionHistoryRepoAsync()
+        {
+            var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
+            await new PositionsHistorySqlRepository(config["connstr"], Mock.Of<ILog>())
+                .AddAsync(JsonConvert.DeserializeObject<PositionHistory>(""), null);
         }
 
         private static async Task CheckPositionEventsPaginatedApiAsync(HttpClientGenerator generator)

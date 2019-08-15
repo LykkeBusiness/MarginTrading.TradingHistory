@@ -122,9 +122,10 @@ OUTER APPLY (
                               $"Entity <{nameof(ITrade)}>: \n" +
                               trade?.ToJson();
                     
-                    _log?.WriteWarning(nameof(OrdersHistorySqlRepository), nameof(AddAsync), msg);
+                    _log?.WriteError(nameof(OrdersHistorySqlRepository), nameof(AddAsync), 
+                        new Exception(msg));
                     
-                    throw new Exception(msg);
+                    throw;
                 }
             }
         }
