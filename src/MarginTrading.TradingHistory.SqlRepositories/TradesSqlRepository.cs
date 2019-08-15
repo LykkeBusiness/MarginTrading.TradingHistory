@@ -20,26 +20,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories
     {
         public const string TableName = "Trades";
 
-        private const string CreateTableScript = "CREATE TABLE [{0}](" +
-                                                 @"[OID] [bigint] NOT NULL IDENTITY (1,1) PRIMARY KEY,
-[Id] [nvarchar](64) NOT NULL,
-[AccountId] [nvarchar](64) NOT NULL,
-[OrderId] [nvarchar](64) NOT NULL,
-[AssetPairId] [nvarchar] (64) NOT NULL,
-[OrderCreatedDate] [datetime] NOT NULL,
-[OrderType] [nvarchar] (64) NOT NULL,
-[Type] [nvarchar] (64) NOT NULL,
-[Originator] [nvarchar] (64) NOT NULL,
-[TradeTimestamp] [datetime] NOT NULL,
-[Price] [float] NULL,
-[Volume] [float] NULL,
-[OrderExpectedPrice] [float] NULL,
-[FxRate] [float] NULL,
-[AdditionalInfo] [nvarchar] (MAX) NULL,
-[CancelledBy] [nvarchar] (64) NULL,
-INDEX IX_{0}_Base (AccountId, AssetPairId)
-);";
-
         private readonly string _connectionString;
         private readonly ILog _log;
 
@@ -49,26 +29,14 @@ INDEX IX_{0}_Base (AccountId, AssetPairId)
         public static readonly string GetFields =
             string.Join(",", typeof(ITrade).GetProperties().Select(x => "@" + x.Name));
 
-        private static readonly string GetUpdateClause = string.Join(",",
-            typeof(ITrade).GetProperties().Select(x => "[" + x.Name + "]=@" + x.Name));
-
         public TradesSqlRepository(string connectionString, ILog log)
         {
             _connectionString = connectionString;
             _log = log;
             
-            using (var conn = new SqlConnection(connectionString))
-            {
-                try { conn.CreateTableIfDoesntExists(CreateTableScript, TableName); }
-                catch (Exception ex)
-                {
-                    _log?.WriteErrorAsync(nameof(TradesSqlRepository), "CreateTableIfDoesntExists", null, ex);
-                    throw;
-                }
-            }
+            connectionString.InitializeSqlObject("dbo.Trades.sql", log);
         }
-        
-        
+
         public async Task AddAsync(ITrade obj)
         {
             using (var conn = new SqlConnection(_connectionString))

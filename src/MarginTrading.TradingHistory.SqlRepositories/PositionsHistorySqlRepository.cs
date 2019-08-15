@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,57 +21,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories
     {
         private const string TableName = "PositionsHistory";
 
-        private const string CreateTableScript = @"CREATE TABLE [{0}](
-[OID] [bigint] NOT NULL IDENTITY (1,1) PRIMARY KEY,
-[Id] [nvarchar](64) NOT NULL,
-[DealId] [nvarchar](128) NULL,
-[Code] [bigint] NULL,
-[AssetPairId] [nvarchar] (64) NULL,
-[Direction] [nvarchar] (64) NULL,
-[Volume] [float] NULL,
-[AccountId] [nvarchar] (64) NULL,
-[TradingConditionId] [nvarchar] (64) NULL,
-[AccountAssetId] [nvarchar] (64) NULL,
-[ExpectedOpenPrice] [float] NULL,
-[OpenMatchingEngineId] [nvarchar] (64) NULL,
-[OpenDate] [datetime] NULL,
-[OpenTradeId] [nvarchar] (64) NULL,
-[OpenOrderType] [nvarchar] (64) NULL,
-[OpenOrderVolume] [float] NULL,
-[OpenPrice] [float] NULL,
-[OpenFxPrice] [float] NULL,
-[EquivalentAsset] [nvarchar] (64) NULL,
-[OpenPriceEquivalent] [float] NULL,
-[RelatedOrders] [nvarchar](1024) NULL,
-[LegalEntity] [nvarchar] (64) NULL,
-[OpenOriginator] [nvarchar] (64) NULL,
-[ExternalProviderId] [nvarchar] (64) NULL,
-[SwapCommissionRate] [float] NULL,
-[OpenCommissionRate] [float] NULL,
-[CloseCommissionRate] [float] NULL,
-[CommissionLot] [float] NULL,
-[CloseMatchingEngineId] [nvarchar] (64) NULL,
-[ClosePrice] [float] NULL,
-[CloseFxPrice] [float] NULL,
-[ClosePriceEquivalent] [float] NULL,
-[StartClosingDate] [datetime] NULL,
-[CloseDate] [datetime] NULL,
-[CloseOriginator] [nvarchar] (64) NULL,
-[CloseReason] [nvarchar] (256) NULL,
-[CloseComment] [nvarchar] (MAX) NULL,
-[CloseTrades] [nvarchar] (1024) NULL,
-[FxAssetPairId] [nvarchar] (64) NULL,
-[FxToAssetPairDirection] [nvarchar] (64) NULL,
-[LastModified] [datetime] NULL,
-[TotalPnL] [float] NULL,
-[ChargedPnl] [float] NULL,
-[AdditionalInfo] [nvarchar] (MAX) NULL,
-[HistoryType] [nvarchar] (64) NULL,
-[DealInfo] [nvarchar] (1024) NULL,
-[HistoryTimestamp] [datetime] NULL,
-INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
-);";
-
         private readonly string _connectionString;
         private readonly ILog _log;
 
@@ -85,15 +35,9 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
             _connectionString = connectionString;
             _log = log;
             
-            using (var conn = new SqlConnection(connectionString))
-            {
-                try { conn.CreateTableIfDoesntExists(CreateTableScript, TableName); }
-                catch (Exception ex)
-                {
-                    _log?.WriteErrorAsync("PositionHistory", "CreateTableIfDoesntExists", null, ex);
-                    throw;
-                }
-            }
+            connectionString.InitializeSqlObject("dbo.Deals.sql", log);
+            connectionString.InitializeSqlObject("dbo.SP_InsertDeal.sql", log);
+            connectionString.InitializeSqlObject("dbo.PositionHistory.sql", log);
         }
 
         public async Task AddAsync(IPositionHistory positionHistory, IDeal deal)
@@ -112,11 +56,12 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
 
                     if (deal != null)
                     {
-                        var dealEntity = DealEntity.Create(deal);
-                        await conn.ExecuteAsync(
-                            $"insert into {DealsSqlRepository.TableName} ({DealsSqlRepository.GetColumns}) values ({DealsSqlRepository.GetFields})",
-                            dealEntity,
-                            transaction);
+                        var entity = DealEntity.Create(deal) as dynamic;
+                        entity.PositionId = positionHistory.Id;
+                        await conn.ExecuteAsync("[dbo].[SP_InsertDeal]",
+                            (object) entity,
+                            transaction,
+                            commandType: CommandType.StoredProcedure);
                     }
 
                     transaction.Commit();
@@ -131,9 +76,9 @@ INDEX IX_{0}_Base (Id, AccountId, AssetPairId)
                               $"Entity <{nameof(IDeal)}>: \n" +
                               deal?.ToJson();
                     
-                    _log?.WriteWarning("PositionsHistorySqlRepository", "AddAsync", msg);
+                    _log?.WriteWarning(nameof(PositionsHistorySqlRepository), nameof(AddAsync), msg);
                     
-                    throw new Exception(msg);
+                    throw;
                 }
             }
         }
