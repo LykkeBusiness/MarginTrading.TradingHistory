@@ -1,0 +1,57 @@
+IF NOT EXISTS(SELECT 'X'
+              FROM INFORMATION_SCHEMA.TABLES
+              WHERE TABLE_NAME = 'PositionsHistory'
+                AND TABLE_SCHEMA = 'dbo')
+    BEGIN
+        CREATE TABLE [dbo].[PositionsHistory]
+        (
+            [OID]                    [bigint]         NOT NULL IDENTITY (1,1) PRIMARY KEY,
+            [Id]                     [nvarchar](64)   NOT NULL,
+            [DealId]                 [nvarchar](128)  NULL,
+            [Code]                   [bigint]         NULL,
+            [AssetPairId]            [nvarchar](64)   NULL,
+            [Direction]              [nvarchar](64)   NULL,
+            [Volume]                 [float]          NULL,
+            [AccountId]              [nvarchar](64)   NULL,
+            [TradingConditionId]     [nvarchar](64)   NULL,
+            [AccountAssetId]         [nvarchar](64)   NULL,
+            [ExpectedOpenPrice]      [float]          NULL,
+            [OpenMatchingEngineId]   [nvarchar](64)   NULL,
+            [OpenDate]               [datetime]       NULL,
+            [OpenTradeId]            [nvarchar](64)   NULL,
+            [OpenOrderType]          [nvarchar](64)   NULL,
+            [OpenOrderVolume]        [float]          NULL,
+            [OpenPrice]              [float]          NULL,
+            [OpenFxPrice]            [float]          NULL,
+            [EquivalentAsset]        [nvarchar](64)   NULL,
+            [OpenPriceEquivalent]    [float]          NULL,
+            [RelatedOrders]          [nvarchar](1024) NULL,
+            [LegalEntity]            [nvarchar](64)   NULL,
+            [OpenOriginator]         [nvarchar](64)   NULL,
+            [ExternalProviderId]     [nvarchar](64)   NULL,
+            [SwapCommissionRate]     [float]          NULL,
+            [OpenCommissionRate]     [float]          NULL,
+            [CloseCommissionRate]    [float]          NULL,
+            [CommissionLot]          [float]          NULL,
+            [CloseMatchingEngineId]  [nvarchar](64)   NULL,
+            [ClosePrice]             [float]          NULL,
+            [CloseFxPrice]           [float]          NULL,
+            [ClosePriceEquivalent]   [float]          NULL,
+            [StartClosingDate]       [datetime]       NULL,
+            [CloseDate]              [datetime]       NULL,
+            [CloseOriginator]        [nvarchar](64)   NULL,
+            [CloseReason]            [nvarchar](256)  NULL,
+            [CloseComment]           [nvarchar](MAX)  NULL,
+            [CloseTrades]            [nvarchar](1024) NULL,
+            [FxAssetPairId]          [nvarchar](64)   NULL,
+            [FxToAssetPairDirection] [nvarchar](64)   NULL,
+            [LastModified]           [datetime]       NULL,
+            [TotalPnL]               [float]          NULL,
+            [ChargedPnl]             [float]          NULL,
+            [AdditionalInfo]         [nvarchar](MAX)  NULL,
+            [HistoryType]            [nvarchar](64)   NULL,
+            [DealInfo]               [nvarchar](1024) NULL,
+            [HistoryTimestamp]       [datetime]       NULL,
+            INDEX IX_PositionsHistory_Base (Id, AccountId, AssetPairId)
+        );
+    END;

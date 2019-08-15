@@ -7,7 +7,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Version>1.12.4</Version>
+    <Version>1.13.0</Version>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -48,5 +48,9 @@
     <ProjectReference Include="..\MarginTrading.TradingHistory.AzureRepositories\MarginTrading.TradingHistory.AzureRepositories.csproj" />
     <ProjectReference Include="..\MarginTrading.TradingHistory.Services\MarginTrading.TradingHistory.Services.csproj" />
     <ProjectReference Include="..\MarginTrading.TradingHistory.SqlRepositories\MarginTrading.TradingHistory.SqlRepositories.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Scripts\**" CopyToOutputDirectory="PreserveNewest" LinkBase="Scripts" />
   </ItemGroup>
 </Project>
