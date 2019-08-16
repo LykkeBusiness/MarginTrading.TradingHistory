@@ -39,9 +39,8 @@ BEGIN
                  SELECT account.EventSourceId,
                         account.ReasonType,
                         account.ChangeAmount
-                 FROM dbo.[Deals] AS deal,
-                      dbo.AccountHistory AS account
-                 WHERE (account.EventSourceId IN (deal.OpenTradeId, deal.CloseTradeId))
+                 FROM dbo.[Deals] AS deal, dbo.AccountHistory AS account
+                 WHERE account.EventSourceId IN (deal.OpenTradeId, deal.CloseTradeId)
              )
     UPDATE [dbo].[Deals]
     SET [OvernightFees] =
@@ -56,32 +55,32 @@ BEGIN
              GROUP BY deal.DealId, ABS(deal.Volume)
             ),
         [Commission]    = (
-            SELECT CONVERT(DECIMAL(24, 13),
+            SELECT TOP(1) CONVERT(DECIMAL(24, 13),
                            ((ISNULL(openingCommission.ChangeAmount, 0.0) / ABS(deal.OpenOrderVolume)
                                + ISNULL(closingCommission.ChangeAmount, 0.0) / ABS(deal.CloseOrderVolume))
                                * ABS(deal.Volume)))
             FROM dbo.[Deals] AS deal
-                     INNER JOIN selectedAccounts openingCommission
+                     JOIN selectedAccounts openingCommission
                                 ON deal.OpenTradeId = openingCommission.EventSourceId AND
                                    openingCommission.ReasonType = 'Commission'
-                     LEFT OUTER JOIN selectedAccounts closingCommission
+                     LEFT JOIN selectedAccounts closingCommission
                                      ON deal.CloseTradeId = closingCommission.EventSourceId AND
                                         closingCommission.ReasonType = 'Commission'
-            WHERE deal.DealId = @DealId
+            WHERE deal.OpenTradeId = @OpenTradeId OR deal.CloseTradeId = @OpenTradeId
         ),
         [OnBehalfFee]   = (
-            SELECT CONVERT(DECIMAL(24, 13),
+            SELECT TOP(1) CONVERT(DECIMAL(24, 13),
                            ((ISNULL(openingOnBehalf.ChangeAmount, 0.0) / ABS(deal.OpenOrderVolume)
                                + ISNULL(closingOnBehalf.ChangeAmount, 0.0) / ABS(deal.CloseOrderVolume))
                                * ABS(deal.Volume)))
             FROM [dbo].[Deals] deal
-                     LEFT OUTER JOIN selectedAccounts openingOnBehalf
+                     JOIN selectedAccounts openingOnBehalf
                                      ON deal.OpenTradeId = openingOnBehalf.EventSourceId AND
                                         openingOnBehalf.ReasonType = 'OnBehalf'
-                     LEFT OUTER JOIN selectedAccounts closingOnBehalf
+                     LEFT JOIN selectedAccounts closingOnBehalf
                                      ON deal.CloseTradeId = closingOnBehalf.EventSourceId AND
                                         closingOnBehalf.ReasonType = 'OnBehalf'
-            WHERE deal.DealId = @DealId
+            WHERE deal.OpenTradeId = @OpenTradeId OR deal.CloseTradeId = @OpenTradeId
         ),
         [Taxes]         = (
             SELECT CONVERT(DECIMAL(24, 13), ISNULL(account.ChangeAmount, 0.0))
