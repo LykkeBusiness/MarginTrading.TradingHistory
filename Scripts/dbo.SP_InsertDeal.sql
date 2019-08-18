@@ -66,7 +66,7 @@ BEGIN
                      LEFT JOIN selectedAccounts closingCommission
                                      ON deal.CloseTradeId = closingCommission.EventSourceId AND
                                         closingCommission.ReasonType = 'Commission'
-            WHERE deal.OpenTradeId = @OpenTradeId OR deal.CloseTradeId = @OpenTradeId
+            WHERE deal.OpenTradeId = @OpenTradeId OR deal.CloseTradeId = @CloseTradeId
         ),
         [OnBehalfFee]   = (
             SELECT TOP(1) CONVERT(DECIMAL(24, 13),
@@ -80,7 +80,7 @@ BEGIN
                      LEFT JOIN selectedAccounts closingOnBehalf
                                      ON deal.CloseTradeId = closingOnBehalf.EventSourceId AND
                                         closingOnBehalf.ReasonType = 'OnBehalf'
-            WHERE deal.OpenTradeId = @OpenTradeId OR deal.CloseTradeId = @OpenTradeId
+            WHERE deal.OpenTradeId = @OpenTradeId OR deal.CloseTradeId = @CloseTradeId
         ),
         [Taxes]         = (
             SELECT CONVERT(DECIMAL(24, 13), ISNULL(account.ChangeAmount, 0.0))
