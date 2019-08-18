@@ -19,8 +19,8 @@ CREATE OR ALTER PROCEDURE [dbo].[SP_InsertDeal](@DealId [nvarchar](64),
                                                 @CloseFxPrice [float],
                                                 @Fpl [float],
                                                 @PnlOfTheLastDay [float],
-                                                @AdditionalInfo [nvarchar](MAX),
-                                                @PositionId [nvarchar](64))
+                                                @AdditionalInfo [nvarchar](MAX)
+)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -34,6 +34,9 @@ BEGIN
             @Direction, @Volume, @Originator, @OpenPrice, @OpenFxPrice, @ClosePrice, @CloseFxPrice, @Fpl,
             @PnlOfTheLastDay, @AdditionalInfo);
 
+    /*
+    CAUTION: The same calculation logic is duplicated here and in SP_InsertAccountHistory
+    */
     WITH selectedAccounts AS
              (
                  SELECT account.EventSourceId,
@@ -48,10 +51,10 @@ BEGIN
              FROM dbo.[Deals] AS deal,
                   dbo.PositionsHistory AS position,
                   dbo.OvernightSwapHistory AS swapHistory
-             WHERE position.Id = @PositionId
-               AND deal.DealId = position.DealId
+             WHERE deal.DealId = position.DealId
                AND position.Id = swapHistory.PositionId
                AND swapHistory.IsSuccess = 1
+               AND deal.DealId = @DealId
              GROUP BY deal.DealId, ABS(deal.Volume)
             ),
         [Commission]    = (
