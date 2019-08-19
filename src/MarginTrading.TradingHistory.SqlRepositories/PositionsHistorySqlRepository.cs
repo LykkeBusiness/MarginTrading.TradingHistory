@@ -60,8 +60,33 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
                     if (deal != null)
                     {
+                        var entity = DealEntity.Create(deal);
                         await conn.ExecuteAsync("[dbo].[SP_InsertDeal]",
-                            DealEntity.Create(deal),
+                            new
+                            {
+                                DealId = entity.DealId,
+                                Created = entity.Created,
+                                AccountId = entity.AccountId,
+                                AssetPairId = entity.AssetPairId,
+                                OpenTradeId = entity.OpenTradeId,
+                                OpenOrderType = entity.OpenOrderType,
+                                OpenOrderVolume = entity.OpenOrderVolume,
+                                OpenOrderExpectedPrice = entity.OpenOrderExpectedPrice,
+                                CloseTradeId = entity.CloseTradeId,
+                                CloseOrderType = entity.CloseOrderType,
+                                CloseOrderVolume = entity.CloseOrderVolume,
+                                CloseOrderExpectedPrice = entity.CloseOrderExpectedPrice,
+                                Direction = entity.Direction,
+                                Volume = entity.Volume,
+                                Originator = entity.Originator,
+                                OpenPrice = entity.OpenPrice,
+                                OpenFxPrice = entity.OpenFxPrice,
+                                ClosePrice = entity.ClosePrice,
+                                CloseFxPrice = entity.CloseFxPrice,
+                                Fpl = entity.Fpl,
+                                PnlOfTheLastDay = entity.PnlOfTheLastDay,
+                                AdditionalInfo = entity.AdditionalInfo,
+                            },
                             transaction,
                             commandType: CommandType.StoredProcedure);
                     }

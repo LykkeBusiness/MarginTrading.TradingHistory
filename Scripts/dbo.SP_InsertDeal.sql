@@ -44,6 +44,7 @@ BEGIN
                         account.ChangeAmount
                  FROM dbo.[Deals] AS deal, dbo.AccountHistory AS account
                  WHERE account.EventSourceId IN (deal.OpenTradeId, deal.CloseTradeId)
+                   AND deal.DealId = @DealId
              )
     UPDATE [dbo].[Deals]
     SET [OvernightFees] =
@@ -58,7 +59,7 @@ BEGIN
              GROUP BY deal.DealId, ABS(deal.Volume)
             ),
         [Commission]    = (
-            SELECT TOP(1) CONVERT(DECIMAL(24, 13),
+            SELECT CONVERT(DECIMAL(24, 13),
                            ((ISNULL(openingCommission.ChangeAmount, 0.0) / ABS(deal.OpenOrderVolume)
                                + ISNULL(closingCommission.ChangeAmount, 0.0) / ABS(deal.CloseOrderVolume))
                                * ABS(deal.Volume)))
@@ -72,7 +73,7 @@ BEGIN
             WHERE deal.OpenTradeId = @OpenTradeId OR deal.CloseTradeId = @CloseTradeId
         ),
         [OnBehalfFee]   = (
-            SELECT TOP(1) CONVERT(DECIMAL(24, 13),
+            SELECT CONVERT(DECIMAL(24, 13),
                            ((ISNULL(openingOnBehalf.ChangeAmount, 0.0) / ABS(deal.OpenOrderVolume)
                                + ISNULL(closingOnBehalf.ChangeAmount, 0.0) / ABS(deal.CloseOrderVolume))
                                * ABS(deal.Volume)))
