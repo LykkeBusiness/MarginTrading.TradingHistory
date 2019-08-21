@@ -49,7 +49,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 {
                     await conn.OpenAsync();
                 }
-                var transaction = conn.BeginTransaction();
+                var transaction = conn.BeginTransaction(IsolationLevel.Serializable);
 
                 try
                 {
