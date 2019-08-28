@@ -23,6 +23,5 @@ namespace MarginTrading.TradingHistory.Core.Repositories
 
         Task<IEnumerable<IDeal>> GetAsync([CanBeNull] string accountId, [CanBeNull] string assetPairId,
             DateTime? closeTimeStart = null, DateTime? closeTimeEnd = null);
-        Task AddAsync(IDeal obj);
     }
 }
