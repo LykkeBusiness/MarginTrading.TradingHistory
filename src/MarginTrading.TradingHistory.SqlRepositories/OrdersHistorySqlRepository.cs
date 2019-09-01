@@ -20,12 +20,12 @@ namespace MarginTrading.TradingHistory.SqlRepositories
     {
         private const string TableName = "OrdersHistory";
 
-        private const string GetAdditionalFieldsScript = @"SELECT * FROM history 
+        private const string GetAdditionalFieldsScript = @"SELECT * FROM history WITH (NOLOCK)
 OUTER APPLY (
     SELECT
         TakeProfit = (
             SELECT TOP 1 Id, Type, ExpectedOpenPrice, Status, ModifiedTimestamp
-            FROM OrdersHistory AS takeProfitHistory
+            FROM OrdersHistory AS takeProfitHistory WITH (NOLOCK)
             WHERE takeProfitHistory.ParentOrderID = history.ID AND takeProfitHistory.Type = 'TakeProfit'
             ORDER BY ModifiedTimestamp DESC
             FOR JSON AUTO
@@ -35,7 +35,7 @@ OUTER APPLY (
     SELECT
         StopLoss = (
             SELECT TOP 1 Id, Type, ExpectedOpenPrice, Status, ModifiedTimestamp
-            FROM OrdersHistory AS stopLossHistory
+            FROM OrdersHistory AS stopLossHistory WITH (NOLOCK)
             WHERE stopLossHistory.ParentOrderID = history.ID AND stopLossHistory.Type in ('StopLoss','TrailingStop')
             ORDER BY ModifiedTimestamp DESC
             FOR JSON AUTO
@@ -45,7 +45,7 @@ OUTER APPLY (
   SELECT
     Spread = (
       SELECT TOP 1 Spread
-      FROM dbo.ExecutionOrderBooks as eob
+      FROM dbo.ExecutionOrderBooks AS eob WITH (NOLOCK)
       WHERE eob.OrderId = history.Id
     )
 ) AS Spread
@@ -53,7 +53,7 @@ OUTER APPLY (
   SELECT
     Commission = (
       SELECT SUM(ah.ChangeAmount)
-      FROM dbo.AccountHistory ah
+      FROM dbo.AccountHistory AS ah WITH (NOLOCK)
       WHERE ah.ReasonType = 'Commission' AND ah.EventSourceId = history.Id
     )
 ) AS Commission
@@ -61,7 +61,7 @@ OUTER APPLY (
   SELECT
     OnBehalf = (
       SELECT SUM(ah.ChangeAmount)
-      FROM dbo.AccountHistory ah
+      FROM dbo.AccountHistory AS ah WITH (NOLOCK)
       WHERE ah.ReasonType = 'OnBehalf' AND ah.EventSourceId = history.Id
     )
 ) AS OnBehalf";
@@ -138,7 +138,7 @@ OUTER APPLY (
                 var whereClause = "WHERE Id=@orderId"
                               + (status == null ? "" : " AND Status=@status");
                 var query =
-                    $"WITH history AS (SELECT * FROM {TableName} {whereClause}) {GetAdditionalFieldsScript} ORDER BY [ModifiedTimestamp] DESC";
+                    $"WITH history AS (SELECT * FROM {TableName} WITH (NOLOCK) {whereClause}) {GetAdditionalFieldsScript} ORDER BY [ModifiedTimestamp] DESC";
                 var objects = await conn.QueryAsync<OrderHistoryWithAdditionalEntity>(query, new
                 {
                     orderId,
@@ -173,7 +173,7 @@ OUTER APPLY (
             using (var conn = new SqlConnection(_connectionString))
             {
                 var sql =
-                    $"WITH history AS (SELECT * FROM {TableName} {whereClause} {paginationClause}) {GetAdditionalFieldsScript}; SELECT COUNT(*) FROM {TableName} {whereClause}";
+                    $"WITH history AS (SELECT * FROM {TableName} WITH (NOLOCK) {whereClause} {paginationClause}) {GetAdditionalFieldsScript}; SELECT COUNT(*) FROM {TableName} {whereClause}";
                 
                 var gridReader = await conn.QueryMultipleAsync(
                     sql,
