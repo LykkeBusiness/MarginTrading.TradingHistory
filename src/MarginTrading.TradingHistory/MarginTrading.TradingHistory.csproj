@@ -14,9 +14,6 @@
     <None Update="Dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
-    <None Update="appsettings.dev.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Content Update="appsettings.json">
