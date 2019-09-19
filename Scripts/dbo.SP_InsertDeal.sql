@@ -59,7 +59,7 @@ BEGIN
              GROUP BY deal.DealId, ABS(deal.Volume)
             ),
         [Commission]    = (
-            SELECT CONVERT(DECIMAL(24, 13),
+            SELECT TOP(1) CONVERT(DECIMAL(24, 13),
                            ((ISNULL(openingCommission.ChangeAmount, 0.0) / ABS(deal.OpenOrderVolume)
                                + ISNULL(closingCommission.ChangeAmount, 0.0) / ABS(deal.CloseOrderVolume))
                                * ABS(deal.Volume)))
@@ -71,9 +71,10 @@ BEGIN
                                      ON deal.CloseTradeId = closingCommission.EventSourceId AND
                                         closingCommission.ReasonType = 'Commission'
             WHERE deal.OpenTradeId = @OpenTradeId OR deal.CloseTradeId = @CloseTradeId
+            ORDER BY closingCommission.ChangeAmount DESC
         ),
         [OnBehalfFee]   = (
-            SELECT CONVERT(DECIMAL(24, 13),
+            SELECT TOP(1) CONVERT(DECIMAL(24, 13),
                            ((ISNULL(openingOnBehalf.ChangeAmount, 0.0) / ABS(deal.OpenOrderVolume)
                                + ISNULL(closingOnBehalf.ChangeAmount, 0.0) / ABS(deal.CloseOrderVolume))
                                * ABS(deal.Volume)))
@@ -85,6 +86,7 @@ BEGIN
                                      ON deal.CloseTradeId = closingOnBehalf.EventSourceId AND
                                         closingOnBehalf.ReasonType = 'OnBehalf'
             WHERE deal.OpenTradeId = @OpenTradeId OR deal.CloseTradeId = @CloseTradeId
+            ORDER BY closingOnBehalf.ChangeAmount DESC
         ),
         [Taxes]         = (
             SELECT CONVERT(DECIMAL(24, 13), ISNULL(account.ChangeAmount, 0.0))
