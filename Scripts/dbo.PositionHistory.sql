@@ -25,7 +25,7 @@ IF NOT EXISTS(SELECT 'X'
             [OpenFxPrice]            [float]          NULL,
             [EquivalentAsset]        [nvarchar](64)   NULL,
             [OpenPriceEquivalent]    [float]          NULL,
-            [RelatedOrders]          [nvarchar](1024) NULL,
+            [RelatedOrders]          [nvarchar](MAX)  NULL,
             [LegalEntity]            [nvarchar](64)   NULL,
             [OpenOriginator]         [nvarchar](64)   NULL,
             [ExternalProviderId]     [nvarchar](64)   NULL,
@@ -42,7 +42,7 @@ IF NOT EXISTS(SELECT 'X'
             [CloseOriginator]        [nvarchar](64)   NULL,
             [CloseReason]            [nvarchar](256)  NULL,
             [CloseComment]           [nvarchar](MAX)  NULL,
-            [CloseTrades]            [nvarchar](1024) NULL,
+            [CloseTrades]            [nvarchar](MAX)  NULL,
             [FxAssetPairId]          [nvarchar](64)   NULL,
             [FxToAssetPairDirection] [nvarchar](64)   NULL,
             [LastModified]           [datetime]       NULL,
@@ -50,7 +50,7 @@ IF NOT EXISTS(SELECT 'X'
             [ChargedPnl]             [float]          NULL,
             [AdditionalInfo]         [nvarchar](MAX)  NULL,
             [HistoryType]            [nvarchar](64)   NULL,
-            [DealInfo]               [nvarchar](1024) NULL,
+            [DealInfo]               [nvarchar](MAX)  NULL,
             [HistoryTimestamp]       [datetime]       NULL,
             INDEX IX_PositionsHistory_Base (Id, AccountId, AssetPairId)
         );
