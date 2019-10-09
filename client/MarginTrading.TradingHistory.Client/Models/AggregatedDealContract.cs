@@ -60,5 +60,10 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// Taxes
         /// </summary>
         public decimal? Taxes { get; set; }
+        
+        /// <summary>
+        /// Number of aggregated deals
+        /// </summary>
+        public int DealsCount { get; set; }
     }
 }
