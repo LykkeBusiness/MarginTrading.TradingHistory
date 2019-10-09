@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2019 Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using JetBrains.Annotations;
 
 namespace MarginTrading.TradingHistory.Client.Models
@@ -65,5 +66,10 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// Number of aggregated deals
         /// </summary>
         public int DealsCount { get; set; }
+        
+        /// <summary>
+        /// Date of the last deal
+        /// </summary>
+        public DateTime LastDealDate { get; set; }
     }
 }
