@@ -15,5 +15,6 @@ namespace MarginTrading.TradingHistory.Core
         decimal? Commission { get; }
         decimal? OnBehalfFee { get; }
         decimal? Taxes { get; }
+        int DealsCount { get; }
     }
 }

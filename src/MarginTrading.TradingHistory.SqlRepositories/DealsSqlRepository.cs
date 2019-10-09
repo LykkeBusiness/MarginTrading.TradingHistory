@@ -96,7 +96,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                         SUM({nameof(IDeal.OvernightFees)}) AS {nameof(IAggregatedDeal.OvernightFees)},
                         SUM({nameof(IDeal.Commission)}) AS {nameof(IAggregatedDeal.Commission)},
                         SUM({nameof(IDeal.OnBehalfFee)}) AS {nameof(IAggregatedDeal.OnBehalfFee)},
-                        SUM({nameof(IDeal.Taxes)}) AS {nameof(IAggregatedDeal.Taxes)}
+                        SUM({nameof(IDeal.Taxes)}) AS {nameof(IAggregatedDeal.Taxes)},
+                        Count({nameof(IDeal.DealId)}) AS {nameof(IAggregatedDeal.DealsCount)}
                       FROM {TableName}
                       {whereClause}
                       GROUP BY {nameof(IAggregatedDeal.AccountId)}, {nameof(IAggregatedDeal.AssetPairId)}
