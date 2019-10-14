@@ -82,7 +82,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                               + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
                               + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
             var order = isAscending ? string.Empty : Constants.DescendingOrder;
-            var paginationClause = $" ORDER BY [AssetPairId] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+            var paginationClause = $" ORDER BY [{nameof(IAggregatedDeal.LastDealDate)}] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
 
             using (var conn = new SqlConnection(_connectionString))
             {
@@ -96,7 +96,9 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                         SUM({nameof(IDeal.OvernightFees)}) AS {nameof(IAggregatedDeal.OvernightFees)},
                         SUM({nameof(IDeal.Commission)}) AS {nameof(IAggregatedDeal.Commission)},
                         SUM({nameof(IDeal.OnBehalfFee)}) AS {nameof(IAggregatedDeal.OnBehalfFee)},
-                        SUM({nameof(IDeal.Taxes)}) AS {nameof(IAggregatedDeal.Taxes)}
+                        SUM({nameof(IDeal.Taxes)}) AS {nameof(IAggregatedDeal.Taxes)},
+                        COUNT({nameof(IDeal.DealId)}) AS {nameof(IAggregatedDeal.DealsCount)},
+                        MAX({nameof(IDeal.Created)}) AS {nameof(IAggregatedDeal.LastDealDate)}
                       FROM {TableName}
                       {whereClause}
                       GROUP BY {nameof(IAggregatedDeal.AccountId)}, {nameof(IAggregatedDeal.AssetPairId)}

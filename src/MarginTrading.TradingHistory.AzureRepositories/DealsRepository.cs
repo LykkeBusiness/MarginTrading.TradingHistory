@@ -87,7 +87,8 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                     OvernightFees = g.Sum(v => v.OvernightFees),
                     Commission = g.Sum(v => v.Commission),
                     OnBehalfFee = g.Sum(v => v.OnBehalfFee),
-                    Taxes = g.Sum(v => v.Taxes)
+                    Taxes = g.Sum(v => v.Taxes),
+                    DealsCount = g.Count()
                 });
 
             skip = skip ?? 0;
