@@ -12,8 +12,8 @@ namespace MarginTrading.TradingHistory.Core.Repositories
     public interface IDealsRepository
     {
         [ItemCanBeNull]
-        Task<IDeal> GetAsync(string id);
-        Task<PaginatedResponse<IDeal>> GetByPagesAsync(string accountId, string assetPairId,
+        Task<IDealWithCommissionParams> GetAsync(string id);
+        Task<PaginatedResponse<IDealWithCommissionParams>> GetByPagesAsync(string accountId, string assetPairId,
             DateTime? closeTimeStart, DateTime? closeTimeEnd,
             int? skip = null, int? take = null, bool isAscending = true);
 
@@ -21,7 +21,8 @@ namespace MarginTrading.TradingHistory.Core.Repositories
             DateTime? closeTimeStart, DateTime? closeTimeEnd,
             int? skip = null, int? take = null, bool isAscending = true);
 
-        Task<IEnumerable<IDeal>> GetAsync([CanBeNull] string accountId, [CanBeNull] string assetPairId,
+        Task<IEnumerable<IDealWithCommissionParams>> GetAsync([CanBeNull] string accountId,
+            [CanBeNull] string assetPairId,
             DateTime? closeTimeStart = null, DateTime? closeTimeEnd = null);
     }
 }

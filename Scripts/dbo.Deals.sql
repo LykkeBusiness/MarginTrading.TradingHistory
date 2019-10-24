@@ -28,10 +28,6 @@ IF NOT EXISTS(SELECT 'X'
             [Fpl]                     [float]         NULL,
             [PnlOfTheLastDay]         [float]         NULL,
             [AdditionalInfo]          [nvarchar](MAX) NULL,
-            [OvernightFees]           [float]         NULL,
-            [Commission]              [float]         NULL,
-            [OnBehalfFee]             [float]         NULL,
-            [Taxes]                   [float]         NULL,
             INDEX IX_Deals_Base (DealId, AccountId, AssetPairId, Created)
         );
     END;

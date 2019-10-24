@@ -27,42 +27,23 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             _convertService = convertService;
         }
         
-        public async Task<IDeal> GetAsync(string id)
+        public async Task<IDealWithCommissionParams> GetAsync(string id)
         {
-            return (await _tableStorage.GetDataAsync(x => x.DealId == id)).SingleOrDefault();
+            throw new NotImplementedException();
         }
 
-        public async Task<PaginatedResponse<IDeal>> GetByPagesAsync(string accountId, string assetPairId,
+        public async Task<PaginatedResponse<IDealWithCommissionParams>> GetByPagesAsync(string accountId,
+            string assetPairId,
             DateTime? closeTimeStart, DateTime? closeTimeEnd, int? skip = null, int? take = null,
             bool isAscending = true)
         {
-            var allData = await GetAsync(accountId, assetPairId, closeTimeStart, closeTimeEnd);
-
-            //TODO refactor before using azure impl
-            var data = (isAscending
-                    ? allData.OrderBy(x => x.Created)
-                    : allData.OrderByDescending(x => x.Created))
-                .ToList();
-            var filtered = take.HasValue ? data.Skip(skip.Value).Take(take.Value).ToList() : data;
-            
-            return new PaginatedResponse<IDeal>(
-                contents: filtered,
-                start: skip ?? 0,
-                size: filtered.Count,
-                totalSize: data.Count
-            );
+            throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<IDeal>> GetAsync(string accountId, string assetPairId,
+        public async Task<IEnumerable<IDealWithCommissionParams>> GetAsync(string accountId, string assetPairId,
             DateTime? closeTimeStart = null, DateTime? closeTimeEnd = null)
         {
-            bool Predicate(DealEntity x) => (string.IsNullOrWhiteSpace(assetPairId) || x.AssetPairId == assetPairId) 
-                                            && (closeTimeStart == null || x.Created >= closeTimeStart) 
-                                            && (closeTimeEnd == null || x.Created < closeTimeEnd);
-
-            return string.IsNullOrWhiteSpace(accountId)
-                ? await _tableStorage.GetDataAsync((Func<DealEntity, bool>) Predicate)
-                : await _tableStorage.GetDataAsync(accountId, (Func<DealEntity, bool>) Predicate);
+            throw new NotImplementedException();
         }
 
         public Task AddAsync(IDeal obj)
