@@ -34,11 +34,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public decimal Fpl { get; set; }
         public string AdditionalInfo { get; set; }
         public decimal PnlOfTheLastDay { get; set; }
-        
-        public decimal? OvernightFees { get; set; }
-        public decimal? Commission { get; set; }
-        public decimal? OnBehalfFee { get; set; }
-        public decimal? Taxes { get; set; }
 
         public static DealEntity Create(IDeal deal)
         {
@@ -66,11 +61,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 Fpl = deal.Fpl,
                 AdditionalInfo = deal.AdditionalInfo,
                 PnlOfTheLastDay = deal.PnlOfTheLastDay,
-                
-                OvernightFees = deal.OvernightFees,
-                Commission = deal.Commission,
-                OnBehalfFee = deal.OnBehalfFee,
-                Taxes = deal.Taxes,
             };
         }
     }

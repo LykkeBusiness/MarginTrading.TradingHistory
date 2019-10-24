@@ -37,7 +37,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             _log = log;
             
             connectionString.InitializeSqlObject("dbo.Deals.sql", log);
-            connectionString.InitializeSqlObject("dbo.SP_InsertDeal.sql", log);
+            connectionString.InitializeSqlObject("dbo.DealCommissionParams.sql", log);
+            connectionString.InitializeSqlObject("dbo.SP_UpdateDealCommissionParamsOnDeal.sql", log);
             connectionString.InitializeSqlObject("dbo.PositionHistory.sql", log);
         }
 
@@ -61,7 +62,10 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                     if (deal != null)
                     {
                         var entity = DealEntity.Create(deal);
-                        await conn.ExecuteAsync("[dbo].[SP_InsertDeal]",
+
+                        await conn.ExecuteAsync($@"INSERT INTO [dbo].[Deals] 
+({string.Join(",", DealsSqlRepository.DealInsertColumns)}) 
+VALUES (@{string.Join(",@", DealsSqlRepository.DealInsertColumns)})",
                             new
                             {
                                 DealId = entity.DealId,
@@ -87,8 +91,11 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                                 PnlOfTheLastDay = entity.PnlOfTheLastDay,
                                 AdditionalInfo = entity.AdditionalInfo,
                             },
-                            transaction,
-                            commandType: CommandType.StoredProcedure);
+                            transaction);
+
+                        await conn.ExecuteAsync("INSERT INTO [dbo].[DealCommissionParams] (DealId) VALUES (@DealId)",
+                            new {deal.DealId},
+                            transaction);
                     }
 
                     transaction.Commit();
@@ -103,11 +110,43 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                               $"Entity <{nameof(IDeal)}>: \n" +
                               deal?.ToJson();
                     
-                    _log?.WriteError(nameof(PositionsHistorySqlRepository), nameof(AddAsync), 
+                    await _log?.WriteErrorAsync(nameof(PositionsHistorySqlRepository), nameof(AddAsync), 
                         new Exception(msg));
                     
                     throw;
                 }
+            }
+            
+            if (deal != null)
+            {
+#pragma warning disable 4014
+                Task.Run(async () =>
+#pragma warning restore 4014
+                {
+                    try
+                    {
+                        using (var conn = new SqlConnection(_connectionString))
+                        {
+                            await conn.ExecuteAsync("[dbo].[SP_UpdateDealCommissionParamsOnDeal]",
+                                new
+                                {
+                                    DealId = deal.DealId,
+                                    OpenTradeId = deal.OpenTradeId,
+                                    OpenOrderVolume = deal.OpenOrderVolume,
+                                    CloseTradeId = deal.CloseTradeId,
+                                    CloseOrderVolume = deal.CloseOrderVolume,
+                                    Volume = deal.Volume,
+                                },
+                                commandType: CommandType.StoredProcedure);
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        await _log?.WriteErrorAsync(nameof(PositionsHistorySqlRepository), nameof(AddAsync), 
+                            new Exception($"Failed to calculate commissions for the deal {deal.DealId}, skipping.", 
+                                exception));
+                    }        
+                });
             }
         }
 
