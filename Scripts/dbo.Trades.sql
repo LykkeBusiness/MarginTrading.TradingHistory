@@ -26,3 +26,15 @@ IF NOT EXISTS(SELECT 'X'
         );
 
     END
+	
+	
+IF NOT EXISTS (
+  SELECT * 
+  FROM   sys.columns 
+  WHERE  object_id = OBJECT_ID(N'[dbo].[Trades]') 
+         AND name = 'ExternalOrderId'
+)
+BEGIN
+	ALTER TABLE [dbo].[Trades]
+	ADD ExternalOrderId nvarchar(64) NULL;
+END
