@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Lykke Corp.
+﻿// Copyright (c) 2019 Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
 using System;
@@ -35,29 +35,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             _log = log;
             
             connectionString.InitializeSqlObject("dbo.Trades.sql", log);
-        }
-
-        public async Task AddAsync(ITrade obj)
-        {
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                try
-                {
-                    var entity = TradeEntity.Create(obj);
-                    await conn.ExecuteAsync(
-                        $"insert into {TableName} ({GetColumns}) values ({GetFields})", entity);
-                }
-                catch (Exception ex)
-                {
-                    var msg = $"Error {ex.Message} \n" +
-                              "Entity <ITradeHistory>: \n" +
-                              obj.ToJson();
-                    
-                    _log?.WriteWarning(nameof(TradesSqlRepository), nameof(AddAsync), msg);
-                    
-                    throw new Exception(msg);
-                }
-            }
         }
 
         public async Task<ITrade> GetAsync(string tradeId)
