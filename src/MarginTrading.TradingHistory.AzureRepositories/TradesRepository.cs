@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Lykke Corp.
+﻿// Copyright (c) 2019 Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
 using System.Collections.Generic;
@@ -24,11 +24,6 @@ namespace MarginTrading.TradingHistory.AzureRepositories
         {
             _tableStorage = tableStorage;
             _convertService = convertService;
-        }
-        
-        public Task AddAsync(ITrade obj)
-        {
-            return _tableStorage.InsertAsync(_convertService.Convert<ITrade, TradeEntity>(obj));
         }
 
         public async Task<ITrade> GetAsync(string tradeId)

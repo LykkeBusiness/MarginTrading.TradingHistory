@@ -26,5 +26,6 @@ namespace MarginTrading.TradingHistory.Core.Domain
         /// Order Id, that cancelled current trade
         /// </summary>
         string CancelledBy { get; }
+        string ExternalOrderId { get; }
     }
 }

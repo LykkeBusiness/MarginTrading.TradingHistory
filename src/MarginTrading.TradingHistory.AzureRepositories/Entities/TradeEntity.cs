@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Lykke Corp.
+﻿// Copyright (c) 2019 Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
 using System;
@@ -34,5 +34,6 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public decimal FxRate { get; set; }
         public string AdditionalInfo { get; set; }
         public string CancelledBy { get; set; }
+        public string ExternalOrderId { get; set; }
     }
 }
