@@ -14,9 +14,5 @@ IF NOT EXISTS(SELECT 'X'
             [Taxes]                   [float]         NULL,
             INDEX IX_DealCommissionParams_Base (DealId)
         );
-
-        --this is a form of migration. no harm would be done when deploying new instance of the system.
-        INSERT INTO [dbo].[DealCommissionParams]
-        SELECT d.DealId, d.OvernightFees, d.Commission, d.OnBehalfFee, d.Taxes FROM [dbo].[Deals] d;
         
     END;
