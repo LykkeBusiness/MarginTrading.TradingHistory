@@ -66,5 +66,10 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// Order Id, that cancelled current trade
         /// </summary>
         public string CancelledBy { get; set; }
+
+        /// <summary>
+        /// External Order Id
+        /// </summary>
+        public string ExternalOrderId { get; set; }
     }
 }

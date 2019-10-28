@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Lykke Corp.
+﻿// Copyright (c) 2019 Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
 using System;
@@ -27,6 +27,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public decimal FxRate { get; set; }
         public string AdditionalInfo { get; set; }
         public string CancelledBy { get; set; }
+        public string ExternalOrderId { get; set; }
 
         public static TradeEntity Create(ITrade obj)
         {
@@ -46,7 +47,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 OrderExpectedPrice = obj.OrderExpectedPrice,
                 FxRate = obj.FxRate,
                 AdditionalInfo = obj.AdditionalInfo,
-                CancelledBy = obj.CancelledBy
+                CancelledBy = obj.CancelledBy,
+                ExternalOrderId = obj.ExternalOrderId
             };
         }
     }

@@ -61,7 +61,8 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                     historyEvent.OrderSnapshot.Volume.Value,
                     historyEvent.OrderSnapshot.ExpectedOpenPrice,
                     historyEvent.OrderSnapshot.FxRate,
-                    historyEvent.OrderSnapshot.AdditionalInfo
+                    historyEvent.OrderSnapshot.AdditionalInfo,
+                    historyEvent.OrderSnapshot.ExternalOrderId
                 )
                 : null;
             
