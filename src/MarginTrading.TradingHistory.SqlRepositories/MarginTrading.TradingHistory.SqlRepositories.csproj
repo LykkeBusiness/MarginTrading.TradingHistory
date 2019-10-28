@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <AssemblyName>MarginTrading.TradingHistory.SqlRepositories</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.SqlRepositories</RootNamespace>
     <Version>1.13.4</Version>
