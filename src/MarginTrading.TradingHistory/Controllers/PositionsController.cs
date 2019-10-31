@@ -81,7 +81,7 @@ namespace MarginTrading.TradingHistory.Controllers
         }
 
         private PositionContract Convert(Dictionary<string, IPositionHistory> positions, 
-            Dictionary<string, IDeal> deals, string id)
+            Dictionary<string, IDealWithCommissionParams> deals, string id)
         {
             if (!positions.TryGetValue(id, out var positionHistory)
                 || !deals.TryGetValue(id, out var deal))
