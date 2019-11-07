@@ -20,7 +20,9 @@ namespace MarginTrading.TradingHistory.SqlRepositories
     {
         private const string TableName = "OrdersHistory";
 
-        private const string GetAdditionalFieldsScript = @"SELECT * FROM history WITH (NOLOCK)
+        private string GetAdditionalFieldsScript(string columnsCommaSeparated)
+        {
+            return $@"SELECT {columnsCommaSeparated} FROM history WITH (NOLOCK)
 OUTER APPLY (
     SELECT
         TakeProfit = (
@@ -65,6 +67,7 @@ OUTER APPLY (
       WHERE ah.ReasonType = 'OnBehalf' AND ah.EventSourceId = history.Id
     )
 ) AS OnBehalf";
+        }
 
         private readonly string _connectionString;
         private readonly ILog _log;
@@ -82,7 +85,7 @@ OUTER APPLY (
         {
             _connectionString = connectionString;
             _log = log;
-            
+
             connectionString.InitializeSqlObject("dbo.OrdersHistory.sql", log);
         }
 
@@ -92,12 +95,12 @@ OUTER APPLY (
             {
                 await conn.OpenAsync();
                 var transaction = conn.BeginTransaction();
-                
+
                 try
                 {
                     var orderHistoryEntity = OrderHistoryEntity.Create(order);
                     await conn.ExecuteAsync(
-                        $"insert into {TableName} ({GetColumns}) values ({GetFields})", 
+                        $"insert into {TableName} ({GetColumns}) values ({GetFields})",
                         orderHistoryEntity,
                         transaction);
 
@@ -105,11 +108,11 @@ OUTER APPLY (
                     {
                         var tradeEntity = TradeEntity.Create(trade);
                         await conn.ExecuteAsync(
-                            $"insert into {TradesSqlRepository.TableName} ({TradesSqlRepository.GetColumns}) values ({TradesSqlRepository.GetFields})", 
+                            $"insert into {TradesSqlRepository.TableName} ({TradesSqlRepository.GetColumns}) values ({TradesSqlRepository.GetFields})",
                             tradeEntity,
                             transaction);
                     }
-                    
+
                     transaction.Commit();
                 }
                 catch (Exception ex)
@@ -121,10 +124,10 @@ OUTER APPLY (
                               order.ToJson() + " \n" +
                               $"Entity <{nameof(ITrade)}>: \n" +
                               trade?.ToJson();
-                    
-                    _log?.WriteError(nameof(OrdersHistorySqlRepository), nameof(AddAsync), 
+
+                    _log?.WriteError(nameof(OrdersHistorySqlRepository), nameof(AddAsync),
                         new Exception(msg));
-                    
+
                     throw;
                 }
             }
@@ -138,7 +141,7 @@ OUTER APPLY (
                 var whereClause = "WHERE Id=@orderId"
                               + (status == null ? "" : " AND Status=@status");
                 var query =
-                    $"WITH history AS (SELECT * FROM {TableName} WITH (NOLOCK) {whereClause}) {GetAdditionalFieldsScript} ORDER BY [ModifiedTimestamp] DESC";
+                    $"WITH history AS (SELECT * FROM {TableName} WITH (NOLOCK) {whereClause}) {GetAdditionalFieldsScript("*")} ORDER BY [ModifiedTimestamp] DESC";
                 var objects = await conn.QueryAsync<OrderHistoryWithAdditionalEntity>(query, new
                 {
                     orderId,
@@ -154,7 +157,8 @@ OUTER APPLY (
             string parentOrderId = null,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
-            int? skip = null, int? take = null, bool isAscending = true)
+            int? skip = null, int? take = null, bool isAscending = true,
+            bool executedOrdersEssentialFieldsOnly = false)
         {
             var whereClause = " WHERE 1=1 "
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
@@ -163,24 +167,28 @@ OUTER APPLY (
                               + (orderTypes == null || orderTypes.Count == 0 ? "" : " AND [Type] IN @orderTypes")
                               + (originatorTypes == null || originatorTypes.Count == 0 ? "" : " AND Originator IN @originatorTypes")
                               + (string.IsNullOrEmpty(parentOrderId) ? "" : " AND ParentOrderId = @parentOrderId")
-                              + (createdTimeStart == null ? "": " AND CreatedTimestamp >= @createdTimeStart")
-                              + (createdTimeEnd == null ? "": " AND CreatedTimestamp < @createdTimeEnd")
-                              + (modifiedTimeStart == null ? "": " AND ModifiedTimestamp >= @modifiedTimeStart")
-                              + (modifiedTimeEnd == null ? "": " AND ModifiedTimestamp < @modifiedTimeEnd");
+                              + (createdTimeStart == null ? "" : " AND CreatedTimestamp >= @createdTimeStart")
+                              + (createdTimeEnd == null ? "" : " AND CreatedTimestamp < @createdTimeEnd")
+                              + (modifiedTimeStart == null ? "" : " AND ModifiedTimestamp >= @modifiedTimeStart")
+                              + (modifiedTimeEnd == null ? "" : " AND ModifiedTimestamp < @modifiedTimeEnd");
             var order = isAscending ? string.Empty : Constants.DescendingOrder;
             var paginationClause = $" ORDER BY [ModifiedTimestamp] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
-            
+
             using (var conn = new SqlConnection(_connectionString))
             {
+                var additionalFieldsScript = GetAdditionalFieldsScript(
+                    executedOrdersEssentialFieldsOnly
+                        ? string.Join(",", OrderHistoryWithAdditionalEntity.ExecutedOrdersEssentialFieldsOnly)
+                        : "*");
                 var sql =
-                    $"WITH history AS (SELECT * FROM {TableName} WITH (NOLOCK) {whereClause} {paginationClause}) {GetAdditionalFieldsScript}; SELECT COUNT(*) FROM {TableName} {whereClause}";
-                
+                    $"WITH history AS (SELECT * FROM {TableName} WITH (NOLOCK) {whereClause} {paginationClause}) {additionalFieldsScript}; SELECT COUNT(*) FROM {TableName} {whereClause}";
+
                 var gridReader = await conn.QueryMultipleAsync(
                     sql,
                     new
                     {
-                        accountId, 
-                        assetPairId, 
+                        accountId,
+                        assetPairId,
                         statuses = statuses?.Select(x => x.ToString()).ToArray(),
                         orderTypes = orderTypes?.Select(x => x.ToString()).ToArray(),
                         originatorTypes = originatorTypes?.Select(x => x.ToString()).ToArray(),
@@ -192,11 +200,11 @@ OUTER APPLY (
                     });
                 var orderHistoryEntities = (await gridReader.ReadAsync<OrderHistoryWithAdditionalEntity>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
-            
+
                 return new PaginatedResponse<IOrderHistoryWithAdditional>(
-                    contents: orderHistoryEntities, 
-                    start: skip ?? 0, 
-                    size: orderHistoryEntities.Count, 
+                    contents: orderHistoryEntities,
+                    start: skip ?? 0,
+                    size: orderHistoryEntities.Count,
                     totalSize: totalCount
                 );
             }
