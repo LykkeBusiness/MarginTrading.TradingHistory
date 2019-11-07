@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Lykke Corp.
+﻿// Copyright (c) 2019 Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
 using System;
@@ -56,7 +56,8 @@ namespace MarginTrading.TradingHistory.Controllers
                 modifiedTimeEnd: filters?.ModifiedTimeEnd,
                 skip: skip,
                 take: take,
-                isAscending: isAscending);
+                isAscending: isAscending,
+                executedOrdersEssentialFieldsOnly: filters?.RequestType == OrderEventsRequestType.ExecutedOrders);
 
             return new PaginatedResponseContract<OrderEventWithAdditionalContract>(
                 contents: data.Contents.Select(Convert).ToList(),
