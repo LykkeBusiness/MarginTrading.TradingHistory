@@ -178,7 +178,7 @@ OUTER APPLY (
             {
                 var additionalFieldsScript = GetAdditionalFieldsScript(
                     executedOrdersEssentialFieldsOnly
-                        ? string.Join(",", OrderHistoryWithAdditionalEntity.ExecutedOrdersEssentialFieldsOnly)
+                        ? string.Join(",", OrderHistoryEntity.ExecutedOrdersEssentialFieldsOnly)
                         : "*");
                 var sql =
                     $"WITH history AS (SELECT * FROM {TableName} WITH (NOLOCK) {whereClause} {paginationClause}) {additionalFieldsScript}; SELECT COUNT(*) FROM {TableName} {whereClause}";
