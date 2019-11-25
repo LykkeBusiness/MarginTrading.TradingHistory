@@ -48,7 +48,8 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             string parentOrderId = null,
             DateTime? createdTimeStart = null, DateTime? createdTimeEnd = null,
             DateTime? modifiedTimeStart = null, DateTime? modifiedTimeEnd = null,
-            int? skip = null, int? take = null, bool isAscending = true)
+            int? skip = null, int? take = null, bool isAscending = true,
+            bool executedOrdersEssentialFieldsOnly = false)
         {
             //TODO refactor before using azure impl
             
