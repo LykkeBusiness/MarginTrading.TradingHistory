@@ -30,5 +30,37 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public decimal Commission { get; set; }
 
         public decimal OnBehalf { get; set; }
+
+
+        public static readonly IEnumerable<string> ExecutedOrdersEssentialFieldsOnly = new string[]
+        {
+            nameof(TakeProfit),
+            nameof(StopLoss),
+            nameof(Spread),
+            nameof(Commission),
+            nameof(OnBehalf),
+            nameof(UpdateType),
+            nameof(RejectReason),
+            nameof(FxToAssetPairDirection),
+            nameof(FillType),
+            nameof(ExecutionPrice),
+            nameof(Volume),
+            nameof(Status),
+            nameof(AdditionalInfo),
+            nameof(Id),
+            nameof(AssetPairId),
+            nameof(AccountId),
+            nameof(Direction),
+            nameof(Type),
+            nameof(ExpectedOpenPrice),
+            nameof(CreatedTimestamp),
+            nameof(ModifiedTimestamp),
+            nameof(Originator),
+            nameof(FxRate),
+            nameof(ValidityTime),
+            nameof(ForceOpen),
+            nameof(PositionId),
+            nameof(ParentOrderId)
+       };
     }
 }
