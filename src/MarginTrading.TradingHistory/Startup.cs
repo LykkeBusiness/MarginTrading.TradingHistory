@@ -33,6 +33,7 @@ using Newtonsoft.Json.Serialization;
 using LogEntity = Lykke.Logs.LogEntity;
 using Microsoft.Extensions.Logging;
 using Lykke.Snow.Common.Startup.Hosting;
+using Lykke.Snow.Common.Startup.Log;
 
 namespace MarginTrading.TradingHistory
 {
