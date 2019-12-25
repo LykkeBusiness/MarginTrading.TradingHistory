@@ -31,6 +31,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json.Serialization;
 using LogEntity = Lykke.Logs.LogEntity;
+using Microsoft.Extensions.Logging;
+using Lykke.Snow.Common.Startup.Hosting;
+using Lykke.Snow.Common.Startup.Log;
 
 namespace MarginTrading.TradingHistory
 {
@@ -81,6 +84,8 @@ namespace MarginTrading.TradingHistory
                 var builder = new ContainerBuilder();
 
                 Log = CreateLogWithSlack(Configuration, services, appSettings);
+
+                services.AddSingleton<ILoggerFactory>(x => new WebHostLoggerFactory(Log));
 
                 builder.RegisterModule(new ServiceModule(appSettings.Nested(x => x.TradingHistoryService), Log));
                 builder.Populate(services);
@@ -147,6 +152,8 @@ namespace MarginTrading.TradingHistory
                 // NOTE: Service not yet receive and process requests here
 
                 await ApplicationContainer.Resolve<IStartupManager>().StartAsync();
+
+                await Program.Host.WriteLogsAsync(Environment, LogLocator.Log);
 
                 await Log.WriteMonitorAsync("", $"Env: {Program.EnvInfo}", "Started");
             }

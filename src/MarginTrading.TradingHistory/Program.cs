@@ -19,6 +19,7 @@ namespace MarginTrading.TradingHistory
     [UsedImplicitly]
     internal sealed class Program
     {
+        internal static IWebHost Host { get; private set; }
         public static string EnvInfo => Environment.GetEnvironmentVariable("ENV_INFO");
         
         public static async Task Main(string[] args)
@@ -43,14 +44,14 @@ namespace MarginTrading.TradingHistory
                         .AddUserSecrets<Startup>()
                         .AddEnvironmentVariables()
                         .Build();
-                    
-                    var host = WebHost.CreateDefaultBuilder()
+
+                    Host = WebHost.CreateDefaultBuilder()
                         .UseConfiguration(configuration)
                         .UseStartup<Startup>()
                         .UseApplicationInsights()
                         .Build();
 
-                    await host.RunAsync();
+                    await Host.RunAsync();
                 }
                 catch (Exception e)
                 {
