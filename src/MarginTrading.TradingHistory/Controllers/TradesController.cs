@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Lykke.Common.ApiLibrary.Validation;
 using MarginTrading.TradingHistory.Client;
 using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
@@ -52,10 +54,9 @@ namespace MarginTrading.TradingHistory.Controllers
         /// Get trades by <param name="accountId"/> with optional filtering by <param name="assetPairId"/> 
         /// </summary>
         [HttpGet, Route("")]
-        public async Task<List<TradeContract>> List([FromQuery] string accountId, [FromQuery] string assetPairId = null)
+        [ValidateModel]
+        public async Task<List<TradeContract>> List([FromQuery] [Required] string accountId, [FromQuery] string assetPairId = null)
         {
-            accountId.RequiredNotNullOrWhiteSpace(nameof(accountId));
-            
             var history = await _tradesRepository.GetByAccountAsync(accountId, assetPairId);
 
             return history.Select(Convert).ToList();
@@ -65,12 +66,11 @@ namespace MarginTrading.TradingHistory.Controllers
         /// Get trades by <param name="accountId"/> with optional filtering by <param name="assetPairId"/> and pagination
         /// </summary>
         [HttpGet, Route("by-pages")]
-        public async Task<PaginatedResponseContract<TradeContract>> ListByPages([FromQuery] string accountId, 
+        [ValidateModel]
+        public async Task<PaginatedResponseContract<TradeContract>> ListByPages([FromQuery] [Required] string accountId, 
             [FromQuery] string assetPairId = null, [FromQuery] int? skip = null, [FromQuery] int? take = null,
             [FromQuery] bool isAscending = false)
         {
-            accountId.RequiredNotNullOrWhiteSpace(nameof(accountId));
-            
             ApiValidationHelper.ValidatePagingParams(skip, take);
             
             var data = await _tradesRepository.GetByPagesAsync(accountId, assetPairId, skip, take,
