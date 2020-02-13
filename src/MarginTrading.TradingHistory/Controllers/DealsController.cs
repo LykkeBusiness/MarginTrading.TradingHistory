@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Lykke.Common.ApiLibrary.Validation;
 using MarginTrading.TradingHistory.Client;
 using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
@@ -70,8 +72,9 @@ namespace MarginTrading.TradingHistory.Controllers
         /// Get deals with optional filtering and pagination 
         /// </summary>
         [HttpGet, Route("aggregated")]
+        [ValidateModel]
         public async Task<PaginatedResponseContract<AggregatedDealContract>> GetAggregated(
-            [FromQuery] string accountId, [FromQuery] string instrument,
+            [FromQuery] [Required] string accountId, [FromQuery] string instrument,
             [FromQuery] DateTime? closeTimeStart = null, [FromQuery] DateTime? closeTimeEnd = null,
             [FromQuery] int? skip = null, [FromQuery] int? take = null,
             [FromQuery] bool isAscending = false)
