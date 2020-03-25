@@ -31,10 +31,10 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public OrderType CloseOrderType { get; set; }
         public decimal CloseOrderVolume { get; set; }
         public decimal? CloseOrderExpectedPrice { get; set; }
-        PositionDirection IDeal.Direction => Enum.Parse<PositionDirection>(Direction);        
+        PositionDirection IDeal.Direction => (PositionDirection) Enum.Parse(typeof(PositionDirection), Direction);        
         public string Direction { get; set; }
         public decimal Volume { get; set; }
-        OriginatorType IDeal.Originator => Enum.Parse<OriginatorType>(Originator);
+        OriginatorType IDeal.Originator => (OriginatorType) Enum.Parse(typeof(OriginatorType), Originator);
         public string Originator { get; set; }
         public decimal OpenPrice { get; set; }
         public decimal OpenFxPrice { get; set; }
