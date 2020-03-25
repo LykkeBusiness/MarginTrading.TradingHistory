@@ -13,19 +13,19 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public string AccountId { get; set; }
         public string AssetPairId { get; set; }
         public string OpenTradeId { get; set; }
-        OrderType IDeal.OpenOrderType => Enum.Parse<OrderType>(OpenOrderType);
+        OrderType IDeal.OpenOrderType => (OrderType) Enum.Parse(typeof(OrderType), OpenOrderType);
         public string OpenOrderType { get; set; }
         public decimal OpenOrderVolume { get; set; }
         public decimal? OpenOrderExpectedPrice { get; set; }
         public string CloseTradeId { get; set; }
-        OrderType IDeal.CloseOrderType => Enum.Parse<OrderType>(CloseOrderType);
+        OrderType IDeal.CloseOrderType => (OrderType) Enum.Parse(typeof(OrderType), CloseOrderType);
         public string CloseOrderType { get; set; }
         public decimal CloseOrderVolume { get; set; }
         public decimal? CloseOrderExpectedPrice { get; set; }
-        PositionDirection IDeal.Direction => Enum.Parse<PositionDirection>(Direction); 
+        PositionDirection IDeal.Direction => (PositionDirection) Enum.Parse(typeof(PositionDirection), Direction); 
         public string Direction { get; set; }
         public decimal Volume { get; set; }
-        OriginatorType IDeal.Originator => Enum.Parse<OriginatorType>(Originator);
+        OriginatorType IDeal.Originator => (OriginatorType) Enum.Parse(typeof(OriginatorType), Originator);
         public string Originator { get; set; }
         public decimal OpenPrice { get; set; }
         public decimal OpenFxPrice { get; set; }
