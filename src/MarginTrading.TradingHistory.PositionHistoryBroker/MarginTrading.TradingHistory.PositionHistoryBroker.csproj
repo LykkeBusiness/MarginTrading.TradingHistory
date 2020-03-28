@@ -32,7 +32,6 @@
     <PackageReference Include="Lykke.SettingsReader" Version="5.2.0" />
     <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.5" />
     <PackageReference Include="Lykke.MarginTrading.BackendSnow.Contracts" Version="1.14.0" />
-    <PackageReference Include="Lykke.MarginTrading.BrokerBase" Version="2.2.5" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="3.1.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.3" />
@@ -45,6 +44,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\MarginTrading.BrokerBase\src\MarginTrading.BrokerBase\MarginTrading.BrokerBase.csproj" />
     <ProjectReference Include="..\..\client\MarginTrading.TradingHistory.Client\MarginTrading.TradingHistory.Client.csproj" />
     <ProjectReference Include="..\MarginTrading.TradingHistory.AzureRepositories\MarginTrading.TradingHistory.AzureRepositories.csproj" />
     <ProjectReference Include="..\MarginTrading.TradingHistory.Services\MarginTrading.TradingHistory.Services.csproj" />
