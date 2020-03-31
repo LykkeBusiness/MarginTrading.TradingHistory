@@ -82,7 +82,7 @@ namespace MarginTrading.TradingHistory
                     options.DefaultLykkeConfiguration("v1", "TradingHistory API");
                     if (!string.IsNullOrWhiteSpace(_mtSettingsManager.CurrentValue.TradingHistoryClient?.ApiKey))
                     {
-                        options.OperationFilter<ApiKeyHeaderOperationFilter>();
+                        options.AddApiKeyAwareness();
                     }
                 });
 
