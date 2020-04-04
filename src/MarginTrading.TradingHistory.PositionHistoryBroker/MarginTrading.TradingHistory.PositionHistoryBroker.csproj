@@ -23,7 +23,7 @@
   </Target>
   <ItemGroup>
     <PackageReference Include="Lykke.Logs" Version="7.2.1" />
-    <PackageReference Include="Lykke.RabbitMqBroker" Version="7.5.1" />
+    <PackageReference Include="Lykke.RabbitMqBroker" Version="7.13.1" />
     <PackageReference Include="Lykke.SettingsReader" Version="5.2.0" />
     <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.5" />
     <PackageReference Include="Lykke.MarginTrading.BackendSnow.Contracts" Version="1.11.9" />
