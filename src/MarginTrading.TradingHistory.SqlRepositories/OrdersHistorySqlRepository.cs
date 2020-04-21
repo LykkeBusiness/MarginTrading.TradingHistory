@@ -48,7 +48,7 @@ OUTER APPLY (
     Spread = (
       SELECT TOP 1 Spread
       FROM dbo.ExecutionOrderBooks AS eob WITH (NOLOCK)
-      WHERE eob.OrderId = history.Id
+      WHERE eob.ExternalOrderId = history.ExternalOrderId
     )
 ) AS Spread
 OUTER APPLY (
