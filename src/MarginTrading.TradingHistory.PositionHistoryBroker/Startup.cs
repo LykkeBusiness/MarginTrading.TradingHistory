@@ -27,7 +27,7 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
 
         protected override string ApplicationName => "PositionHistoryBroker";
 
-        protected override void RegisterCustomServices(IServiceCollection services, ContainerBuilder builder, IReloadingManager<Settings> settings, ILog log)
+        protected override void RegisterCustomServices(ContainerBuilder builder, IReloadingManager<Settings> settings, ILog log)
         {
             builder.RegisterType<Application>().As<IBrokerApplication>().SingleInstance();
             builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();

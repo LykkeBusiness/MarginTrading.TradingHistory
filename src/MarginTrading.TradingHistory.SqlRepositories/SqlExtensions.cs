@@ -3,11 +3,10 @@
 
 using System;
 using System.Data;
-using System.Data.SqlClient;
-using System.IO;
 using Common.Log;
 using Dapper;
 using MarginTrading.TradingHistory.Core.Extensions;
+using Microsoft.Data.SqlClient;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
 {

@@ -1,17 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <Version>1.13.15</Version>
     <AssemblyName>MarginTrading.TradingHistory.TestClient</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.TestClient</RootNamespace>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>latest</LangVersion>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+    <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Lykke.HttpClientGenerator" Version="2.3.0" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Lykke.HttpClientGenerator" Version="2.5.0" />
     <PackageReference Include="MarginTrading.TradingHistory.Client" Version="3.4.8" />
-    <PackageReference Include="Moq" Version="4.8.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Moq" Version="4.13.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MarginTrading.TradingHistory.SqlRepositories\MarginTrading.TradingHistory.SqlRepositories.csproj" />

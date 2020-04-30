@@ -2,12 +2,14 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AzureStorage.Tables;
 using Common.Log;
 using JetBrains.Annotations;
+using Microsoft.OpenApi.Models;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
@@ -34,13 +36,15 @@ using LogEntity = Lykke.Logs.LogEntity;
 using Microsoft.Extensions.Logging;
 using Lykke.Snow.Common.Startup.Hosting;
 using Lykke.Snow.Common.Startup.Log;
+using MarginTrading.TradingHistory.Settings.ServiceSettings;
 
 namespace MarginTrading.TradingHistory
 {
     public class Startup
     {
+        private IReloadingManager<AppSettings> _mtSettingsManager;
         public IHostingEnvironment Environment { get; }
-        public IContainer ApplicationContainer { get; private set; }
+        public ILifetimeScope ApplicationContainer { get; private set; }
         public IConfigurationRoot Configuration { get; }
         public ILog Log { get; private set; }
 
@@ -57,41 +61,34 @@ namespace MarginTrading.TradingHistory
             Environment = env;
         }
 
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             try
             {
-                services.AddMvc()
-                    .AddJsonOptions(options =>
+                services
+                    .AddControllers()
+                    .AddNewtonsoftJson(options =>
                     {
                         options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                     });
                 
-                var appSettings = Configuration.LoadSettings<AppSettings>(
+                _mtSettingsManager = Configuration.LoadSettings<AppSettings>(
                     throwExceptionOnCheckError: !Configuration.NotThrowExceptionsOnServiceValidation());
                 
-                services.AddApiKeyAuth(appSettings.CurrentValue.TradingHistoryClient);
+                services.AddApiKeyAuth(_mtSettingsManager.CurrentValue.TradingHistoryClient);
 
                 services.AddSwaggerGen(options =>
                 {
                     options.DefaultLykkeConfiguration("v1", "TradingHistory API");
-                    if (!string.IsNullOrWhiteSpace(appSettings.CurrentValue.TradingHistoryClient?.ApiKey))
+                    if (!string.IsNullOrWhiteSpace(_mtSettingsManager.CurrentValue.TradingHistoryClient?.ApiKey))
                     {
-                        options.OperationFilter<ApiKeyHeaderOperationFilter>();
+                        options.AddApiKeyAwareness();
                     }
                 });
 
-                var builder = new ContainerBuilder();
-
-                Log = CreateLogWithSlack(Configuration, services, appSettings);
+                Log = CreateLogWithSlack(Configuration, services, _mtSettingsManager);
 
                 services.AddSingleton<ILoggerFactory>(x => new WebHostLoggerFactory(Log));
-
-                builder.RegisterModule(new ServiceModule(appSettings.Nested(x => x.TradingHistoryService), Log));
-                builder.Populate(services);
-                ApplicationContainer = builder.Build();
-
-                return new AutofacServiceProvider(ApplicationContainer);
             }
             catch (Exception ex)
             {
@@ -105,6 +102,8 @@ namespace MarginTrading.TradingHistory
         {
             try
             {
+                ApplicationContainer = app.ApplicationServices.GetAutofacRoot();
+                
                 if (env.IsDevelopment())
                 {
                     app.UseDeveloperExceptionPage();
@@ -121,17 +120,21 @@ namespace MarginTrading.TradingHistory
 #else
                 app.UseLykkeMiddleware(ServiceName, ex => new ErrorResponse {ErrorMessage = ex.Message});
 #endif
-                
+                app.UseRouting();
                 app.UseAuthentication();
-                app.UseMvc();
+                app.UseAuthorization();
+                app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                });
                 app.UseSwagger(c =>
                 {
-                    c.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
+                    c.PreSerializeFilters.Add((swagger, httpReq) =>
+                        swagger.Servers = new List<OpenApiServer> {
+                            new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}" }
+                        });
                 });
-                app.UseSwaggerUI(x =>
-                {
-                    x.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-                });
+                app.UseSwaggerUI(a => a.SwaggerEndpoint("/swagger/v1/swagger.json", "Trading Engine API Swagger"));
                 app.UseStaticFiles();
 
                 appLifetime.ApplicationStarted.Register(() => StartApplication().GetAwaiter().GetResult());
@@ -144,6 +147,11 @@ namespace MarginTrading.TradingHistory
                 throw;
             }
         }
+        
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            builder.RegisterModule(new ServiceModule(_mtSettingsManager.Nested(x => x.TradingHistoryService), Log));
+        }
 
         private async Task StartApplication()
         {
@@ -153,7 +161,7 @@ namespace MarginTrading.TradingHistory
 
                 await ApplicationContainer.Resolve<IStartupManager>().StartAsync();
 
-                await Program.Host.WriteLogsAsync(Environment, LogLocator.Log);
+                Program.AppHost.WriteLogs(Environment, LogLocator.Log);
 
                 await Log.WriteMonitorAsync("", $"Env: {Program.EnvInfo}", "Started");
             }

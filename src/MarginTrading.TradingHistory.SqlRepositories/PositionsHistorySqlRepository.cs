@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Common;
@@ -12,9 +11,9 @@ using Common.Log;
 using Dapper;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
-using MarginTrading.TradingHistory.Core.Extensions;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
+using Microsoft.Data.SqlClient;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
 {

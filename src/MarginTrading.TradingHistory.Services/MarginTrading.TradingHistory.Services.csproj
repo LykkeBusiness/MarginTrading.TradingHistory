@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>MarginTrading.TradingHistory.Services</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.Services</RootNamespace>
     <Version>1.13.15</Version>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.0" />
@@ -12,7 +12,6 @@
     <PackageReference Include="Lykke.SlackNotifications" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\client\MarginTrading.TradingHistory.Client\MarginTrading.TradingHistory.Client.csproj" />
     <ProjectReference Include="..\MarginTrading.TradingHistory.AzureRepositories\MarginTrading.TradingHistory.AzureRepositories.csproj" />
     <ProjectReference Include="..\MarginTrading.TradingHistory.Core\MarginTrading.TradingHistory.Core.csproj" />
   </ItemGroup>
