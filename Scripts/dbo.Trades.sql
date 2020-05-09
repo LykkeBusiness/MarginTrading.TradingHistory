@@ -38,3 +38,13 @@ BEGIN
 	ALTER TABLE [dbo].[Trades]
 	ADD ExternalOrderId nvarchar(64) NULL;
 END
+
+IF NOT EXISTS(
+        SELECT 'X'
+        FROM sys.indexes
+        WHERE name = 'IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume'
+          AND object_id = OBJECT_ID('dbo.Trades'))
+    BEGIN
+        CREATE UNIQUE INDEX IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume
+            ON Trades (Id, AccountId, AssetPairId, TradeTimestamp, Volume)
+    END;

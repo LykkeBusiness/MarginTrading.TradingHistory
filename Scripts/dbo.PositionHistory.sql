@@ -55,3 +55,13 @@ IF NOT EXISTS(SELECT 'X'
             INDEX IX_PositionsHistory_Base (Id, AccountId, AssetPairId)
         );
     END;
+    
+IF NOT EXISTS(
+    SELECT 'X'
+    FROM sys.indexes
+    WHERE name = 'IX_PositionHistory_Id_DealId_AccountId_AssetPairId_Direction_Volume_HistoryTimestamp'
+      AND object_id = OBJECT_ID('dbo.PositionsHistory'))
+BEGIN
+    CREATE UNIQUE INDEX IX_PositionHistory_Id_DealId_AccountId_AssetPairId_Direction_Volume_HistoryTimestamp
+        ON PositionsHistory (Id, DealId, AccountId, AssetPairId, Direction, Volume, HistoryTimestamp)
+END;

@@ -9,15 +9,18 @@ Below is the API description.
 2. Configure environment variables according to "Environment variables" section.
 3. Put secrets.json with endpoint data including the certificate:
 ```json
-"Kestrel": {
-  "EndPoints": {
-    "HttpsInlineCertFile": {
-      "Url": "https://*:5041",
-      "Certificate": {
-        "Path": "<path to .pfx file>",
-        "Password": "<certificate password>"
+{
+  "Kestrel": {
+    "EndPoints": {
+      "HttpsInlineCertFile": {
+        "Url": "https://*:5041",
+        "Certificate": {
+          "Path": "<path to .pfx file>",
+          "Password": "<certificate password>"
+        }
       }
     }
+  }
 }
 ```
 4. Initialize all dependencies.

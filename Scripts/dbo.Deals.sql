@@ -31,3 +31,13 @@ IF NOT EXISTS(SELECT 'X'
             INDEX IX_Deals_Base (DealId, AccountId, AssetPairId, Created)
         );
     END;
+    
+IF NOT EXISTS(
+    SELECT 'X'
+    FROM sys.indexes
+    WHERE name = 'IX_Deals_DealId_AccountId_AssetPairId_Direction_Volume_Created'
+      AND object_id = OBJECT_ID('dbo.Deals'))
+BEGIN
+    CREATE UNIQUE INDEX IX_Deals_DealId_AccountId_AssetPairId_Direction_Volume_Created
+        ON Deals (DealId, AccountId, AssetPairId, Direction, Volume, Created)
+END;
