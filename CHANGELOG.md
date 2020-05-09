@@ -11,9 +11,10 @@ with cte as (
            Id,
            AccountId,
            AssetPairId,
-           OrderCreatedDate,
+           TradeTimestamp,
+           Volume,
            ROW_NUMBER()
-                   over (partition by Id, AccountId, AssetPairId, OrderCreatedDate order by Id, AccountId, AssetPairId, OrderCreatedDate) row_num
+                   over (partition by Id, AccountId, AssetPairId, TradeTimestamp, Volume order by Id, AccountId, AssetPairId, TradeTimestamp, Volume) row_num
     from Trades)
 delete
 from cte
@@ -21,8 +22,8 @@ where row_num > 1
 go
 
 
-create unique index IX_Trades_Id_AccountId_AssetPairId_OrderCreatedDate
-	on Trades (Id, AccountId, AssetPairId, OrderCreatedDate)
+create unique index IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume
+	on Trades (Id, AccountId, AssetPairId, TradeTimestamp, Volume)
 go
 
 -- Update Deals table
@@ -49,6 +50,7 @@ go
 -- Update PositionHistory
 with cte as (
     select OID,
+           Id,
            DealId,
            AccountId,
            AssetPairId,
@@ -56,15 +58,14 @@ with cte as (
            Volume,
            HistoryTimestamp,
            row_number()
-                   over (partition by DealId, AccountId, AssetPairId, Direction, Volume, HistoryTimestamp order by DealId, AccountId, AssetPairId, Direction, Volume, HistoryTimestamp) row_num
+                   over (partition by Id, DealId, AccountId, AssetPairId, Direction, Volume, HistoryTimestamp order by Id, DealId, AccountId, AssetPairId, Direction, Volume, HistoryTimestamp) row_num
     from PositionsHistory)
 delete
 from cte
 where row_num > 1
 go
 
-create unique index IX_PositionHistory_DealId_AccountId_AssetPairId_Direction_Volume_HistoryTimestamp
-	on PositionsHistory (DealId, AccountId, AssetPairId, Direction, Volume, HistoryTimestamp)
+create unique index IX_PositionHistory_Id_DealId_AccountId_AssetPairId_Direction_Volume_HistoryTimestamp
+	on PositionsHistory (Id, DealId, AccountId, AssetPairId, Direction, Volume, HistoryTimestamp)
 go
-
 ```
