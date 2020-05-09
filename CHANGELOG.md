@@ -1,4 +1,4 @@
-## 1.13.15 (TBD)
+## 1.14.1 (May 11, 2020)
 
 * BUGS-1635 (TBD): Trades duplication
 
