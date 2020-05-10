@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>MarginTrading.TradingHistory.Services</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.Services</RootNamespace>
-    <Version>1.14.0</Version>
+    <Version>1.14.1</Version>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
