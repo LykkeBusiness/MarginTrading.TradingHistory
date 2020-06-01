@@ -12,15 +12,14 @@ using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Services;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace MarginTrading.TradingHistory.OrderHistoryBroker
 {
     [UsedImplicitly]
     public class Startup : BrokerStartupBase<DefaultBrokerApplicationSettings<Settings>, Settings>
     {
-        public Startup(IHostingEnvironment env) : base(env)
+        public Startup(IHostEnvironment env) : base(env)
         {
         }
 
