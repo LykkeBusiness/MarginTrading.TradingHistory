@@ -37,20 +37,23 @@ using Microsoft.Extensions.Logging;
 using Lykke.Snow.Common.Startup.Hosting;
 using Lykke.Snow.Common.Startup.Log;
 using MarginTrading.TradingHistory.Settings.ServiceSettings;
+using Microsoft.Extensions.Hosting;
+using IApplicationLifetime = Microsoft.AspNetCore.Hosting.IApplicationLifetime;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace MarginTrading.TradingHistory
 {
     public class Startup
     {
         private IReloadingManager<AppSettings> _mtSettingsManager;
-        public IHostingEnvironment Environment { get; }
+        public IHostEnvironment Environment { get; }
         public ILifetimeScope ApplicationContainer { get; private set; }
         public IConfigurationRoot Configuration { get; }
         public ILog Log { get; private set; }
 
         public static string ServiceName { get; } = PlatformServices.Default.Application.ApplicationName;
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IHostEnvironment env)
         {
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
