@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>MarginTrading.TradingHistory.AzureRepositories</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.AzureRepositories</RootNamespace>
-    <Version>1.14.4</Version>
+    <Version>1.14.5</Version>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
