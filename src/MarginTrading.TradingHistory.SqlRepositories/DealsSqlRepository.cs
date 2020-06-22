@@ -20,6 +20,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
     public class DealsSqlRepository : IDealsRepository
     {
         private const string ViewName = "[dbo].[V_DealsWithCommissionParams]";
+        private const string TableName = "[dbo].[Deals]";
 
         private readonly string _connectionString;
 
@@ -130,6 +131,24 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 
                 var query = $"SELECT * FROM {ViewName} {clause}";
                 return await conn.QueryAsync<DealWithCommissionParamsEntity>(query, 
+                    new {accountId, assetPairId, closeTimeStart, closeTimeEnd});
+            }
+        }
+
+        public async Task<decimal> GetTotalPnlAsync(string accountId, string assetPairId, DateTime? closeTimeStart = null,
+            DateTime? closeTimeEnd = null)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                var whereClause = "WHERE 1=1 "
+                             + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId = @accountId")
+                             + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId = @assetPairId")
+                             + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
+                             + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
+                
+                var query = $"SELECT SUM(Fpl) FROM {TableName} {whereClause}";
+
+                return await conn.QuerySingleOrDefaultAsync<decimal>(query,
                     new {accountId, assetPairId, closeTimeStart, closeTimeEnd});
             }
         }

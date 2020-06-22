@@ -45,6 +45,22 @@ namespace MarginTrading.TradingHistory.Controllers
             return data.Where(d => d != null).Select(Convert).ToList();
         }
 
+        /// <summary>
+        /// Get deals total PnL with optional filtering 
+        /// </summary>
+        /// <param name="accountId">The account id</param>
+        /// <param name="instrument">The instrument id</param>
+        /// <param name="closeTimeStart"></param>
+        /// <param name="closeTimeEnd"></param>
+        /// <returns></returns>
+        public async Task<decimal> GetTotalPnL([FromQuery] string accountId, [FromQuery] string instrument,
+            [FromQuery] DateTime? closeTimeStart = null, [FromQuery] DateTime? closeTimeEnd = null)
+        {
+            var data = await _dealsRepository.GetTotalPnlAsync(accountId, instrument, closeTimeStart, closeTimeEnd);
+
+            return data;
+        }
+
         /// <summary> 
         /// Get deals with optional filtering and pagination 
         /// </summary>
