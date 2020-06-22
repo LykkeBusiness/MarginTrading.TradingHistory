@@ -26,6 +26,14 @@ namespace MarginTrading.TradingHistory.Client
             [Query, CanBeNull] DateTime? closeTimeStart = null, [Query, CanBeNull] DateTime? closeTimeEnd = null);
         
         /// <summary> 
+        /// Get deals total PnL with optional filtering 
+        /// </summary> 
+        [Get("/api/deals/totalPnl")] 
+        Task<decimal> GetTotalPnL( 
+            [Query, CanBeNull] string accountId, [Query, CanBeNull] string instrument,
+            [Query, CanBeNull] DateTime? closeTimeStart = null, [Query, CanBeNull] DateTime? closeTimeEnd = null);
+        
+        /// <summary> 
         /// Get deals with optional filtering and pagination 
         /// </summary> 
         [Get("/api/deals/by-pages")] 

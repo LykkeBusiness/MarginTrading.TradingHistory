@@ -46,6 +46,12 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             throw new NotImplementedException();
         }
 
+        public async Task<decimal> GetTotalPnlAsync(string accountId, string assetPairId, DateTime? closeTimeStart = null,
+            DateTime? closeTimeEnd = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task AddAsync(IDeal obj)
         {
             return _tableStorage.InsertAsync(_convertService.Convert<IDeal, DealEntity>(obj));
