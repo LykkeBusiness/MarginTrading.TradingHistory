@@ -152,8 +152,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 
                 var query = $"SELECT SUM(Fpl) FROM {TableName} {whereClause}";
                 
-                _log.Info($"{nameof(GetTotalPnlAsync)} details", new {accountId, assetPairId, closeTimeStart, closeTimeEnd, query});
-
                 _log.WriteInfoAsync(nameof(DealsSqlRepository), nameof(GetTotalPnlAsync),
                     new
                     {
