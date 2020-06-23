@@ -22,8 +22,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories
     {
         private const string ViewName = "[dbo].[V_DealsWithCommissionParams]";
         private const string TableName = "[dbo].[Deals]";
-        private readonly ILog _log;
-
         private readonly string _connectionString;
 
         public static readonly List<string> DealInsertColumns = typeof(IDeal).GetProperties().Select(x => x.Name).ToList();
@@ -35,8 +33,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             connectionString.InitializeSqlObject("dbo.Deals.sql", log);
             connectionString.InitializeSqlObject("dbo.DealCommissionParams.sql", log);
             connectionString.InitializeSqlObject("dbo.V_DealsWithCommissionParams.sql", log);
-
-            _log = log;
         }
         
         public async Task<IDealWithCommissionParams> GetAsync(string id)
@@ -150,17 +146,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                              + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
                              + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
                 
-                var query = $"SELECT SUM(Fpl) FROM {TableName} {whereClause}";
-
-                _log.WriteInfoAsync(nameof(DealsSqlRepository), nameof(GetTotalPnlAsync),
-                    new
-                    {
-                        accountId,
-                        assetPairId,
-                        closeTimeStart,
-                        closeTimeEnd,
-                        query
-                    }.ToJson(), $"{nameof(GetTotalPnlAsync)} execution details");
+                var query = $"SELECT ISNULL(SUM(Fpl), 0) FROM {TableName} {whereClause}";
 
                 return await conn.QuerySingleOrDefaultAsync<decimal>(query,
                     new {accountId, assetPairId, closeTimeStart, closeTimeEnd});
