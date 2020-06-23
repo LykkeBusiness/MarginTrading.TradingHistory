@@ -154,6 +154,16 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 
                 _log.Info($"{nameof(GetTotalPnlAsync)} details", new {accountId, assetPairId, closeTimeStart, closeTimeEnd, query});
 
+                _log.WriteInfoAsync(nameof(DealsSqlRepository), nameof(GetTotalPnlAsync),
+                    new
+                    {
+                        accountId,
+                        assetPairId,
+                        closeTimeStart,
+                        closeTimeEnd,
+                        query
+                    }.ToJson(), $"{nameof(GetTotalPnlAsync)} execution details");
+
                 return await conn.QuerySingleOrDefaultAsync<decimal>(query,
                     new {accountId, assetPairId, closeTimeStart, closeTimeEnd});
             }
