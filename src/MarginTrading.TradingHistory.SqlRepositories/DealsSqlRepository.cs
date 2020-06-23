@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Dapper;
+using Lykke.Common.Log;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
@@ -21,6 +22,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
     {
         private const string ViewName = "[dbo].[V_DealsWithCommissionParams]";
         private const string TableName = "[dbo].[Deals]";
+        private readonly ILog _log;
 
         private readonly string _connectionString;
 
@@ -33,6 +35,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             connectionString.InitializeSqlObject("dbo.Deals.sql", log);
             connectionString.InitializeSqlObject("dbo.DealCommissionParams.sql", log);
             connectionString.InitializeSqlObject("dbo.V_DealsWithCommissionParams.sql", log);
+
+            _log = log;
         }
         
         public async Task<IDealWithCommissionParams> GetAsync(string id)
@@ -147,6 +151,16 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                              + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
                 
                 var query = $"SELECT SUM(Fpl) FROM {TableName} {whereClause}";
+
+                _log.WriteInfoAsync(nameof(DealsSqlRepository), nameof(GetTotalPnlAsync),
+                    new
+                    {
+                        accountId,
+                        assetPairId,
+                        closeTimeStart,
+                        closeTimeEnd,
+                        query
+                    }.ToJson(), $"{nameof(GetTotalPnlAsync)} execution details");
 
                 return await conn.QuerySingleOrDefaultAsync<decimal>(query,
                     new {accountId, assetPairId, closeTimeStart, closeTimeEnd});
