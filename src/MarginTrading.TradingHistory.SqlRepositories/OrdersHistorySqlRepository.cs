@@ -10,6 +10,7 @@ using Common.Log;
 using Dapper;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
+using MarginTrading.TradingHistory.Core.Extensions;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
 using Microsoft.Data.SqlClient;
@@ -83,54 +84,19 @@ OUTER APPLY (
 
         public OrdersHistorySqlRepository(string connectionString, ILog log)
         {
-            _connectionString = connectionString;
-            _log = log;
+            _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
+            _log = log ?? throw new ArgumentNullException(nameof(log));
 
             connectionString.InitializeSqlObject("dbo.OrdersHistory.sql", log);
         }
 
-        public async Task AddAsync(IOrderHistory order, ITrade trade)
+        public Task AddAsync(IOrderHistory order, ITrade trade)
         {
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                await conn.OpenAsync();
-                var transaction = conn.BeginTransaction();
-
-                try
-                {
-                    var orderHistoryEntity = OrderHistoryEntity.Create(order);
-                    await conn.ExecuteAsync(
-                        $"insert into {TableName} ({GetColumns}) values ({GetFields})",
-                        orderHistoryEntity,
-                        transaction);
-
-                    if (trade != null)
-                    {
-                        var tradeEntity = TradeEntity.Create(trade);
-                        await conn.ExecuteAsync(
-                            $"insert into {TradesSqlRepository.TableName} ({TradesSqlRepository.GetColumns}) values ({TradesSqlRepository.GetFields})",
-                            tradeEntity,
-                            transaction);
-                    }
-
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-
-                    var msg = $"Error {ex.Message} \n" +
-                              $"Entity <{nameof(IOrderHistory)}>: \n" +
-                              order.ToJson() + " \n" +
-                              $"Entity <{nameof(ITrade)}>: \n" +
-                              trade?.ToJson();
-
-                    _log?.WriteError(nameof(OrdersHistorySqlRepository), nameof(AddAsync),
-                        new Exception(msg));
-
-                    throw;
-                }
-            }
+            return TransactionWrapperExtensions.RunInTransactionAsync(
+                (conn, transaction) => DoAdd(conn, transaction, order, trade),
+                _connectionString,
+                RollbackExceptionHandler,
+                commitException => CommitExceptionHandler(commitException, order, trade));
         }
 
         public async Task<IEnumerable<IOrderHistoryWithAdditional>> GetHistoryAsync(string orderId,
@@ -208,6 +174,43 @@ OUTER APPLY (
                     totalSize: totalCount
                 );
             }
+        }
+        
+        private async Task DoAdd(SqlConnection conn, SqlTransaction transaction, IOrderHistory order, ITrade trade)
+        {
+            var orderHistoryEntity = OrderHistoryEntity.Create(order);
+            await conn.ExecuteAsync(
+                $"insert into {TableName} ({GetColumns}) values ({GetFields})",
+                orderHistoryEntity,
+                transaction);
+
+            if (trade != null)
+            {
+                var tradeEntity = TradeEntity.Create(trade);
+                await conn.ExecuteAsync(
+                    $"insert into {TradesSqlRepository.TableName} ({TradesSqlRepository.GetColumns}) values ({TradesSqlRepository.GetFields})",
+                    tradeEntity,
+                    transaction);
+            }
+        }
+        
+        private Task RollbackExceptionHandler(Exception exception)
+        {
+            var context =
+                $"An attempt to rollback transaction failed due to the following exception: {exception.Message}";
+
+            return _log.WriteErrorAsync(nameof(OrdersHistorySqlRepository), nameof(AddAsync), context, exception);
+        }
+
+        private Task CommitExceptionHandler(Exception exception, IOrderHistory order, ITrade trade)
+        {
+            var context = $"Error {exception.Message} \n" +
+                      $"Entity <{nameof(IOrderHistory)}>: \n" +
+                      order.ToJson() + " \n" +
+                      $"Entity <{nameof(ITrade)}>: \n" +
+                      trade?.ToJson();
+
+            return _log.WriteErrorAsync(nameof(OrdersHistorySqlRepository), nameof(AddAsync), context, exception);
         }
     }
 }
