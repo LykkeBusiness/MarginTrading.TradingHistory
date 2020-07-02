@@ -25,6 +25,8 @@ namespace MarginTrading.TradingHistory.Core.Extensions
             
             using (var conn = new SqlConnection(connectionString))
             {
+                await conn.OpenAsync();
+                
                 var transaction = conn.BeginTransaction(isolationLevel);
 
                 try
