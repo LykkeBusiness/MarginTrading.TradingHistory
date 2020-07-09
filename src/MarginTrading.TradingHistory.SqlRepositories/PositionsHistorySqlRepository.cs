@@ -52,29 +52,33 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
             if (deal != null)
             {
-                using (var conn = new SqlConnection(_connectionString))
+                Task.Run(async () =>
                 {
-                    try
+                    using (var conn = new SqlConnection(_connectionString))
                     {
-                        await conn.ExecuteAsync("[dbo].[SP_UpdateDealCommissionParamsOnDeal]",
-                            new
-                            {
-                                deal.DealId,
-                                deal.OpenTradeId,
-                                deal.OpenOrderVolume,
-                                deal.CloseTradeId,
-                                deal.CloseOrderVolume,
-                                deal.Volume,
-                            },
-                            commandType: CommandType.StoredProcedure);
+                        try
+                        {
+                            await conn.ExecuteAsync("[dbo].[SP_UpdateDealCommissionParamsOnDeal]",
+                                new
+                                {
+                                    deal.DealId,
+                                    deal.OpenTradeId,
+                                    deal.OpenOrderVolume,
+                                    deal.CloseTradeId,
+                                    deal.CloseOrderVolume,
+                                    deal.Volume,
+                                },
+                                commandType: CommandType.StoredProcedure);
+                        }
+                        catch (Exception e)
+                        {
+                            await _log.WriteErrorAsync(nameof(PositionsHistorySqlRepository),
+                                nameof(AddAsync),
+                                $"Failed to calculate commissions for the deal {deal.DealId}, skipping.", e);
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        await _log.WriteErrorAsync(nameof(PositionsHistorySqlRepository),
-                            nameof(AddAsync),
-                            $"Failed to calculate commissions for the deal {deal.DealId}, skipping.", e);
-                    }
-                }
+                });
+
             }
         }
 
