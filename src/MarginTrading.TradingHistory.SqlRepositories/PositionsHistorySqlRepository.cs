@@ -11,6 +11,7 @@ using Common.Log;
 using Dapper;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
+using MarginTrading.TradingHistory.Core.Extensions;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
 using Microsoft.Data.SqlClient;
@@ -32,8 +33,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
         public PositionsHistorySqlRepository(string connectionString, ILog log)
         {
-            _connectionString = connectionString;
-            _log = log;
+            _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
+            _log = log ?? throw new ArgumentNullException(nameof(log));
             
             connectionString.InitializeSqlObject("dbo.Deals.sql", log);
             connectionString.InitializeSqlObject("dbo.DealCommissionParams.sql", log);
@@ -43,109 +44,41 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
         public async Task AddAsync(IPositionHistory positionHistory, IDeal deal)
         {
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                if (conn.State == ConnectionState.Closed)
-                {
-                    await conn.OpenAsync();
-                }
-                var transaction = conn.BeginTransaction(IsolationLevel.Serializable);
+            await TransactionWrapperExtensions.RunInTransactionAsync(
+                (conn, transaction) => DoAdd(conn, transaction, positionHistory, deal),
+                _connectionString,
+                RollbackExceptionHandler,
+                commitException => CommitExceptionHandler(commitException, positionHistory, deal));
 
-                try
-                {
-                    var positionEntity = PositionsHistoryEntity.Create(positionHistory);
-                    await conn.ExecuteAsync($"insert into {TableName} ({GetColumns}) values ({GetFields})",
-                        positionEntity,
-                        transaction);
-
-                    if (deal != null)
-                    {
-                        var entity = DealEntity.Create(deal);
-
-                        await conn.ExecuteAsync($@"INSERT INTO [dbo].[Deals] 
-({string.Join(",", DealsSqlRepository.DealInsertColumns)}) 
-VALUES (@{string.Join(",@", DealsSqlRepository.DealInsertColumns)})",
-                            new
-                            {
-                                DealId = entity.DealId,
-                                Created = entity.Created,
-                                AccountId = entity.AccountId,
-                                AssetPairId = entity.AssetPairId,
-                                OpenTradeId = entity.OpenTradeId,
-                                OpenOrderType = entity.OpenOrderType,
-                                OpenOrderVolume = entity.OpenOrderVolume,
-                                OpenOrderExpectedPrice = entity.OpenOrderExpectedPrice,
-                                CloseTradeId = entity.CloseTradeId,
-                                CloseOrderType = entity.CloseOrderType,
-                                CloseOrderVolume = entity.CloseOrderVolume,
-                                CloseOrderExpectedPrice = entity.CloseOrderExpectedPrice,
-                                Direction = entity.Direction,
-                                Volume = entity.Volume,
-                                Originator = entity.Originator,
-                                OpenPrice = entity.OpenPrice,
-                                OpenFxPrice = entity.OpenFxPrice,
-                                ClosePrice = entity.ClosePrice,
-                                CloseFxPrice = entity.CloseFxPrice,
-                                Fpl = entity.Fpl,
-                                PnlOfTheLastDay = entity.PnlOfTheLastDay,
-                                AdditionalInfo = entity.AdditionalInfo,
-                            },
-                            transaction);
-
-                        await conn.ExecuteAsync("INSERT INTO [dbo].[DealCommissionParams] (DealId) VALUES (@DealId)",
-                            new {deal.DealId},
-                            transaction);
-                    }
-
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-
-                    var msg = $"Error {ex.Message} \n" +
-                              $"Entity <{nameof(IPositionHistory)}>: \n" +
-                              positionHistory.ToJson() + " \n" +
-                              $"Entity <{nameof(IDeal)}>: \n" +
-                              deal?.ToJson();
-                    
-                    await _log?.WriteErrorAsync(nameof(PositionsHistorySqlRepository), nameof(AddAsync), 
-                        new Exception(msg));
-                    
-                    throw;
-                }
-            }
-            
             if (deal != null)
             {
-#pragma warning disable 4014
                 Task.Run(async () =>
-#pragma warning restore 4014
                 {
-                    try
+                    using (var conn = new SqlConnection(_connectionString))
                     {
-                        using (var conn = new SqlConnection(_connectionString))
+                        try
                         {
                             await conn.ExecuteAsync("[dbo].[SP_UpdateDealCommissionParamsOnDeal]",
                                 new
                                 {
-                                    DealId = deal.DealId,
-                                    OpenTradeId = deal.OpenTradeId,
-                                    OpenOrderVolume = deal.OpenOrderVolume,
-                                    CloseTradeId = deal.CloseTradeId,
-                                    CloseOrderVolume = deal.CloseOrderVolume,
-                                    Volume = deal.Volume,
+                                    deal.DealId,
+                                    deal.OpenTradeId,
+                                    deal.OpenOrderVolume,
+                                    deal.CloseTradeId,
+                                    deal.CloseOrderVolume,
+                                    deal.Volume,
                                 },
                                 commandType: CommandType.StoredProcedure);
                         }
+                        catch (Exception e)
+                        {
+                            await _log.WriteErrorAsync(nameof(PositionsHistorySqlRepository),
+                                nameof(AddAsync),
+                                $"Failed to calculate commissions for the deal {deal.DealId}, skipping.", e);
+                        }
                     }
-                    catch (Exception exception)
-                    {
-                        await _log?.WriteErrorAsync(nameof(PositionsHistorySqlRepository), nameof(AddAsync), 
-                            new Exception($"Failed to calculate commissions for the deal {deal.DealId}, skipping.", 
-                                exception));
-                    }        
                 });
+
             }
         }
 
@@ -198,6 +131,71 @@ VALUES (@{string.Join(",@", DealsSqlRepository.DealInsertColumns)})",
                 
                 return objects.Cast<IPositionHistory>().ToList();
             }
+        }
+        
+        private async Task DoAdd(SqlConnection conn, SqlTransaction transaction, IPositionHistory positionHistory, IDeal deal)
+        {
+            var positionEntity = PositionsHistoryEntity.Create(positionHistory);
+            await conn.ExecuteAsync($"insert into {TableName} ({GetColumns}) values ({GetFields})",
+                positionEntity,
+                transaction);
+
+            if (deal != null)
+            {
+                var entity = DealEntity.Create(deal);
+
+                await conn.ExecuteAsync(
+                    $@"INSERT INTO [dbo].[Deals] ({string.Join(",", DealsSqlRepository.DealInsertColumns)}) VALUES (@{string.Join(",@", DealsSqlRepository.DealInsertColumns)})",
+                    new
+                    {
+                        entity.DealId,
+                        entity.Created,
+                        entity.AccountId,
+                        entity.AssetPairId,
+                        entity.OpenTradeId,
+                        entity.OpenOrderType,
+                        entity.OpenOrderVolume,
+                        entity.OpenOrderExpectedPrice,
+                        entity.CloseTradeId,
+                        entity.CloseOrderType,
+                        entity.CloseOrderVolume,
+                        entity.CloseOrderExpectedPrice,
+                        entity.Direction,
+                        entity.Volume,
+                        entity.Originator,
+                        entity.OpenPrice,
+                        entity.OpenFxPrice,
+                        entity.ClosePrice,
+                        entity.CloseFxPrice,
+                        entity.Fpl,
+                        entity.PnlOfTheLastDay,
+                        entity.AdditionalInfo,
+                    },
+                    transaction);
+
+                await conn.ExecuteAsync("INSERT INTO [dbo].[DealCommissionParams] (DealId) VALUES (@DealId)",
+                    new {deal.DealId},
+                    transaction);
+            }
+        }
+
+        private Task RollbackExceptionHandler(Exception exception)
+        {
+            var context =
+                $"An attempt to rollback transaction failed due to the following exception: {exception.Message}";
+
+            return _log.WriteErrorAsync(nameof(PositionsHistorySqlRepository), nameof(AddAsync), context, exception);
+        }
+
+        private Task CommitExceptionHandler(Exception exception, IPositionHistory positionHistory, IDeal deal)
+        {
+            var context = $"Error {exception.Message} \n" +
+                      $"Entity <{nameof(IPositionHistory)}>: \n" +
+                      positionHistory.ToJson() + " \n" +
+                      $"Entity <{nameof(IDeal)}>: \n" +
+                      deal?.ToJson();
+
+            return _log.WriteErrorAsync(nameof(PositionsHistorySqlRepository), nameof(AddAsync), context, exception);
         }
     }
 }
