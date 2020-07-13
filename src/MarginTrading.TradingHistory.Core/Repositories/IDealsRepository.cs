@@ -24,5 +24,9 @@ namespace MarginTrading.TradingHistory.Core.Repositories
         Task<IEnumerable<IDealWithCommissionParams>> GetAsync([CanBeNull] string accountId,
             [CanBeNull] string assetPairId,
             DateTime? closeTimeStart = null, DateTime? closeTimeEnd = null);
+            
+        Task<decimal> GetTotalPnlAsync([CanBeNull] string accountId,
+            [CanBeNull] string assetPairId,
+            DateTime? closeTimeStart = null, DateTime? closeTimeEnd = null);
     }
 }
