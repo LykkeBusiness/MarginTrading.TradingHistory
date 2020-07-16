@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Log;
 using Lykke.Common.ApiLibrary.Validation;
 using MarginTrading.TradingHistory.Client;
 using MarginTrading.TradingHistory.Client.Common;
@@ -25,12 +26,16 @@ namespace MarginTrading.TradingHistory.Controllers
     {
         private readonly IDealsRepository _dealsRepository;
         private readonly IConvertService _convertService;
+        private readonly ILog _log;
 
-        public DealsController(IDealsRepository dealsRepository,
-            IConvertService convertService)
+        public DealsController(
+            IDealsRepository dealsRepository,
+            IConvertService convertService, 
+            ILog log)
         {
             _dealsRepository = dealsRepository;
             _convertService = convertService;
+            _log = log;
         }
 
         /// <summary>
@@ -46,7 +51,7 @@ namespace MarginTrading.TradingHistory.Controllers
         }
 
         /// <summary>
-        /// Get deals total PnL with optional filtering 
+        /// Get deals total PnL with optional filtering by period
         /// </summary>
         /// <param name="accountId">The account id</param>
         /// <param name="instrument">The instrument id</param>
@@ -59,6 +64,55 @@ namespace MarginTrading.TradingHistory.Controllers
             [FromQuery] DateTime? closeTimeStart = null, [FromQuery] DateTime? closeTimeEnd = null)
         {
             var totalPnl = await _dealsRepository.GetTotalPnlAsync(accountId, instrument, closeTimeStart, closeTimeEnd);
+
+            return new TotalPnlContract {Value = totalPnl};
+        }
+
+        /// <summary>
+        /// Get deals total PnL with optional filtering by set of days
+        /// </summary>
+        /// <param name="accountId">The account id</param>
+        /// <param name="instrument">The instrument id</param>
+        /// <param name="days">The days array</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("totalPnl/days")]
+        public async Task<TotalPnlContract> GetTotalPnL(string accountId, string instrument, DateTime[] days)
+        {
+            if (string.IsNullOrEmpty(accountId))
+            {
+                await _log.WriteWarningAsync(
+                    nameof(DealsController), 
+                    nameof(GetTotalPnL), 
+                    null,
+                    $"{nameof(accountId)} value is not valid");
+                
+                return TotalPnlContract.Empty();
+            }
+
+            if (string.IsNullOrEmpty(instrument))
+            {
+                await _log.WriteWarningAsync(
+                    nameof(DealsController), 
+                    nameof(GetTotalPnL), 
+                    null,
+                    $"{nameof(instrument)} value is not valid");
+                
+                return TotalPnlContract.Empty();
+            }
+
+            if (days == null || days.Length == 0)
+            {
+                await _log.WriteWarningAsync(
+                    nameof(DealsController), 
+                    nameof(GetTotalPnL), 
+                    null,
+                    $"{nameof(days)} value is not valid");
+                
+                return TotalPnlContract.Empty();
+            }
+
+            var totalPnl = await _dealsRepository.GetTotalPnlAsync(accountId, instrument, days);
 
             return new TotalPnlContract {Value = totalPnl};
         }

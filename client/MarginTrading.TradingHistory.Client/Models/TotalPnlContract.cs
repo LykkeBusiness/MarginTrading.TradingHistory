@@ -15,5 +15,7 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// The value of total PnL
         /// </summary>
         public decimal Value { get; set; }
+
+        public static TotalPnlContract Empty() => new TotalPnlContract {Value = 0};
     }
 }
