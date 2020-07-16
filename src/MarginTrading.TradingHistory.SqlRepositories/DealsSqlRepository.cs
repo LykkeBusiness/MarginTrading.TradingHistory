@@ -4,12 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using Common;
 using Common.Log;
 using Dapper;
-using Lykke.Common.Log;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
@@ -150,6 +147,35 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
                 return await conn.QuerySingleOrDefaultAsync<decimal>(query,
                     new {accountId, assetPairId, closeTimeStart, closeTimeEnd});
+            }
+        }
+
+        public async Task<decimal> GetTotalPnlAsync(string accountId, string assetPairId, DateTime[] days)
+        {
+            if (string.IsNullOrEmpty(accountId))
+                throw new ArgumentNullException(nameof(accountId));
+            
+            if (string.IsNullOrEmpty(assetPairId))
+                throw new ArgumentNullException(nameof(assetPairId));
+            
+            if (days == null || days.Length == 0)
+                throw new ArgumentNullException(nameof(days));
+            
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                var whereClause = "WHERE AccountId = @accountId" 
+                                  + " AND AssetPairId = @assetPairId" 
+                                  + " AND EXISTS (SELECT 1 FROM @days WHERE [day] = CAST([Created] as DATE))";
+
+                var daysInsertionSql = string.Join(
+                    "\r\n",
+                    days.Select(d => $"INSERT INTO @days VALUES('{d:yyyy-MM-dd}');"));
+
+                var query = $"DECLARE @days TABLE (day Date);" 
+                            + daysInsertionSql
+                            + $"SELECT ISNULL(SUM(Fpl), 0) FROM {TableName} {whereClause}";
+
+                return await conn.QuerySingleOrDefaultAsync<decimal>(query, new {accountId, assetPairId});
             }
         }
     }
