@@ -77,7 +77,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("totalPnl/days")]
-        public async Task<TotalPnlContract> GetTotalPnL(string accountId, string instrument, DateTime[] days)
+        public async Task<TotalPnlContract> GetTotalPnL(string accountId, DateTime[] days)
         {
             if (string.IsNullOrEmpty(accountId))
             {
@@ -86,17 +86,6 @@ namespace MarginTrading.TradingHistory.Controllers
                     nameof(GetTotalPnL), 
                     null,
                     $"{nameof(accountId)} value is not valid");
-                
-                return TotalPnlContract.Empty();
-            }
-
-            if (string.IsNullOrEmpty(instrument))
-            {
-                await _log.WriteWarningAsync(
-                    nameof(DealsController), 
-                    nameof(GetTotalPnL), 
-                    null,
-                    $"{nameof(instrument)} value is not valid");
                 
                 return TotalPnlContract.Empty();
             }
@@ -112,7 +101,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 return TotalPnlContract.Empty();
             }
 
-            var totalPnl = await _dealsRepository.GetTotalPnlAsync(accountId, instrument, days);
+            var totalPnl = await _dealsRepository.GetTotalPnlAsync(accountId, days);
 
             return new TotalPnlContract {Value = totalPnl};
         }

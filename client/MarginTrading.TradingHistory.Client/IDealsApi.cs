@@ -39,13 +39,11 @@ namespace MarginTrading.TradingHistory.Client
         /// Get deals total PnL with filtering by set of days
         /// </summary>
         /// <param name="accountId">The account id</param>
-        /// <param name="instrument">The instrument id</param>
         /// <param name="days">The days array</param>
         /// <returns></returns>
         [Get("/api/deals/totalPnl/days")]
         Task<TotalPnlContract> GetTotalPnL(
-            [Query] string accountId, 
-            [Query] string instrument, 
+            [Query] string accountId,
             [Query(CollectionFormat.Multi)] DateTime[] days);
         
         /// <summary> 
