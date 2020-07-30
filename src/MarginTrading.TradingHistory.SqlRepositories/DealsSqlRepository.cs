@@ -18,7 +18,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
     public class DealsSqlRepository : IDealsRepository
     {
         private const string ViewName = "[dbo].[V_DealsWithCommissionParams]";
-        private const string TableName = "[dbo].[    ]";
+        private const string TableName = "[dbo].[Deals]";
         private readonly string _connectionString;
 
         public static readonly List<string> DealInsertColumns = typeof(IDeal).GetProperties().Select(x => x.Name).ToList();
