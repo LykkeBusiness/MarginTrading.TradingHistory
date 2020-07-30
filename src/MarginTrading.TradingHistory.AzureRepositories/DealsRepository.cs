@@ -52,7 +52,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             throw new NotImplementedException();
         }
 
-        public async Task<decimal> GetTotalPnlAsync(string accountId, string assetPairId, DateTime[] days)
+        public async Task<decimal> GetTotalPnlAsync(string accountId, DateTime[] days)
         {
             throw new NotImplementedException();
         }

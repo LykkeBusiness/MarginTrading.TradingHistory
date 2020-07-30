@@ -18,7 +18,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
     public class DealsSqlRepository : IDealsRepository
     {
         private const string ViewName = "[dbo].[V_DealsWithCommissionParams]";
-        private const string TableName = "[dbo].[Deals]";
+        private const string TableName = "[dbo].[    ]";
         private readonly string _connectionString;
 
         public static readonly List<string> DealInsertColumns = typeof(IDeal).GetProperties().Select(x => x.Name).ToList();
@@ -150,32 +150,19 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public async Task<decimal> GetTotalPnlAsync(string accountId, string assetPairId, DateTime[] days)
+        public async Task<decimal> GetTotalPnlAsync(string accountId, DateTime[] days)
         {
             if (string.IsNullOrEmpty(accountId))
                 throw new ArgumentNullException(nameof(accountId));
-            
-            if (string.IsNullOrEmpty(assetPairId))
-                throw new ArgumentNullException(nameof(assetPairId));
-            
+
             if (days == null || days.Length == 0)
                 throw new ArgumentNullException(nameof(days));
             
             using (var conn = new SqlConnection(_connectionString))
             {
-                var whereClause = "WHERE AccountId = @accountId" 
-                                  + " AND AssetPairId = @assetPairId" 
-                                  + " AND EXISTS (SELECT 1 FROM @days WHERE [day] = CAST([Created] as DATE))";
+                var query = $"SELECT ISNULL(SUM(Fpl), 0) FROM {TableName} WHERE AccountId = @accountId AND CAST([Created] as DATE) IN @days";
 
-                var daysInsertionSql = string.Join(
-                    "\r\n",
-                    days.Select(d => $"INSERT INTO @days VALUES('{d:yyyy-MM-dd}');"));
-
-                var query = $"DECLARE @days TABLE (day Date);" 
-                            + daysInsertionSql
-                            + $"SELECT ISNULL(SUM(Fpl), 0) FROM {TableName} {whereClause}";
-
-                return await conn.QuerySingleOrDefaultAsync<decimal>(query, new {accountId, assetPairId});
+                return await conn.QuerySingleOrDefaultAsync<decimal>(query, new {accountId, days});
             }
         }
     }
