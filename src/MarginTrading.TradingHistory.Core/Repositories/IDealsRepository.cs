@@ -29,6 +29,6 @@ namespace MarginTrading.TradingHistory.Core.Repositories
             [CanBeNull] string assetPairId,
             DateTime? closeTimeStart = null, DateTime? closeTimeEnd = null);
         
-        Task<decimal> GetTotalPnlAsync(string accountId, DateTime[] days);
+        Task<decimal> GetTotalProfitAsync(string accountId, DateTime[] days);
     }
 }
