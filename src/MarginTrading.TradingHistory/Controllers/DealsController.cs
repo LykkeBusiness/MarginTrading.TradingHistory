@@ -69,41 +69,40 @@ namespace MarginTrading.TradingHistory.Controllers
         }
 
         /// <summary>
-        /// Get deals total PnL with optional filtering by set of days
+        /// Get total profit of deals with filtering by set of days
         /// </summary>
         /// <param name="accountId">The account id</param>
-        /// <param name="instrument">The instrument id</param>
         /// <param name="days">The days array</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("totalPnl/days")]
-        public async Task<TotalPnlContract> GetTotalPnL(string accountId, DateTime[] days)
+        [Route("totalProfit")]
+        public async Task<TotalProfitContract> GetTotalProfit(string accountId, DateTime[] days)
         {
             if (string.IsNullOrEmpty(accountId))
             {
                 await _log.WriteWarningAsync(
                     nameof(DealsController), 
-                    nameof(GetTotalPnL), 
+                    nameof(GetTotalProfit), 
                     null,
                     $"{nameof(accountId)} value is not valid");
                 
-                return TotalPnlContract.Empty();
+                return TotalProfitContract.Empty();
             }
 
             if (days == null || days.Length == 0)
             {
                 await _log.WriteWarningAsync(
                     nameof(DealsController), 
-                    nameof(GetTotalPnL), 
+                    nameof(GetTotalProfit), 
                     null,
                     $"{nameof(days)} value is not valid");
                 
-                return TotalPnlContract.Empty();
+                return TotalProfitContract.Empty();
             }
 
-            var totalPnl = await _dealsRepository.GetTotalPnlAsync(accountId, days);
+            var totalProfit = await _dealsRepository.GetTotalProfitAsync(accountId, days);
 
-            return new TotalPnlContract {Value = totalPnl};
+            return new TotalProfitContract {Value = totalProfit};
         }
 
         /// <summary> 

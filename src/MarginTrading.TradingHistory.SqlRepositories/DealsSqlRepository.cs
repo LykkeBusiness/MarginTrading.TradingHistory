@@ -150,7 +150,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public async Task<decimal> GetTotalPnlAsync(string accountId, DateTime[] days)
+        public async Task<decimal> GetTotalProfitAsync(string accountId, DateTime[] days)
         {
             if (string.IsNullOrEmpty(accountId))
                 throw new ArgumentNullException(nameof(accountId));
@@ -160,8 +160,13 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             
             using (var conn = new SqlConnection(_connectionString))
             {
-                var query = $"SELECT ISNULL(SUM(Fpl), 0) FROM {TableName} WHERE AccountId = @accountId AND CAST([Created] as DATE) IN @days";
-
+                var query =
+                    $"SELECT ISNULL(SUM(p.[Value]),0) " +
+                    $"FROM (SELECT SUM(Fpl) as [Value] FROM {TableName} " +
+                    $"WHERE AccountId = @accountId AND CAST([Created] as DATE) IN @days " +
+                    $"GROUP BY CAST([Created] as DATE) " +
+                    $"HAVING SUM(Fpl) >  0) as p";
+                    
                 return await conn.QuerySingleOrDefaultAsync<decimal>(query, new {accountId, days});
             }
         }
