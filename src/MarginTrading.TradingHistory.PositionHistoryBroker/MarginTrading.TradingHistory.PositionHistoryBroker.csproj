@@ -7,7 +7,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Version>1.14.9</Version>
+    <Version>2.0.0</Version>
     <LangVersion>latest</LangVersion>
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
@@ -32,7 +32,7 @@
     <PackageReference Include="Lykke.SettingsReader" Version="5.3.0" />
     <PackageReference Include="Lykke.MarginTrading.BrokerBase" Version="3.3.0" />
     <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.5" />
-    <PackageReference Include="Lykke.MarginTrading.BackendSnow.Contracts" Version="1.14.0" />
+    <PackageReference Include="Lykke.MarginTrading.BackendSnow.Contracts" Version="1.19.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="3.1.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.4" />

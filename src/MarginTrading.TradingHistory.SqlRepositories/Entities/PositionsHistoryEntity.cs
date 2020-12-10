@@ -60,6 +60,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public string HistoryType { get; set; }
 
         public DateTime HistoryTimestamp { get; set; }
+        public bool ForceOpen { get; set; }
 
         List<RelatedOrderInfo> IPositionHistory.RelatedOrders => string.IsNullOrEmpty(RelatedOrders)
             ? new List<RelatedOrderInfo>()
@@ -125,6 +126,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 TradingConditionId = history.TradingConditionId,
                 Volume = history.Volume,
                 HistoryTimestamp = history.HistoryTimestamp,
+                ForceOpen = history.ForceOpen
             };
         }
     }
