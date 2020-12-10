@@ -12,7 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Lykke.Common" Version="7.5.0" />
-    <PackageReference Include="Lykke.MarginTrading.BackendSnow.Contracts" Version="1.14.0" />
+    <PackageReference Include="Lykke.MarginTrading.BackendSnow.Contracts" Version="1.19.0" />
     <PackageReference Include="Lykke.SlackNotifications" Version="2.0.0" />
     <PackageReference Include="AutoMapper" Version="7.0.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="2.0.0" />

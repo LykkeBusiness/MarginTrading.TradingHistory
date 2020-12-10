@@ -137,6 +137,7 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                 AdditionalInfo = positionHistoryEvent.PositionSnapshot.AdditionalInfo,
                 HistoryType = positionHistoryEvent.EventType.ToType<PositionHistoryType>(),
                 HistoryTimestamp = positionHistoryEvent.Timestamp,
+                ForceOpen = positionHistoryEvent.PositionSnapshot.ForceOpen
             };
         }
     }

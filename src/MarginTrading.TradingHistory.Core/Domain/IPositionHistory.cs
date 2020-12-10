@@ -53,5 +53,6 @@ namespace MarginTrading.TradingHistory.Core.Domain
         string AdditionalInfo { get; }
         PositionHistoryType HistoryType { get; }
         DateTime HistoryTimestamp { get; }
+        bool ForceOpen { get; }
     }
 }
