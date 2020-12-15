@@ -11,6 +11,8 @@ using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
+using MarginTrading.TradingHistory.Mappers;
+using MarginTrading.TradingHistory.SqlRepositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,10 +26,12 @@ namespace MarginTrading.TradingHistory.Controllers
     public class OrderEventsController : Controller, IOrderEventsApi
     {
         private readonly IOrdersHistoryRepository _ordersHistoryRepository;
+        private readonly OrderHistoryForSupportQuery _orderHistoryForSupportQuery;
         
-        public OrderEventsController(IOrdersHistoryRepository ordersHistoryRepository)
+        public OrderEventsController(IOrdersHistoryRepository ordersHistoryRepository, OrderHistoryForSupportQuery orderHistoryForSupportQuery)
         {
             _ordersHistoryRepository = ordersHistoryRepository;
+            _orderHistoryForSupportQuery = orderHistoryForSupportQuery;
         }
 
         /// <summary>
@@ -65,6 +69,20 @@ namespace MarginTrading.TradingHistory.Controllers
                 size: data.Size,
                 totalSize: data.TotalSize
             );
+        }
+
+        [HttpPost("/api/order-events/for-support")]
+        public async Task<PaginatedResponseContract<OrderEventForSupportContract>> OrderHistoryForSupport([FromBody]OrderEventsForSupportRequest request)
+        {
+            ApiValidationHelper.ValidatePagingParams(request.Skip, request.Take);
+
+            var result = await _orderHistoryForSupportQuery.Ask(request.FromContract());
+            var items = result.Contents.Select(p => p.ToContract()).ToList();
+
+            return new PaginatedResponseContract<OrderEventForSupportContract>(contents: items,
+                start: result.Start, 
+                size: result.Size, 
+                totalSize: result.TotalSize);
         }
 
         /// <summary>

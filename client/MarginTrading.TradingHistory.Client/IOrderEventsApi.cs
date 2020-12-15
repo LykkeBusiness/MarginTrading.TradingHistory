@@ -25,6 +25,10 @@ namespace MarginTrading.TradingHistory.Client
             [Query] [CanBeNull] int? skip = 0,
             [Query] [CanBeNull] int? take = 20,
             [Query] bool isAscending = false);
+        
+        [Post("/api/order-events/for-support")]
+        Task<PaginatedResponseContract<OrderEventForSupportContract>> OrderHistoryForSupport(
+            [Body] OrderEventsForSupportRequest request);
 
         /// <summary>
         /// Get order by Id, optionally including related orders.
