@@ -94,6 +94,8 @@ namespace MarginTrading.TradingHistory.Modules
                 builder.RegisterInstance(new DealsSqlRepository(
                         _settings.CurrentValue.Db.HistoryConnString, _log))
                     .As<IDealsRepository>();
+
+                builder.RegisterInstance(new OrderHistoryForSupportQuery(_settings.CurrentValue.Db.HistoryConnString));
             }
             
             builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();
