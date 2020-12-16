@@ -34,7 +34,8 @@ namespace MarginTrading.TradingHistory.Mappers
                 CreatedTimestampTo = source.CreatedTimestampTo,
                 ExecutedTimestampFrom = source.ExecutedTimestampFrom,
                 ExecutedTimestampTo = source.ExecutedTimestampTo,
-                Id = source.Id
+                Id = source.Id,
+                IsAscending = source.IsAscending
             };
         }        
         

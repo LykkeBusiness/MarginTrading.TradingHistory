@@ -51,9 +51,12 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             public int Skip { get; set; }
 
             public int Take { get; set; }
+
+            public bool IsAscending { get; set; }
         }
 
         private readonly string _connectionString;
+        private readonly int _executionTimeoutSeconds = 60;
 
         public OrderHistoryForSupportQuery(string connectionString)
         {
@@ -72,7 +75,8 @@ select
   oh.AssetPairId  as '{nameof(ResultItem.AssetPairId)}'
 from OrdersHistory oh, MarginTradingAccounts a 
 /**where**/
-order by oh.[Oid] offset @{nameof(Criterion.Skip)} ROWS FETCH NEXT @{nameof(Criterion.Take)} ROWS ONLY;
+/**orderby**/
+offset @{nameof(Criterion.Skip)} ROWS FETCH NEXT @{nameof(Criterion.Take)} ROWS ONLY;
 select count(*) from OrdersHistory oh, MarginTradingAccounts a /**where**/
 ";
 
@@ -81,10 +85,10 @@ select count(*) from OrdersHistory oh, MarginTradingAccounts a /**where**/
             var builder = new SqlBuilder();
             var selector = builder.AddTemplate(_template);
             var parameters = GetDynamicParameters(criterion);
-            FillSearchParams(parameters, builder, criterion);
+            FillParams(parameters, builder, criterion);
 
             using var connection = new SqlConnection(_connectionString);
-            using var reader = await connection.QueryMultipleAsync(selector.RawSql, parameters);
+            using var reader = await connection.QueryMultipleAsync(selector.RawSql, parameters, commandTimeout: _executionTimeoutSeconds);
 
             var items = await reader.ReadAsync<ResultItem>();
             var count = await reader.ReadSingleAsync<int>();
@@ -94,7 +98,7 @@ select count(*) from OrdersHistory oh, MarginTradingAccounts a /**where**/
             return result;
         }
 
-        private static void FillSearchParams(DynamicParameters parameters, SqlBuilder builder, Criterion criterion)
+        private static void FillParams(DynamicParameters parameters, SqlBuilder builder, Criterion criterion)
         {
             builder.Where("oh.AccountId = a.Id ");
             if (!string.IsNullOrEmpty(criterion.Id))
@@ -134,6 +138,15 @@ select count(*) from OrdersHistory oh, MarginTradingAccounts a /**where**/
                 var paramName = "PreparedPrice";
                 parameters.Add(paramName, $"%{criterion.ExecutionPrice}%");
                 builder.Where($"CONVERT(nvarchar(32), oh.ExecutionPrice) like @{paramName}");
+            }
+
+            if (criterion.IsAscending)
+            {
+                builder.OrderBy("oh.Oid asc");
+            }
+            else
+            {
+                builder.OrderBy("oh.Oid desc");
             }
         }
 
