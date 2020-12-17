@@ -69,5 +69,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public PositionHistoryType HistoryType { get; set; }
         [ValueSerializer(typeof(JsonStorageValueSerializer))]
         public DateTime HistoryTimestamp { get; set; }
+
+        public bool ForceOpen { get; set; }
     }
 }

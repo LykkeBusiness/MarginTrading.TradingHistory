@@ -52,6 +52,7 @@ IF NOT EXISTS(SELECT 'X'
             [HistoryType]            [nvarchar](64)   NULL,
             [DealInfo]               [nvarchar](MAX)  NULL,
             [HistoryTimestamp]       [datetime]       NULL,
+            [ForceOpen]              [bit]            NULL,
             INDEX IX_PositionsHistory_Base (Id, AccountId, AssetPairId)
         );
     END;
