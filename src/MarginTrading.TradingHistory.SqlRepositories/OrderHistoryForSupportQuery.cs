@@ -56,7 +56,6 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         }
 
         private readonly string _connectionString;
-        private readonly int _executionTimeoutSeconds = 60;
 
         public OrderHistoryForSupportQuery(string connectionString)
         {
@@ -88,7 +87,7 @@ select count(*) from OrdersHistory oh, MarginTradingAccounts a /**where**/
             FillParams(parameters, builder, criterion);
 
             using var connection = new SqlConnection(_connectionString);
-            using var reader = await connection.QueryMultipleAsync(selector.RawSql, parameters, commandTimeout: _executionTimeoutSeconds);
+            using var reader = await connection.QueryMultipleAsync(selector.RawSql, parameters);
 
             var items = await reader.ReadAsync<ResultItem>();
             var count = await reader.ReadSingleAsync<int>();
@@ -101,12 +100,7 @@ select count(*) from OrdersHistory oh, MarginTradingAccounts a /**where**/
         private static void FillParams(DynamicParameters parameters, SqlBuilder builder, Criterion criterion)
         {
             builder.Where("oh.AccountId = a.Id ");
-            if (!string.IsNullOrEmpty(criterion.Id))
-            {
-                var paramName = "PreparedId";
-                parameters.Add(paramName, $"%{criterion.Id}%");
-                builder.Where($"oh.Id like @{paramName}");
-            }
+
             if (criterion.ExecutedTimestampFrom != null)
             {
                 builder.Where($"oh.ExecutedTimestamp >= @{nameof(criterion.ExecutedTimestampFrom)}");
@@ -139,15 +133,14 @@ select count(*) from OrdersHistory oh, MarginTradingAccounts a /**where**/
                 parameters.Add(paramName, $"%{criterion.ExecutionPrice}%");
                 builder.Where($"CONVERT(nvarchar(32), oh.ExecutionPrice) like @{paramName}");
             }
+            if (!string.IsNullOrEmpty(criterion.Id))
+            {
+                var paramName = "PreparedId";
+                parameters.Add(paramName, $"%{criterion.Id}%");
+                builder.Where($"oh.Id like @{paramName}");
+            }
 
-            if (criterion.IsAscending)
-            {
-                builder.OrderBy("oh.Oid asc");
-            }
-            else
-            {
-                builder.OrderBy("oh.Oid desc");
-            }
+            builder.OrderBy(criterion.IsAscending ? "oh.Oid asc" : "oh.Oid desc");
         }
 
         private static DynamicParameters GetDynamicParameters(object criterion)
