@@ -163,9 +163,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 var query =
                     $"SELECT ISNULL(SUM(p.[Value]),0) " +
                     $"FROM (SELECT SUM(Fpl) as [Value] FROM {TableName} " +
-                    $"WHERE AccountId = @accountId AND CAST([Created] as DATE) IN @days " +
-                    $"GROUP BY CAST([Created] as DATE) " +
-                    $"HAVING SUM(Fpl) >  0) as p";
+                    $"WHERE AccountId = @accountId AND CAST([Created] as DATE) IN @days AND Fpl > 0" +
+                    $"GROUP BY CAST([Created] as DATE)) as p";
                     
                 return await conn.QuerySingleOrDefaultAsync<decimal>(query, new {accountId, days});
             }
