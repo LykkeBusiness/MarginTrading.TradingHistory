@@ -56,10 +56,12 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         }
 
         private readonly string _connectionString;
+        private readonly TimeSpan _executionTimeout;
 
-        public OrderHistoryForSupportQuery(string connectionString)
+        public OrderHistoryForSupportQuery(string connectionString, TimeSpan executionTimeout)
         {
             _connectionString = connectionString;
+            _executionTimeout = executionTimeout;
         }
 
         private readonly string _template = $@"
@@ -87,7 +89,7 @@ select count(*) from OrdersHistory oh, MarginTradingAccounts a /**where**/
             FillParams(parameters, builder, criterion);
 
             using var connection = new SqlConnection(_connectionString);
-            using var reader = await connection.QueryMultipleAsync(selector.RawSql, parameters);
+            using var reader = await connection.QueryMultipleAsync(selector.RawSql, parameters, commandTimeout: (int) _executionTimeout.TotalSeconds);
 
             var items = await reader.ReadAsync<ResultItem>();
             var count = await reader.ReadSingleAsync<int>();

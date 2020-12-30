@@ -95,7 +95,7 @@ namespace MarginTrading.TradingHistory.Modules
                         _settings.CurrentValue.Db.HistoryConnString, _log))
                     .As<IDealsRepository>();
 
-                builder.RegisterInstance(new OrderHistoryForSupportQuery(_settings.CurrentValue.Db.HistoryConnString));
+                builder.RegisterInstance(new OrderHistoryForSupportQuery(_settings.CurrentValue.Db.HistoryConnString, _settings.CurrentValue.Db.OrderHistoryForSupportExecutionTimeout));
             }
             
             builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();
