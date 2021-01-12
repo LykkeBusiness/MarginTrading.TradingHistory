@@ -46,7 +46,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
             public string ClientId { get; set; }
 
-            public string ExecutionPrice { get; set; }
+            public decimal? ExecutionPrice { get; set; }
 
             public int Skip { get; set; }
 
@@ -74,11 +74,12 @@ select
   oh.Volume  as '{nameof(ResultItem.Volume)}',
   oh.ExecutionPrice  as '{nameof(ResultItem.ExecutionPrice)}',
   oh.AssetPairId  as '{nameof(ResultItem.AssetPairId)}'
-from OrdersHistory oh, MarginTradingAccounts a 
+from OrdersHistory oh
+join MarginTradingAccounts a on oh.AccountId = a.Id 
 /**where**/
 /**orderby**/
 offset @{nameof(Criterion.Skip)} ROWS FETCH NEXT @{nameof(Criterion.Take)} ROWS ONLY;
-select count(*) from OrdersHistory oh, MarginTradingAccounts a /**where**/
+select count(*) from OrdersHistory oh join MarginTradingAccounts a on oh.AccountId = a.Id  /**where**/
 ";
 
         public async Task<PaginatedResponse<ResultItem>> Ask(Criterion criterion)
@@ -101,8 +102,6 @@ select count(*) from OrdersHistory oh, MarginTradingAccounts a /**where**/
 
         private static void FillParams(DynamicParameters parameters, SqlBuilder builder, Criterion criterion)
         {
-            builder.Where("oh.AccountId = a.Id ");
-
             if (criterion.ExecutedTimestampFrom != null)
             {
                 builder.Where($"oh.ExecutedTimestamp >= @{nameof(criterion.ExecutedTimestampFrom)}");
@@ -125,24 +124,18 @@ select count(*) from OrdersHistory oh, MarginTradingAccounts a /**where**/
             }
             if (!string.IsNullOrEmpty(criterion.ClientId))
             {
-                var paramName = "PreparedClientId";
-                parameters.Add(paramName, $"%{criterion.ClientId}%");
-                builder.Where($"a.ClientId like @{paramName}");
+                builder.Where($"a.ClientId = @{nameof(criterion.ClientId)}");
             }
-            if (!string.IsNullOrEmpty(criterion.ExecutionPrice))
+            if (criterion.ExecutionPrice != null)
             {
-                var paramName = "PreparedPrice";
-                parameters.Add(paramName, $"%{criterion.ExecutionPrice}%");
-                builder.Where($"CONVERT(nvarchar(32), oh.ExecutionPrice) like @{paramName}");
+                builder.Where($"oh.ExecutionPrice = {nameof(criterion.ExecutionPrice)}");
             }
             if (!string.IsNullOrEmpty(criterion.Id))
             {
-                var paramName = "PreparedId";
-                parameters.Add(paramName, $"%{criterion.Id}%");
-                builder.Where($"oh.Id like @{paramName}");
+                builder.Where($"oh.Id = @{nameof(criterion.Id)}");
             }
 
-            builder.OrderBy(criterion.IsAscending ? "oh.Oid asc" : "oh.Oid desc");
+            builder.OrderBy(criterion.IsAscending ? "oh.ExecutedTimestamp asc" : "oh.ExecutedTimestamp desc");
         }
 
         private static DynamicParameters GetDynamicParameters(object criterion)
