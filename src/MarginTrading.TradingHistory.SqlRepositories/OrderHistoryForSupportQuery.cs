@@ -118,7 +118,7 @@ select count(*) from OrdersHistory oh join MarginTradingAccounts a on oh.Account
             {
                 builder.Where($"oh.CreatedTimestamp < @{nameof(criterion.CreatedTimestampTo)}");
             }
-            if (criterion.AssetPairIds?.Any() ?? false)
+            if (criterion.AssetPairIds != null)
             {
                 builder.Where($"oh.AssetPairId in @{nameof(criterion.AssetPairIds)}");
             }
