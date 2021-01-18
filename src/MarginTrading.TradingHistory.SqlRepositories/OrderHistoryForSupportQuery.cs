@@ -128,7 +128,7 @@ select count(*) from OrdersHistory oh join MarginTradingAccounts a on oh.Account
             }
             if (criterion.ExecutionPrice != null)
             {
-                builder.Where($"oh.ExecutionPrice = {nameof(criterion.ExecutionPrice)}");
+                builder.Where($"oh.ExecutionPrice = @{nameof(criterion.ExecutionPrice)}");
             }
             if (!string.IsNullOrEmpty(criterion.Id))
             {
