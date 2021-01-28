@@ -38,7 +38,7 @@ namespace MarginTrading.TradingHistory.Client.Models
 
         public string ClientId { get; set; }
 
-        public string ExecutionPrice { get; set; }
+        public decimal? ExecutionPrice { get; set; }
 
         public int Skip { get; set; } = 0;
 

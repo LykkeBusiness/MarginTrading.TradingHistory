@@ -58,5 +58,6 @@ IF NOT EXISTS(SELECT 'X'
 
         CREATE INDEX IX_OrdersHistory_Child ON [dbo].[OrdersHistory]
             (ParentOrderId, Type) include (Id, Status, ExpectedOpenPrice, ModifiedTimestamp);
+        CREATE INDEX IX_OrdersHistory_ExecutedTimestamp ON OrdersHistory(ExecutedTimestamp DESC);
 
     END;
