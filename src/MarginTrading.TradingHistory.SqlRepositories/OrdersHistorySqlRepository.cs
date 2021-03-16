@@ -29,8 +29,8 @@ OUTER APPLY (
         TakeProfit = (
             SELECT TOP 1 Id, Type, ExpectedOpenPrice, Status, ModifiedTimestamp
             FROM OrdersHistory AS takeProfitHistory WITH (NOLOCK)
-            WHERE takeProfitHistory.ParentOrderID = history.ID AND takeProfitHistory.Type = 'TakeProfit'
-            ORDER BY ModifiedTimestamp DESC
+            WHERE takeProfitHistory.ParentOrderID = history.ID AND takeProfitHistory.Type = 'TakeProfit' and takeProfitHistory.ModifiedTimestamp >= history.ModifiedTimestamp
+            ORDER BY ModifiedTimestamp ASC
             FOR JSON AUTO
         )
 ) AS TakeProfit
@@ -39,8 +39,8 @@ OUTER APPLY (
         StopLoss = (
             SELECT TOP 1 Id, Type, ExpectedOpenPrice, Status, ModifiedTimestamp
             FROM OrdersHistory AS stopLossHistory WITH (NOLOCK)
-            WHERE stopLossHistory.ParentOrderID = history.ID AND stopLossHistory.Type in ('StopLoss','TrailingStop')
-            ORDER BY ModifiedTimestamp DESC
+            WHERE stopLossHistory.ParentOrderID = history.ID AND stopLossHistory.Type in ('StopLoss','TrailingStop') and stopLossHistory.ModifiedTimestamp >= history.ModifiedTimestamp
+            ORDER BY ModifiedTimestamp ASC
             FOR JSON AUTO
         )
 ) AS StopLoss
