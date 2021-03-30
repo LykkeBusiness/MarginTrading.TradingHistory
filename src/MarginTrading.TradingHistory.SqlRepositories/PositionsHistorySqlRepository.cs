@@ -38,7 +38,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             
             connectionString.InitializeSqlObject("dbo.Deals.sql", log);
             connectionString.InitializeSqlObject("dbo.DealCommissionParams.sql", log);
-            connectionString.InitializeSqlObject("dbo.SP_UpdateDealCommissionParamsOnDeal.sql", log);
+            connectionString.InitializeSqlObject("dbo.UpdateDealCommissionParamsOnDeal.sql", log);
             connectionString.InitializeSqlObject("dbo.PositionHistory.sql", log);
         }
 
@@ -58,7 +58,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                     {
                         try
                         {
-                            await conn.ExecuteAsync("[dbo].[SP_UpdateDealCommissionParamsOnDeal]",
+                            await conn.ExecuteAsync("[dbo].[UpdateDealCommissionParamsOnDeal]",
                                 new
                                 {
                                     deal.DealId,

@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE [dbo].[SP_UpdateDealCommissionParamsOnDeal](
+CREATE OR ALTER PROCEDURE [dbo].[UpdateDealCommissionParamsOnDeal](
                                                 @DealId [nvarchar](64),
                                                 @OpenTradeId [nvarchar](64),
                                                 @OpenOrderVolume [float],
@@ -11,7 +11,7 @@ BEGIN
     SET NOCOUNT ON;
 
     /*
-    CAUTION: similar calculation logic is duplicated here and in SP_UpdateDealCommissionParamsOnAccountHistory
+    CAUTION: similar calculation logic is duplicated here and in UpdateDealCommissionParamsOnAccountHistory
     */
     WITH selectedAccounts AS
              (
