@@ -27,10 +27,10 @@ namespace MarginTrading.TradingHistory.AzureRepositories
             _convertService = convertService;
         }
 
-        public async Task<List<IPositionHistory>> GetAsync(string accountId, string assetPairId)
+        public async Task<List<IPositionHistory>> GetAsync(string accountId, string assetPairId, DateTime? eventDate)
         {
             var predicate = new Func<PositionHistoryEntity, bool>(p =>
-                (string.IsNullOrEmpty(assetPairId) || p.AssetPairId == accountId));
+                (string.IsNullOrEmpty(assetPairId) || p.AssetPairId == accountId) && (eventDate == null || p.HistoryTimestamp == eventDate));
 
             return (string.IsNullOrEmpty(accountId)
                     ? await _tableStorage.GetDataAsync(predicate)
@@ -38,10 +38,10 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 .Cast<IPositionHistory>().ToList();
         }
 
-        public async Task<PaginatedResponse<IPositionHistory>> GetByPagesAsync(string accountId, string assetPairId, 
+        public async Task<PaginatedResponse<IPositionHistory>> GetByPagesAsync(string accountId, string assetPairId, DateTime? eventDate,
             int? skip = null, int? take = null)
         {
-            var allData = await GetAsync(accountId, assetPairId);
+            var allData = await GetAsync(accountId, assetPairId, eventDate);
 
             //TODO refactor before using azure impl
             var data = allData.OrderBy(x => x.HistoryTimestamp).ToList();

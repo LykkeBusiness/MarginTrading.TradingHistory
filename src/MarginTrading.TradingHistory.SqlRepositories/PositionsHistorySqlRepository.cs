@@ -52,7 +52,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
             if (deal != null)
             {
-                Task.Run(async () =>
+                Task.Run(async () =>    
                 {
                     using (var conn = new SqlConnection(_connectionString))
                     {
@@ -82,13 +82,14 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public async Task<List<IPositionHistory>> GetAsync(string accountId, string assetPairId)
+        public async Task<List<IPositionHistory>> GetAsync(string accountId, string assetPairId, DateTime? eventDate)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
                 var whereClause = "Where 1=1 " +
                                   (string.IsNullOrEmpty(accountId) ? "" : " And AccountId = @accountId") +
-                                  (string.IsNullOrEmpty(assetPairId) ? "" : " And AssetPairId = @assetPairId");
+                                  (string.IsNullOrEmpty(assetPairId) ? "" : " And AssetPairId = @assetPairId") +
+                                  (eventDate == null ? "" : " AND CONVERT(date, HistoryTimestamp)=@eventDate");
 
                 var query = $"SELECT * FROM {TableName} {whereClause}";
                 var objects = await conn.QueryAsync<PositionsHistoryEntity>(query, new {accountId, assetPairId});
@@ -97,19 +98,20 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public async Task<PaginatedResponse<IPositionHistory>> GetByPagesAsync(string accountId, string assetPairId, 
+        public async Task<PaginatedResponse<IPositionHistory>> GetByPagesAsync(string accountId, string assetPairId, DateTime? eventDate,
             int? skip = null, int? take = null)
         {
             var whereClause = " WHERE 1=1 "
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
-                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId");
+                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
+                              + (eventDate == null ? "" : " AND CONVERT(date, HistoryTimestamp)=@eventDate");
             
             using (var conn = new SqlConnection(_connectionString))
             {
                 var paginationClause = $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
                 var gridReader = await conn.QueryMultipleAsync(
                     $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
-                    new {accountId,  assetPairId});
+                    new {accountId,  assetPairId, eventDate});
                 var positionsHistoryEntities = (await gridReader.ReadAsync<PositionsHistoryEntity>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
              
