@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2019 Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -17,20 +18,22 @@ namespace MarginTrading.TradingHistory.Client
     public interface IPositionEventsApi
     {
         /// <summary> 
-        /// Get all position events with optional filtering by accountId and instrument.
+        /// Get all position events with optional filtering.
         /// </summary> 
         [Get("/api/position-events")]
         Task<List<PositionEventContract>> PositionHistory(
             [Query, CanBeNull] string accountId,
-            [Query, CanBeNull] string instrument);
+            [Query, CanBeNull] string instrument,
+            [Query, CanBeNull] DateTime? eventDate);
 
         /// <summary> 
-        /// Get paginated position events with optional filtering by accountId and instrument.
+        /// Get paginated position events with optional filtering.
         /// </summary> 
         [Get("/api/position-events/by-pages")]
         Task<PaginatedResponseContract<PositionEventContract>> PositionHistoryByPages(
             [Query, CanBeNull] string accountId,
             [Query, CanBeNull] string instrument,
+            [Query, CanBeNull] DateTime? eventDate,
             [Query, CanBeNull] int? skip = null,
             [Query, CanBeNull] int? take = null);
 
