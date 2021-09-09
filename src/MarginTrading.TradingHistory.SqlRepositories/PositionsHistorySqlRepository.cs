@@ -89,10 +89,10 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 var whereClause = "Where 1=1 " +
                                   (string.IsNullOrEmpty(accountId) ? "" : " And AccountId = @accountId") +
                                   (string.IsNullOrEmpty(assetPairId) ? "" : " And AssetPairId = @assetPairId") +
-                                  (eventDate == null ? "" : " AND CONVERT(date, HistoryTimestamp)=@eventDate");
+                                  (eventDate == null ? "" : " AND CONVERT(date, HistoryTimestamp) = @eventDate");
 
                 var query = $"SELECT * FROM {TableName} {whereClause}";
-                var objects = await conn.QueryAsync<PositionsHistoryEntity>(query, new {accountId, assetPairId});
+                var objects = await conn.QueryAsync<PositionsHistoryEntity>(query, new {accountId, assetPairId, eventDate});
                 
                 return objects.Cast<IPositionHistory>().ToList();
             }
@@ -104,7 +104,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             var whereClause = " WHERE 1=1 "
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
-                              + (eventDate == null ? "" : " AND CONVERT(date, HistoryTimestamp)=@eventDate");
+                              + (eventDate == null ? "" : " AND CONVERT(date, HistoryTimestamp) = @eventDate");
             
             using (var conn = new SqlConnection(_connectionString))
             {
