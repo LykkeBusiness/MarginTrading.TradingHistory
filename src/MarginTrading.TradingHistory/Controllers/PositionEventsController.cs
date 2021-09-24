@@ -37,9 +37,9 @@ namespace MarginTrading.TradingHistory.Controllers
         /// </summary>
         [HttpGet, Route("")] 
         public async Task<List<PositionEventContract>> PositionHistory(
-            [FromQuery] string accountId, [FromQuery] string instrument)
+            [FromQuery] string accountId, [FromQuery] string instrument, [FromQuery] DateTime? eventDate)
         {
-            var orders = await _positionsHistoryRepository.GetAsync(accountId, instrument);
+            var orders = await _positionsHistoryRepository.GetAsync(accountId, instrument, eventDate);
 
             return orders.Select(Convert).Where(d => d != null).ToList();
         }
@@ -49,12 +49,12 @@ namespace MarginTrading.TradingHistory.Controllers
         /// </summary> 
         [HttpGet, Route("by-pages")] 
         public async Task<PaginatedResponseContract<PositionEventContract>> PositionHistoryByPages(
-            [FromQuery] string accountId, [FromQuery] string instrument,
+            [FromQuery] string accountId, [FromQuery] string instrument, [FromQuery] DateTime? eventDate,
             int? skip = null, int? take = null)
         {
             ApiValidationHelper.ValidatePagingParams(skip, take);
             
-            var data = await _positionsHistoryRepository.GetByPagesAsync(accountId, instrument, skip, take);
+            var data = await _positionsHistoryRepository.GetByPagesAsync(accountId, instrument, eventDate, skip, take);
 
             return new PaginatedResponseContract<PositionEventContract>(
                 contents: data.Contents.Where(d => d != null).Select(Convert).ToList(),
