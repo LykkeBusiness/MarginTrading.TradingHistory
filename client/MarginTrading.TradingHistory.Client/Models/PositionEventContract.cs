@@ -85,5 +85,7 @@ namespace MarginTrading.TradingHistory.Client.Models
         public PositionHistoryTypeContract HistoryType { get; set; }
 
         public string DealId { get; set; }
+        
+        public DateTime Timestamp { get; set; }
     }
 }

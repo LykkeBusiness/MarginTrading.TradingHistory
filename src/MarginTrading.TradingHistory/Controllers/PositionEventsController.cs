@@ -127,7 +127,8 @@ namespace MarginTrading.TradingHistory.Controllers
                 TotalPnL = positionHistory.TotalPnL,
                 ChargedPnl = positionHistory.ChargedPnl,
                 HistoryType = positionHistory.HistoryType.ToType<PositionHistoryTypeContract>(),
-                DealId = positionHistory.DealId
+                DealId = positionHistory.DealId,
+                Timestamp = positionHistory.HistoryTimestamp,
             };
         }
 
