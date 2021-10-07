@@ -41,9 +41,9 @@ namespace MarginTrading.TradingHistory.Controllers
         [HttpGet, Route("")] 
         [Obsolete("Will be removed.")]
         public async Task<List<PositionContract>> PositionHistory(
-            [FromQuery] string accountId, [FromQuery] string instrument, [FromQuery] DateTime? eventDate)
+            [FromQuery] string accountId, [FromQuery] string instrument, [FromQuery] DateTime? eventDateFrom, [FromQuery] DateTime? eventDateTo)
         {
-            var positions = (await _positionsHistoryRepository.GetAsync(accountId, instrument, eventDate))
+            var positions = (await _positionsHistoryRepository.GetAsync(accountId, instrument, eventDateFrom, eventDateTo))
                 .Where(x => x.HistoryType == PositionHistoryType.Close || x.HistoryType == PositionHistoryType.PartiallyClose)
                 .ToDictionary(x => x.DealId);
             var deals = (await _dealsRepository.GetAsync(accountId, instrument))

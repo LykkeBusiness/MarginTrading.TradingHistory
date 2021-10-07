@@ -25,7 +25,8 @@ namespace MarginTrading.TradingHistory.Client
         Task<List<PositionContract>> PositionHistory( 
             [Query, CanBeNull] string accountId, 
             [Query, CanBeNull] string instrument,
-            [Query, CanBeNull] DateTime? eventDate);
+            [Query, CanBeNull] DateTime? eventDateFrom,
+            [Query, CanBeNull] DateTime? eventDateTo);
         
         /// <summary>
         /// Get closed position by Id

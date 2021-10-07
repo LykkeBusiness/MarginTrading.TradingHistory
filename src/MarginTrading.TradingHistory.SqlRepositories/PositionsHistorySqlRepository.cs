@@ -82,43 +82,54 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public async Task<List<IPositionHistory>> GetAsync(string accountId, string assetPairId, DateTime? eventDate)
+        public async Task<List<IPositionHistory>> GetAsync(string accountId,
+            string assetPairId,
+            DateTime? eventDateFrom,
+            DateTime? eventDateTo)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
                 var whereClause = "Where 1=1 " +
                                   (string.IsNullOrEmpty(accountId) ? "" : " And AccountId = @accountId") +
                                   (string.IsNullOrEmpty(assetPairId) ? "" : " And AssetPairId = @assetPairId") +
-                                  (eventDate == null ? "" : " AND CONVERT(date, HistoryTimestamp) = @eventDate");
+                                  (eventDateFrom == null ? "" : " AND CONVERT(date, HistoryTimestamp) >= @eventDateFrom") +
+                                  (eventDateTo == null ? "" : " AND CONVERT(date, HistoryTimestamp) <= @eventDateTo");
 
                 var query = $"SELECT * FROM {TableName} {whereClause}";
-                var objects = await conn.QueryAsync<PositionsHistoryEntity>(query, new {accountId, assetPairId, eventDate});
-                
+                var objects =
+                    await conn.QueryAsync<PositionsHistoryEntity>(query, new { accountId, assetPairId, eventDateFrom, eventDateTo });
+
                 return objects.Cast<IPositionHistory>().ToList();
             }
         }
 
-        public async Task<PaginatedResponse<IPositionHistory>> GetByPagesAsync(string accountId, string assetPairId, DateTime? eventDate,
-            int? skip = null, int? take = null)
+        public async Task<PaginatedResponse<IPositionHistory>> GetByPagesAsync(string accountId,
+            string assetPairId,
+            DateTime? eventDateFrom,
+            DateTime? eventDateTo,
+            int? skip = null,
+            int? take = null)
         {
             var whereClause = " WHERE 1=1 "
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
-                              + (eventDate == null ? "" : " AND CONVERT(date, HistoryTimestamp) = @eventDate");
-            
+                              + (eventDateFrom == null ? "" : " AND CONVERT(date, HistoryTimestamp) >= @eventDateFrom")
+                              + (eventDateTo == null ? "" : " AND CONVERT(date, HistoryTimestamp) <= @eventDateTo");
+
             using (var conn = new SqlConnection(_connectionString))
             {
-                var paginationClause = $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+                var paginationClause =
+                    $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
                 var gridReader = await conn.QueryMultipleAsync(
                     $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
-                    new {accountId,  assetPairId, eventDate});
+                    new { accountId, assetPairId, eventDateFrom, eventDateTo });
                 var positionsHistoryEntities = (await gridReader.ReadAsync<PositionsHistoryEntity>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
-             
+
                 return new PaginatedResponse<IPositionHistory>(
-                    contents: positionsHistoryEntities, 
-                    start: skip ?? 0, 
-                    size: positionsHistoryEntities.Count, 
+                    contents: positionsHistoryEntities,
+                    start: skip ?? 0,
+                    size: positionsHistoryEntities.Count,
                     totalSize: totalCount
                 );
             }
