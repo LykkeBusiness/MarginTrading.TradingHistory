@@ -24,7 +24,8 @@ namespace MarginTrading.TradingHistory.Client
         Task<List<PositionEventContract>> PositionHistory(
             [Query, CanBeNull] string accountId,
             [Query, CanBeNull] string instrument,
-            [Query, CanBeNull] DateTime? eventDate);
+            [Query, CanBeNull] DateTime? eventDateFrom,
+            [Query, CanBeNull] DateTime? eventDateTo);
 
         /// <summary> 
         /// Get paginated position events with optional filtering.
@@ -33,7 +34,8 @@ namespace MarginTrading.TradingHistory.Client
         Task<PaginatedResponseContract<PositionEventContract>> PositionHistoryByPages(
             [Query, CanBeNull] string accountId,
             [Query, CanBeNull] string instrument,
-            [Query, CanBeNull] DateTime? eventDate,
+            [Query, CanBeNull] DateTime? eventDateFrom,
+            [Query, CanBeNull] DateTime? eventDateTo,
             [Query, CanBeNull] int? skip = null,
             [Query, CanBeNull] int? take = null);
 

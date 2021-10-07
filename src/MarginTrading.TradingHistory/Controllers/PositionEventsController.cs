@@ -32,29 +32,26 @@ namespace MarginTrading.TradingHistory.Controllers
             _convertService = convertService;
         }
 
-        /// <summary> 
-        /// Get all position events with optional filtering by accountId and instrument.
-        /// </summary> 
+        /// <summary>
+        /// Get all position events with optional filtering by accountId, instrument and event date period.
+        /// </summary>
         [HttpGet, Route("")] 
-        public async Task<List<PositionEventContract>> PositionHistory(
-            [FromQuery] string accountId, [FromQuery] string instrument, [FromQuery] DateTime? eventDate)
+        public async Task<List<PositionEventContract>> PositionHistory([FromQuery] string accountId, [FromQuery] string instrument, [FromQuery] DateTime? eventDateFrom, [FromQuery] DateTime? eventDateTo)
         {
-            var orders = await _positionsHistoryRepository.GetAsync(accountId, instrument, eventDate);
+            var orders = await _positionsHistoryRepository.GetAsync(accountId, instrument, eventDateFrom, eventDateTo);
 
             return orders.Select(Convert).Where(d => d != null).ToList();
         }
 
         /// <summary> 
-        /// Get paginated position events with optional filtering by accountId and instrument.
+        /// Get paginated position events with optional filtering by accountId, instrument and event date period.
         /// </summary> 
         [HttpGet, Route("by-pages")] 
-        public async Task<PaginatedResponseContract<PositionEventContract>> PositionHistoryByPages(
-            [FromQuery] string accountId, [FromQuery] string instrument, [FromQuery] DateTime? eventDate,
-            int? skip = null, int? take = null)
+        public async Task<PaginatedResponseContract<PositionEventContract>> PositionHistoryByPages([FromQuery] string accountId, [FromQuery] string instrument, [FromQuery] DateTime? eventDateFrom, [FromQuery] DateTime? eventDateTo, int? skip = null, int? take = null)
         {
             ApiValidationHelper.ValidatePagingParams(skip, take);
             
-            var data = await _positionsHistoryRepository.GetByPagesAsync(accountId, instrument, eventDate, skip, take);
+            var data = await _positionsHistoryRepository.GetByPagesAsync(accountId, instrument, eventDateFrom, eventDateTo, skip, take);
 
             return new PaginatedResponseContract<PositionEventContract>(
                 contents: data.Contents.Where(d => d != null).Select(Convert).ToList(),
