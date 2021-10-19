@@ -7,11 +7,14 @@ using JetBrains.Annotations;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.SettingsReader;
+using Lykke.Snow.Common.Correlation;
 using MarginTrading.TradingHistory.AzureRepositories;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace MarginTrading.TradingHistory.OrderHistoryBroker
@@ -24,6 +27,18 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         }
 
         protected override string ApplicationName => "OrderHistoryBroker";
+
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            base.ConfigureServices(services);
+            services.AddCorrelation();
+        }
+
+        public override void Configure(IApplicationBuilder app, IHostEnvironment env, IHostApplicationLifetime appLifetime)
+        {
+            base.Configure(app, env, appLifetime);
+            app.UseCorrelation();
+        }
 
         protected override void RegisterCustomServices(ContainerBuilder builder, IReloadingManager<Settings> settings, ILog log)
         {

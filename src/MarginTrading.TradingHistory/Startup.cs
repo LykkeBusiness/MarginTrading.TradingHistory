@@ -22,6 +22,7 @@ using MarginTrading.TradingHistory.Settings;
 using MarginTrading.TradingHistory.Modules;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
+using Lykke.Snow.Common.Correlation;
 using Lykke.Snow.Common.Startup;
 using Lykke.Snow.Common.Startup.ApiKey;
 using MarginTrading.TradingHistory.Core;
@@ -92,6 +93,8 @@ namespace MarginTrading.TradingHistory
                 Log = CreateLogWithSlack(Configuration, services, _mtSettingsManager);
 
                 services.AddSingleton<ILoggerFactory>(x => new WebHostLoggerFactory(Log));
+
+                services.AddCorrelation();
             }
             catch (Exception ex)
             {
@@ -117,7 +120,8 @@ namespace MarginTrading.TradingHistory
                 }
 
                 app.UseLykkeForwardedHeaders();
-                
+
+                app.UseCorrelation();
 #if DEBUG
                 app.UseLykkeMiddleware(ServiceName, ex => ex.ToString());
 #else

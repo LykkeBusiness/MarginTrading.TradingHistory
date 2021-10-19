@@ -10,12 +10,14 @@ using Common.Log;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.SlackNotifications;
+using Lykke.Snow.Common.Correlation.RabbitMq;
 using MarginTrading.Backend.Contracts.Events;
 using MarginTrading.Backend.Contracts.Positions;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
+using Microsoft.Extensions.Logging;
 
 namespace MarginTrading.TradingHistory.PositionHistoryBroker
 {
@@ -26,22 +28,30 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
         private readonly IConvertService _convertService;
         private readonly ILog _log;
         private readonly Settings _settings;
+        private readonly RabbitMqCorrelationManager _correlationManager;
 
-        public Application(IPositionsHistoryRepository positionsHistoryRepository, 
+        public Application(
+            RabbitMqCorrelationManager correlationManager,
+            ILoggerFactory loggerFactory, 
+            IPositionsHistoryRepository positionsHistoryRepository, 
             IDealsRepository dealsRepository,
             ILog logger,
             IConvertService convertService,
             Settings settings, 
             CurrentApplicationInfo applicationInfo,
             ISlackNotificationsSender slackNotificationsSender)
-            : base(logger, slackNotificationsSender, applicationInfo)
+            : base(loggerFactory, logger, slackNotificationsSender, applicationInfo)
         {
+            _correlationManager = correlationManager;
             _positionsHistoryRepository = positionsHistoryRepository;
             _dealsRepository = dealsRepository;
             _log = logger;
             _settings = settings;
             _convertService = convertService;
         }
+
+        protected override Action<IDictionary<string, object>> ReadHeadersAction =>
+            _correlationManager.FetchCorrelationIfExists;
 
         protected override BrokerSettingsBase Settings => _settings;
         protected override string ExchangeName => _settings.RabbitMqQueues.PositionsHistory.ExchangeName;
