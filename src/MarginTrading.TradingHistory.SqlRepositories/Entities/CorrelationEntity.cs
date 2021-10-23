@@ -2,6 +2,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using Common;
 using MarginTrading.TradingHistory.Core.Domain;
 
 namespace MarginTrading.TradingHistory.SqlRepositories.Entities
@@ -10,7 +11,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
     {
         public string Id { get; set; }
         public string CorrelationId { get; set; }
-        public CorrelationEntityType EntityType { get; set; }
+        CorrelationEntityType ICorrelation.EntityType => EntityType.ParseEnum<CorrelationEntityType>();
+        public string EntityType { get; set; }
         public string EntityId { get; set; }
         public DateTime Timestamp { get; set; }
         
@@ -20,7 +22,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
             {
                 Id = correlation.Id,
                 CorrelationId = correlation.CorrelationId,
-                EntityType = correlation.EntityType,
+                EntityType = correlation.EntityType.ToString(),
                 EntityId = correlation.EntityId,
                 Timestamp = correlation.Timestamp
             };
