@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Common;
 using Common.Log;
+using Lykke.Common.Log;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.SlackNotifications;
@@ -23,6 +25,7 @@ namespace MarginTrading.TradingHistory.CorrelationBroker
         private readonly ICorrelationRepository _correlationRepository;
         private readonly Settings _settings;
         private readonly RabbitMqCorrelationManager _correlationManager;
+        private readonly ILog _log;
 
         public Application(
             RabbitMqCorrelationManager correlationManager,
@@ -37,6 +40,7 @@ namespace MarginTrading.TradingHistory.CorrelationBroker
             _correlationManager = correlationManager;
             _correlationRepository = correlationRepository;
             _settings = settings;
+            _log = logger;
         }
 
         protected override Action<IDictionary<string, object>> ReadHeadersAction =>
@@ -49,6 +53,8 @@ namespace MarginTrading.TradingHistory.CorrelationBroker
 
         protected override async Task HandleMessage(CorrelationContract correlation)
         {
+            _log.Info(nameof(HandleMessage), $"Received correlation: ${correlation.ToJson()}");
+            
             var entity = new Correlation(
                 Guid.NewGuid().ToString("N"),
                 correlation.CorrelationId,
