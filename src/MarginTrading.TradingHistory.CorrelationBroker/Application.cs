@@ -53,7 +53,7 @@ namespace MarginTrading.TradingHistory.CorrelationBroker
 
         protected override async Task HandleMessage(CorrelationContract correlation)
         {
-            _log.Info(nameof(HandleMessage), $"Received correlation: ${correlation.ToJson()}");
+            await _log.WriteInfoAsync(nameof(Application), nameof(HandleMessage), $"Received correlation: {correlation.ToJson()}");
             
             var entity = new Correlation(
                 Guid.NewGuid().ToString("N"),
