@@ -24,12 +24,12 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             string.Join(",", typeof(CorrelationEntity).GetProperties().Select(x => "@" + x.Name));
         
         private readonly string _connectionString;
-        private readonly ILog _log;
 
         public CorrelationSqlRepository(string connectionString, ILog log)
         {
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
-            _log = log ?? throw new ArgumentNullException(nameof(log));
+            
+            connectionString.InitializeSqlObject("dbo.Correlations.sql", log);
         }
 
         public async Task AddAsync(ICorrelation correlation)
