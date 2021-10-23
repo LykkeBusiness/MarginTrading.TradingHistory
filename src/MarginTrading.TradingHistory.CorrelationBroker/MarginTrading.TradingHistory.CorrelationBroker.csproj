@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>MarginTrading.TradingHistory.CorrelationBroker</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>MarginTrading.TradingHistory.CorrelationBroker</PackageId>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Version>2.4.0</Version>
+    <LangVersion>latest</LangVersion>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+    <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Dockerfile">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+  <Target Name="CopySerilogConfig" AfterTargets="AfterBuild">
+    <Copy SourceFiles="appsettings.Serilog.json" DestinationFolder="$(OutDir)" />
+  </Target>
+  <Target Name="CopySerilogConfigOnPublish" AfterTargets="Publish">
+    <Copy SourceFiles="appsettings.Serilog.json" DestinationFolder="$(PublishDir)" />
+  </Target>
+  <ItemGroup>
+    <PackageReference Include="Lykke.Logs" Version="7.4.0" />
+    <PackageReference Include="Lykke.MarginTrading.BackendSnow.Contracts" Version="1.20.0" />
+    <PackageReference Include="Lykke.SettingsReader" Version="5.3.0" />
+    <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.5" />
+    <PackageReference Include="Lykke.Snow.Common" Version="1.29.0" />
+    <PackageReference Include="LykkeBiz.MarginTrading.BrokerBase" Version="4.0.0" />
+    <PackageReference Include="LykkeBiz.RabbitMqBroker" Version="9.2.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\client\MarginTrading.TradingHistory.Client\MarginTrading.TradingHistory.Client.csproj" />
+    <ProjectReference Include="..\MarginTrading.TradingHistory.Core\MarginTrading.TradingHistory.Core.csproj" />
+    <ProjectReference Include="..\MarginTrading.TradingHistory.Services\MarginTrading.TradingHistory.Services.csproj" />
+    <ProjectReference Include="..\MarginTrading.TradingHistory.SqlRepositories\MarginTrading.TradingHistory.SqlRepositories.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Scripts\**" CopyToOutputDirectory="PreserveNewest" LinkBase="Scripts" />
+  </ItemGroup>
+</Project>
