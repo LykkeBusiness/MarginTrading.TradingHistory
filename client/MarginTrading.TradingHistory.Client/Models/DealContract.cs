@@ -142,5 +142,7 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// Taxes
         /// </summary>
         public decimal? Taxes { get; set; }
+        
+        public string CorrelationId { get; set; }
     }
 }

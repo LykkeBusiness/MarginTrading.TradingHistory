@@ -48,5 +48,6 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public decimal? Commission { get; set; }
         public decimal? OnBehalfFee { get; set; }
         public decimal? Taxes { get; set; }
+        public string CorrelationId { get; set; }
     }
 }

@@ -3,13 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Common.Log;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.SlackNotifications;
+using Lykke.Snow.Common.Correlation;
 using Lykke.Snow.Common.Correlation.RabbitMq;
 using MarginTrading.Backend.Contracts.Events;
 using MarginTrading.Backend.Contracts.Orders;
@@ -27,8 +26,10 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         private readonly ILog _log;
         private readonly Settings _settings;
         private readonly RabbitMqCorrelationManager _correlationManager;
+        private readonly CorrelationContextAccessor _correlationContextAccessor;
 
         public Application(
+            CorrelationContextAccessor correlationContextAccessor,
             RabbitMqCorrelationManager correlationManager,
             ILoggerFactory loggerFactory, 
             IOrdersHistoryRepository ordersHistoryRepository,
@@ -38,6 +39,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
             ISlackNotificationsSender slackNotificationsSender) : base(loggerFactory, logger, slackNotificationsSender,
             applicationInfo)
         {
+            _correlationContextAccessor = correlationContextAccessor;
             _correlationManager = correlationManager;
             _ordersHistoryRepository = ordersHistoryRepository;
             _tradesRepository = tradesRepository;
@@ -54,7 +56,16 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
 
         protected override async Task HandleMessage(OrderHistoryEvent historyEvent)
         {
-            var orderHistory = historyEvent.OrderSnapshot.ToOrderHistoryDomain(historyEvent.Type);
+            var correlationId = _correlationContextAccessor.CorrelationContext?.CorrelationId;
+            if (string.IsNullOrWhiteSpace(correlationId))
+            {
+                await _log.WriteMonitorAsync(
+                    nameof(HandleMessage), 
+                    nameof(OrderHistoryEvent),
+                    $"Correlation id is empty for order {historyEvent.OrderSnapshot.Id}");
+            }
+
+            var orderHistory = historyEvent.OrderSnapshot.ToOrderHistoryDomain(historyEvent.Type, correlationId);
 
             var trade = historyEvent.Type == OrderHistoryTypeContract.Executed
                 ? new Trade(
@@ -72,7 +83,8 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                     historyEvent.OrderSnapshot.ExpectedOpenPrice,
                     historyEvent.OrderSnapshot.FxRate,
                     historyEvent.OrderSnapshot.AdditionalInfo,
-                    historyEvent.OrderSnapshot.ExternalOrderId
+                    historyEvent.OrderSnapshot.ExternalOrderId,
+                    correlationId
                 )
                 : null;
             

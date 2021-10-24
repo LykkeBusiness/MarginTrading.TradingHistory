@@ -183,6 +183,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                         entity.Fpl,
                         entity.PnlOfTheLastDay,
                         entity.AdditionalInfo,
+                        entity.CorrelationId
                     },
                     transaction);
 

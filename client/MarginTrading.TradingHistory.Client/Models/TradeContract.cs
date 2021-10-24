@@ -71,5 +71,7 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// External Order Id
         /// </summary>
         public string ExternalOrderId { get; set; }
+        
+        public string CorrelationId { get; set; }
     }
 }

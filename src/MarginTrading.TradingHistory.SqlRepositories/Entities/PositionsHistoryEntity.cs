@@ -76,6 +76,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
 
         public string RelatedOrders { get; set; }
         public string CloseTrades { get; set; }
+        public string CorrelationId { get; set; }
 
         public static PositionsHistoryEntity Create(IPositionHistory history)
         {
@@ -126,7 +127,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 TradingConditionId = history.TradingConditionId,
                 Volume = history.Volume,
                 HistoryTimestamp = history.HistoryTimestamp,
-                ForceOpen = history.ForceOpen
+                ForceOpen = history.ForceOpen,
+                CorrelationId = history.CorrelationId
             };
         }
     }

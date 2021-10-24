@@ -99,7 +99,8 @@ namespace MarginTrading.TradingHistory.Controllers
                 Volume = tradeEntity.Volume,
                 AdditionalInfo = tradeEntity.AdditionalInfo,
                 CancelledBy = tradeEntity.CancelledBy,
-                ExternalOrderId = tradeEntity.ExternalOrderId
+                ExternalOrderId = tradeEntity.ExternalOrderId,
+                CorrelationId = tradeEntity.CorrelationId
             };
         }
     }
