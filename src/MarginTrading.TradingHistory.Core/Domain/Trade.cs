@@ -24,11 +24,13 @@ namespace MarginTrading.TradingHistory.Core.Domain
         public string AdditionalInfo { get; }
         public string ExternalOrderId { get; }
         public string CancelledBy { get; }
+        public string CorrelationId { get; }
 
         public Trade([NotNull] string id, [NotNull] string accountId, [NotNull] string orderId,
             [NotNull] string assetPairId, DateTime orderCreatedDate, OrderType orderType,
             TradeType type, OriginatorType originator, DateTime tradeTimestamp, decimal price, decimal volume,
-            decimal? orderExpectedPrice, decimal fxRate, string additionalInfo, string externalOrderId, string cancelledBy = null)
+            decimal? orderExpectedPrice, decimal fxRate, string additionalInfo, string externalOrderId, string correlationId,
+            string cancelledBy = null)
         {
             Id = id ?? throw new ArgumentNullException(nameof(id));
             AccountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
@@ -45,6 +47,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
             FxRate = fxRate;
             AdditionalInfo = additionalInfo;
             ExternalOrderId = externalOrderId;
+            CorrelationId = correlationId;
             CancelledBy = cancelledBy;
         }
     }

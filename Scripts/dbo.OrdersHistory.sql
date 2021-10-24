@@ -61,3 +61,8 @@ IF NOT EXISTS(SELECT 'X'
         CREATE INDEX IX_OrdersHistory_ExecutedTimestamp ON OrdersHistory(ExecutedTimestamp DESC);
 
     END;
+
+BEGIN
+    ALTER TABLE [dbo].[OrdersHistory]
+    ALTER COLUMN CorrelationId NVARCHAR(251) NULL;
+END;

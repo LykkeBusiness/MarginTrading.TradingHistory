@@ -27,5 +27,6 @@ namespace MarginTrading.TradingHistory.Core.Domain
         /// </summary>
         string CancelledBy { get; }
         string ExternalOrderId { get; }
+        string CorrelationId { get; }
     }
 }

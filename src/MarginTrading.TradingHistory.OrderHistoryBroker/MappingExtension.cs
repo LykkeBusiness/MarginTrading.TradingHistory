@@ -13,7 +13,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
 {
     public static class MappingExtension
     {
-        public static OrderHistory ToOrderHistoryDomain(this OrderContract order, OrderHistoryTypeContract historyType)
+        public static OrderHistory ToOrderHistoryDomain(this OrderContract order, OrderHistoryTypeContract historyType, string correlationId)
         {
             var orderContract = new OrderHistory
             {
@@ -62,7 +62,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                 UpdateType = historyType.ToType<OrderUpdateType>(),
                 MatchedOrders = new List<MatchedOrder>(),
                 AdditionalInfo = order.AdditionalInfo,
-                CorrelationId = order.CorrelationId,
+                CorrelationId = correlationId,
                 PendingOrderRetriesCount = order.PendingOrderRetriesCount,
             };
 

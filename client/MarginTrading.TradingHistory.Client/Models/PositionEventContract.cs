@@ -87,5 +87,6 @@ namespace MarginTrading.TradingHistory.Client.Models
         public string DealId { get; set; }
         
         public DateTime Timestamp { get; set; }
+        public string CorrelationId { get; set; }
     }
 }

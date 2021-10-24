@@ -35,5 +35,6 @@ namespace MarginTrading.TradingHistory.AzureRepositories.Entities
         public string AdditionalInfo { get; set; }
         public string CancelledBy { get; set; }
         public string ExternalOrderId { get; set; }
+        public string CorrelationId { get; set; }
     }
 }
