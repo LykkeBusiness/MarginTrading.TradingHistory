@@ -44,13 +44,6 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 return new TradesRepository(AzureTableStorage<TradeEntity>.Create(connString, "Trades", log), 
                     convertService);
             }
-
-            public static ICorrelationRepository CreateCorrelationRepository(IReloadingManager<string> connString, ILog log,
-                IConvertService convertService)
-            {
-                return new CorrelationRepository(AzureTableStorage<CorrelationEntity>.Create(connString, "Correlations", log), 
-                    convertService);
-            }
         }
     }
 }
