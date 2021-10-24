@@ -19,9 +19,6 @@
     <None Update="Dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
-    <None Update="..\..\Scripts\dbo.Correlations.sql">
-      <Link>Scripts\dbo.Correlations.sql</Link>
-    </None>
   </ItemGroup>
   <Target Name="CopySerilogConfig" AfterTargets="AfterBuild">
     <Copy SourceFiles="appsettings.Serilog.json" DestinationFolder="$(OutDir)" />
