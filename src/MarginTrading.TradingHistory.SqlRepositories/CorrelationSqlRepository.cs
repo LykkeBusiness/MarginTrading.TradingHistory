@@ -15,7 +15,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 {
     public class CorrelationSqlRepository : ICorrelationRepository
     {
-        private const string TableName = "Correlations";
+        private const string TableName = "Correlation";
         
         private static readonly string GetColumns =
             string.Join(",", typeof(CorrelationEntity).GetProperties().Select(x => x.Name));
