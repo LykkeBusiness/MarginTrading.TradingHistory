@@ -23,6 +23,7 @@ using MarginTrading.TradingHistory.Modules;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
 using Lykke.Snow.Common.Correlation;
+using Lykke.Snow.Common.Correlation.Serilog;
 using Lykke.Snow.Common.Startup;
 using Lykke.Snow.Common.Startup.ApiKey;
 using MarginTrading.TradingHistory.Core;
@@ -39,6 +40,7 @@ using Lykke.Snow.Common.Startup.Hosting;
 using Lykke.Snow.Common.Startup.Log;
 using MarginTrading.TradingHistory.Settings.ServiceSettings;
 using Microsoft.Extensions.Hosting;
+using Serilog.Core;
 using IApplicationLifetime = Microsoft.AspNetCore.Hosting.IApplicationLifetime;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
@@ -90,11 +92,11 @@ namespace MarginTrading.TradingHistory
                     }
                 });
 
+                services.AddCorrelation();
+
                 Log = CreateLogWithSlack(Configuration, services, _mtSettingsManager);
 
                 services.AddSingleton<ILoggerFactory>(x => new WebHostLoggerFactory(Log));
-
-                services.AddCorrelation();
             }
             catch (Exception ex)
             {
@@ -255,7 +257,11 @@ namespace MarginTrading.TradingHistory
 
             if (settings.CurrentValue.TradingHistoryService.UseSerilog)
             {
-                aggregateLogger.AddLog(new SerilogLogger(typeof(Startup).Assembly, configuration));
+                var correlationContextAccessor = services.BuildServiceProvider().GetService<CorrelationContextAccessor>();
+                aggregateLogger.AddLog(new SerilogLogger(typeof(Startup).Assembly, configuration, new List<ILogEventEnricher>()
+                {
+                    new CorrelationLogEventEnricher("CorrelationId", correlationContextAccessor)
+                }));
             }
             else if (settings.CurrentValue.TradingHistoryService.Db.StorageMode == StorageMode.Azure)
             {
