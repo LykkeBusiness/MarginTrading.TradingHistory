@@ -25,7 +25,6 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         private readonly ITradesRepository _tradesRepository;
         private readonly ILog _log;
         private readonly Settings _settings;
-        private readonly RabbitMqCorrelationManager _correlationManager;
         private readonly CorrelationContextAccessor _correlationContextAccessor;
 
         public Application(
@@ -36,19 +35,15 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
             ITradesRepository tradesRepository,
             ILog logger,
             Settings settings, CurrentApplicationInfo applicationInfo,
-            ISlackNotificationsSender slackNotificationsSender) : base(loggerFactory, logger, slackNotificationsSender,
-            applicationInfo)
+            ISlackNotificationsSender slackNotificationsSender) : base(correlationManager,
+            loggerFactory, logger, slackNotificationsSender, applicationInfo)
         {
             _correlationContextAccessor = correlationContextAccessor;
-            _correlationManager = correlationManager;
             _ordersHistoryRepository = ordersHistoryRepository;
             _tradesRepository = tradesRepository;
             _log = logger;
             _settings = settings;
         }
-
-        protected override Action<IDictionary<string, object>> ReadHeadersAction =>
-            _correlationManager.FetchCorrelationIfExists;
 
         protected override BrokerSettingsBase Settings => _settings;
         protected override string ExchangeName => _settings.RabbitMqQueues.OrderHistory.ExchangeName;
