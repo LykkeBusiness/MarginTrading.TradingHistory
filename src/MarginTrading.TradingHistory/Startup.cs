@@ -23,6 +23,9 @@ using MarginTrading.TradingHistory.Modules;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
 using Lykke.Snow.Common.Correlation;
+using Lykke.Snow.Common.Correlation.Cqrs;
+using Lykke.Snow.Common.Correlation.Http;
+using Lykke.Snow.Common.Correlation.RabbitMq;
 using Lykke.Snow.Common.Correlation.Serilog;
 using Lykke.Snow.Common.Startup;
 using Lykke.Snow.Common.Startup.ApiKey;
@@ -92,9 +95,13 @@ namespace MarginTrading.TradingHistory
                     }
                 });
 
-                services.AddCorrelation();
+                var correlationContextAccessor = new CorrelationContextAccessor();
+                services.AddSingleton<CorrelationContextAccessor>();
+                services.AddSingleton<RabbitMqCorrelationManager>();
+                services.AddSingleton<CqrsCorrelationManager>();
+                services.AddTransient<HttpCorrelationHandler>();
 
-                Log = CreateLogWithSlack(Configuration, services, _mtSettingsManager);
+                Log = CreateLogWithSlack(Configuration, services, _mtSettingsManager, correlationContextAccessor);
 
                 services.AddSingleton<ILoggerFactory>(x => new WebHostLoggerFactory(Log));
             }
@@ -224,7 +231,7 @@ namespace MarginTrading.TradingHistory
         }
 
         private static ILog CreateLogWithSlack(IConfiguration configuration, IServiceCollection services, 
-            IReloadingManager<AppSettings> settings)
+            IReloadingManager<AppSettings> settings, CorrelationContextAccessor correlationContextAccessor)
         {
             var consoleLogger = new LogToConsole();
             var aggregateLogger = new AggregateLogger();
@@ -257,7 +264,6 @@ namespace MarginTrading.TradingHistory
 
             if (settings.CurrentValue.TradingHistoryService.UseSerilog)
             {
-                var correlationContextAccessor = services.BuildServiceProvider().GetService<CorrelationContextAccessor>();
                 aggregateLogger.AddLog(new SerilogLogger(typeof(Startup).Assembly, configuration, new List<ILogEventEnricher>()
                 {
                     new CorrelationLogEventEnricher("CorrelationId", correlationContextAccessor)
