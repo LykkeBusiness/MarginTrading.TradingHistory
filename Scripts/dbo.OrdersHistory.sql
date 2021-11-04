@@ -64,5 +64,5 @@ IF NOT EXISTS(SELECT 'X'
 
 BEGIN
     ALTER TABLE [dbo].[OrdersHistory]
-    ALTER COLUMN CorrelationId NVARCHAR(251) NULL;
+    ALTER COLUMN CorrelationId NVARCHAR(250) NULL;
 END;
