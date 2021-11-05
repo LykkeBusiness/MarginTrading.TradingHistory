@@ -31,12 +31,13 @@ namespace MarginTrading.TradingHistory.Core.Domain
         public decimal PnlOfTheLastDay { get; }
         
         [NotNull] public string AdditionalInfo { get; }
+        public string CorrelationId { get; }
 
         public Deal([NotNull] string dealId, DateTime created, [NotNull] string accountId, [NotNull] string assetPairId,
             [NotNull] string openTradeId, OrderType openOrderType, decimal openOrderVolume, decimal? openOrderExpectedPrice, 
             [NotNull] string closeTradeId, OrderType closeOrderType, decimal closeOrderVolume, decimal? closeOrderExpectedPrice, 
-            PositionDirection direction, decimal volume, OriginatorType originator, decimal openPrice, 
-            decimal openFxPrice, decimal closePrice, decimal closeFxPrice, decimal fpl, string additionalInfo, decimal pnlOfTheLastDay)
+            PositionDirection direction, decimal volume, OriginatorType originator, decimal openPrice, decimal openFxPrice,
+            decimal closePrice, decimal closeFxPrice, decimal fpl, string additionalInfo, decimal pnlOfTheLastDay, string correlationId)
         {
             DealId = dealId ?? throw new ArgumentNullException(nameof(dealId));
             Created = created;
@@ -60,6 +61,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
             Fpl = fpl;
             AdditionalInfo = additionalInfo;
             PnlOfTheLastDay = pnlOfTheLastDay;
+            CorrelationId = correlationId;
         }
     }
 }

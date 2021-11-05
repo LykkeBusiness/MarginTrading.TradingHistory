@@ -126,6 +126,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 HistoryType = positionHistory.HistoryType.ToType<PositionHistoryTypeContract>(),
                 DealId = positionHistory.DealId,
                 Timestamp = positionHistory.HistoryTimestamp,
+                CorrelationId = positionHistory.CorrelationId
             };
         }
 

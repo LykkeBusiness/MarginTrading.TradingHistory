@@ -89,5 +89,7 @@ namespace MarginTrading.TradingHistory.Client.Models
         /// Who initiated close of position
         /// </summary>
         public OriginatorTypeContract? Originator { get; set; }
+        
+        public string CorrelationId { get; set; }
     }
 }

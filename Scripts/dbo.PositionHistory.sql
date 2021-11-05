@@ -56,6 +56,17 @@ IF NOT EXISTS(SELECT 'X'
             INDEX IX_PositionsHistory_Base (Id, AccountId, AssetPairId)
         );
     END;
+
+IF NOT EXISTS (
+  SELECT * 
+  FROM   sys.columns 
+  WHERE  object_id = OBJECT_ID(N'[dbo].[PositionsHistory]') 
+         AND name = 'CorrelationId'
+)
+BEGIN
+ALTER TABLE [dbo].[PositionsHistory]
+    ADD CorrelationId nvarchar(250) NULL;
+END
     
 IF NOT EXISTS(
     SELECT 'X'

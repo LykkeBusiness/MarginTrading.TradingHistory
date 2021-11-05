@@ -28,6 +28,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public string AdditionalInfo { get; set; }
         public string CancelledBy { get; set; }
         public string ExternalOrderId { get; set; }
+        public string CorrelationId { get; set; }
 
         public static TradeEntity Create(ITrade obj)
         {
@@ -48,7 +49,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 FxRate = obj.FxRate,
                 AdditionalInfo = obj.AdditionalInfo,
                 CancelledBy = obj.CancelledBy,
-                ExternalOrderId = obj.ExternalOrderId
+                ExternalOrderId = obj.ExternalOrderId,
+                CorrelationId = obj.CorrelationId
             };
         }
     }

@@ -7,12 +7,15 @@ using JetBrains.Annotations;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.SettingsReader;
+using Lykke.Snow.Common.Correlation;
 using MarginTrading.TradingHistory.AzureRepositories;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Services;
 using MarginTrading.TradingHistory.SqlRepositories;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace MarginTrading.TradingHistory.PositionHistoryBroker

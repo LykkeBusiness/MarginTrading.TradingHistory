@@ -34,6 +34,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public decimal Fpl { get; set; }
         public string AdditionalInfo { get; set; }
         public decimal PnlOfTheLastDay { get; set; }
+        public string CorrelationId { get; set; }
 
         public static DealEntity Create(IDeal deal)
         {
@@ -61,6 +62,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 Fpl = deal.Fpl,
                 AdditionalInfo = deal.AdditionalInfo,
                 PnlOfTheLastDay = deal.PnlOfTheLastDay,
+                CorrelationId = deal.CorrelationId
             };
         }
     }

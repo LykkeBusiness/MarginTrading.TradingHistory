@@ -31,6 +31,17 @@ IF NOT EXISTS(SELECT 'X'
             INDEX IX_Deals_Base (DealId, AccountId, AssetPairId, Created)
         );
     END;
+
+IF NOT EXISTS (
+  SELECT * 
+  FROM   sys.columns 
+  WHERE  object_id = OBJECT_ID(N'[dbo].[Deals]') 
+         AND name = 'CorrelationId'
+)
+BEGIN
+ALTER TABLE [dbo].[Deals]
+    ADD CorrelationId nvarchar(250) NULL;
+END
     
 IF NOT EXISTS(
     SELECT 'X'

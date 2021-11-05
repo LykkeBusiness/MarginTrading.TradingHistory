@@ -30,5 +30,6 @@ namespace MarginTrading.TradingHistory.Core.Domain
         decimal Fpl { get; }
         string AdditionalInfo { get; }
         decimal PnlOfTheLastDay { get; }
+        string CorrelationId { get; }
     }
 }

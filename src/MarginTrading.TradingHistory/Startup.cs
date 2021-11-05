@@ -22,6 +22,11 @@ using MarginTrading.TradingHistory.Settings;
 using MarginTrading.TradingHistory.Modules;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
+using Lykke.Snow.Common.Correlation;
+using Lykke.Snow.Common.Correlation.Cqrs;
+using Lykke.Snow.Common.Correlation.Http;
+using Lykke.Snow.Common.Correlation.RabbitMq;
+using Lykke.Snow.Common.Correlation.Serilog;
 using Lykke.Snow.Common.Startup;
 using Lykke.Snow.Common.Startup.ApiKey;
 using MarginTrading.TradingHistory.Core;
@@ -38,6 +43,7 @@ using Lykke.Snow.Common.Startup.Hosting;
 using Lykke.Snow.Common.Startup.Log;
 using MarginTrading.TradingHistory.Settings.ServiceSettings;
 using Microsoft.Extensions.Hosting;
+using Serilog.Core;
 using IApplicationLifetime = Microsoft.AspNetCore.Hosting.IApplicationLifetime;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
@@ -89,7 +95,13 @@ namespace MarginTrading.TradingHistory
                     }
                 });
 
-                Log = CreateLogWithSlack(Configuration, services, _mtSettingsManager);
+                var correlationContextAccessor = new CorrelationContextAccessor();
+                services.AddSingleton<CorrelationContextAccessor>();
+                services.AddSingleton<RabbitMqCorrelationManager>();
+                services.AddSingleton<CqrsCorrelationManager>();
+                services.AddTransient<HttpCorrelationHandler>();
+
+                Log = CreateLogWithSlack(Configuration, services, _mtSettingsManager, correlationContextAccessor);
 
                 services.AddSingleton<ILoggerFactory>(x => new WebHostLoggerFactory(Log));
             }
@@ -117,7 +129,8 @@ namespace MarginTrading.TradingHistory
                 }
 
                 app.UseLykkeForwardedHeaders();
-                
+
+                app.UseCorrelation();
 #if DEBUG
                 app.UseLykkeMiddleware(ServiceName, ex => ex.ToString());
 #else
@@ -218,7 +231,7 @@ namespace MarginTrading.TradingHistory
         }
 
         private static ILog CreateLogWithSlack(IConfiguration configuration, IServiceCollection services, 
-            IReloadingManager<AppSettings> settings)
+            IReloadingManager<AppSettings> settings, CorrelationContextAccessor correlationContextAccessor)
         {
             var consoleLogger = new LogToConsole();
             var aggregateLogger = new AggregateLogger();
@@ -251,7 +264,10 @@ namespace MarginTrading.TradingHistory
 
             if (settings.CurrentValue.TradingHistoryService.UseSerilog)
             {
-                aggregateLogger.AddLog(new SerilogLogger(typeof(Startup).Assembly, configuration));
+                aggregateLogger.AddLog(new SerilogLogger(typeof(Startup).Assembly, configuration, new List<ILogEventEnricher>()
+                {
+                    new CorrelationLogEventEnricher("CorrelationId", correlationContextAccessor)
+                }));
             }
             else if (settings.CurrentValue.TradingHistoryService.Db.StorageMode == StorageMode.Azure)
             {

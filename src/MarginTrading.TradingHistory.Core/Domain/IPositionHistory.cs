@@ -54,5 +54,6 @@ namespace MarginTrading.TradingHistory.Core.Domain
         PositionHistoryType HistoryType { get; }
         DateTime HistoryTimestamp { get; }
         bool ForceOpen { get; }
+        string CorrelationId { get; }
     }
 }

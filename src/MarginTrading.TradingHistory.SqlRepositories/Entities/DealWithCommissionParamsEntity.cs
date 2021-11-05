@@ -44,6 +44,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
                 Commission = deal.Commission,
                 OnBehalfFee = deal.OnBehalfFee,
                 Taxes = deal.Taxes,
+                CorrelationId = deal.CorrelationId
             };
         }
     }

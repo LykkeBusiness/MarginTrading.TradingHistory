@@ -10,12 +10,15 @@ using Common.Log;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.SlackNotifications;
+using Lykke.Snow.Common.Correlation;
+using Lykke.Snow.Common.Correlation.RabbitMq;
 using MarginTrading.Backend.Contracts.Events;
 using MarginTrading.Backend.Contracts.Positions;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
+using Microsoft.Extensions.Logging;
 
 namespace MarginTrading.TradingHistory.PositionHistoryBroker
 {
@@ -26,16 +29,22 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
         private readonly IConvertService _convertService;
         private readonly ILog _log;
         private readonly Settings _settings;
+        private readonly CorrelationContextAccessor _correlationContextAccessor;
 
-        public Application(IPositionsHistoryRepository positionsHistoryRepository, 
+        public Application(
+            CorrelationContextAccessor correlationContextAccessor,
+            RabbitMqCorrelationManager correlationManager,
+            ILoggerFactory loggerFactory, 
+            IPositionsHistoryRepository positionsHistoryRepository, 
             IDealsRepository dealsRepository,
             ILog logger,
             IConvertService convertService,
             Settings settings, 
             CurrentApplicationInfo applicationInfo,
             ISlackNotificationsSender slackNotificationsSender)
-            : base(logger, slackNotificationsSender, applicationInfo)
+            : base(correlationManager, loggerFactory, logger, slackNotificationsSender, applicationInfo)
         {
+            _correlationContextAccessor = correlationContextAccessor;
             _positionsHistoryRepository = positionsHistoryRepository;
             _dealsRepository = dealsRepository;
             _log = logger;
@@ -50,7 +59,16 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
 
         protected override async Task HandleMessage(PositionHistoryEvent positionHistoryEvent)
         {
-            var position = Map(positionHistoryEvent);
+            var correlationId = _correlationContextAccessor.CorrelationContext?.CorrelationId;
+            if (string.IsNullOrWhiteSpace(correlationId))
+            {
+                await _log.WriteMonitorAsync(
+                    nameof(HandleMessage), 
+                    nameof(PositionHistoryEvent),
+                    $"Correlation id is empty for postition {positionHistoryEvent.PositionSnapshot.Id}");
+            }
+            
+            var position = Map(positionHistoryEvent, correlationId);
             
             var deal = (positionHistoryEvent.EventType == PositionHistoryTypeContract.Close
                         || positionHistoryEvent.EventType == PositionHistoryTypeContract.PartiallyClose)
@@ -77,14 +95,15 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                     closeFxPrice: positionHistoryEvent.Deal.CloseFxPrice,
                     fpl: positionHistoryEvent.Deal.Fpl,
                     additionalInfo: positionHistoryEvent.Deal.AdditionalInfo,
-                    pnlOfTheLastDay: positionHistoryEvent.Deal.PnlOfTheLastDay
+                    pnlOfTheLastDay: positionHistoryEvent.Deal.PnlOfTheLastDay,
+                    correlationId: correlationId
                 )
                 : null;
             
             await _positionsHistoryRepository.AddAsync(position, deal);
         }
 
-        private static PositionHistory Map(PositionHistoryEvent positionHistoryEvent)
+        private static PositionHistory Map(PositionHistoryEvent positionHistoryEvent, string correlationId)
         {
             return new PositionHistory
             {
@@ -137,7 +156,8 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                 AdditionalInfo = positionHistoryEvent.PositionSnapshot.AdditionalInfo,
                 HistoryType = positionHistoryEvent.EventType.ToType<PositionHistoryType>(),
                 HistoryTimestamp = positionHistoryEvent.Timestamp,
-                ForceOpen = positionHistoryEvent.PositionSnapshot.ForceOpen
+                ForceOpen = positionHistoryEvent.PositionSnapshot.ForceOpen,
+                CorrelationId = correlationId
             };
         }
     }
