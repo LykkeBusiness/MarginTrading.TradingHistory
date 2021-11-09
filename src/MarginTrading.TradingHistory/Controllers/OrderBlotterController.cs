@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using MarginTrading.TradingHistory.Client;
@@ -30,7 +31,7 @@ namespace MarginTrading.TradingHistory.Controllers
 
         [HttpGet]
         public async Task<PaginatedResponseContract<OrderForOrderBlotterContract>> Get(
-            [FromQuery] DateTime relevanceTimestamp,
+            [FromQuery, Required] DateTime? relevanceTimestamp,
             [FromQuery] string accountId,
             [FromQuery] string assetPairId,
             [FromQuery] string createdBy,
@@ -47,7 +48,7 @@ namespace MarginTrading.TradingHistory.Controllers
             ApiValidationHelper.ValidatePagingParams(skip, take);
 
             var result = await _ordersHistoryRepository.GetOrderBlotterAsync(
-                relevanceTimestamp,
+                relevanceTimestamp.Value,
                 accountId,
                 assetPairId,
                 createdBy,
