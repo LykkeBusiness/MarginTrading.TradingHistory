@@ -129,6 +129,7 @@ OUTER APPLY (
 
         private readonly string _connectionString;
         private readonly ILog _log;
+        private readonly TimeSpan _orderBlotterExecutionTimeout;
 
         private static readonly string GetColumns =
             string.Join(",", typeof(OrderHistoryEntity).GetProperties().Select(x => x.Name));
@@ -139,10 +140,11 @@ OUTER APPLY (
         private static readonly string GetUpdateClause = string.Join(",",
             typeof(IOrderHistory).GetProperties().Select(x => "[" + x.Name + "]=@" + x.Name));
 
-        public OrdersHistorySqlRepository(string connectionString, ILog log)
+        public OrdersHistorySqlRepository(string connectionString, ILog log, TimeSpan orderBlotterExecutionTimeout)
         {
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
             _log = log ?? throw new ArgumentNullException(nameof(log));
+            _orderBlotterExecutionTimeout = orderBlotterExecutionTimeout;
 
             connectionString.InitializeSqlObject("dbo.OrdersHistory.sql", log);
         }
@@ -202,7 +204,8 @@ OUTER APPLY (
                         modifiedOnTo,
                         skip,
                         take
-                    });
+                    },
+                    commandTimeout: (int) _orderBlotterExecutionTimeout.TotalSeconds);
                 var orderHistoryEntities = (await gridReader.ReadAsync<OrderHistoryForOrderBlotterEntity>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
 
@@ -351,7 +354,8 @@ OUTER APPLY (
                     {
                         ids,
                         externalIds
-                    });
+                    },
+                    commandTimeout: (int) _orderBlotterExecutionTimeout.TotalSeconds);
 
                 await PopulateTakeProfitAndStopLossAsync(gridReader, orderHistoryEntities);
                 await PopulateSpreadAsync(gridReader, orderHistoryEntities);
