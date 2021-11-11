@@ -25,7 +25,9 @@ namespace MarginTrading.TradingHistory.Core.Repositories
             DateTime? modifiedOnFrom,
             DateTime? modifiedOnTo,
             int skip,
-            int take);
+            int take,
+            OrderBlotterSortingColumn sortingColumn,
+            SortingOrder sortingOrder);
         
         Task<IEnumerable<IOrderHistoryWithAdditional>> GetHistoryAsync(string orderId, 
             OrderStatus? status = null);

@@ -36,7 +36,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
 
         public Task<PaginatedResponse<IOrderHistoryForOrderBlotterWithAdditionalData>> GetOrderBlotterAsync(DateTime relevanceTimestamp, string accountId, string assetPairId, string createdBy,
             List<OrderStatus> statuses, List<OrderType> orderTypes, List<OriginatorType> originatorTypes, DateTime? createdOnFrom, DateTime? createdOnTo,
-            DateTime? modifiedOnFrom, DateTime? modifiedOnTo, int skip, int take)
+            DateTime? modifiedOnFrom, DateTime? modifiedOnTo, int skip, int take, OrderBlotterSortingColumn sortingColumn, SortingOrder sortingOrder)
         {
             throw new NotImplementedException();
         }

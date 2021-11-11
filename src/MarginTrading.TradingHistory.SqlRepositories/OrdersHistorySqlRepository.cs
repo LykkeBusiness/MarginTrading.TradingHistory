@@ -158,6 +158,26 @@ OUTER APPLY (
                 commitException => CommitExceptionHandler(commitException, order, trade));
         }
 
+        private string ToOrderHistoryColumn(OrderBlotterSortingColumn sortingColumn)
+        {
+            switch (sortingColumn)
+            {
+                case OrderBlotterSortingColumn.Price:
+                    return nameof(IOrderHistoryForOrderBlotter.ExecutionPrice);
+                case OrderBlotterSortingColumn.Quantity:
+                    return nameof(IOrderHistoryForOrderBlotter.Volume);
+                case OrderBlotterSortingColumn.Validity:
+                    return nameof(IOrderHistoryForOrderBlotter.ValidityTime);
+                case OrderBlotterSortingColumn.CreatedOn:
+                    return nameof(IOrderHistoryForOrderBlotter.CreatedTimestamp);
+                case OrderBlotterSortingColumn.ExchangeRate:
+                    return nameof(IOrderHistoryForOrderBlotter.FxRate);
+                case OrderBlotterSortingColumn.ModifiedOn:
+                    return nameof(IOrderHistoryForOrderBlotter.ModifiedTimestamp);
+                default: throw new NotImplementedException();
+            }
+        }
+
         public async Task<PaginatedResponse<IOrderHistoryForOrderBlotterWithAdditionalData>> GetOrderBlotterAsync(
             DateTime relevanceTimestamp,
             string accountId,
@@ -171,7 +191,9 @@ OUTER APPLY (
             DateTime? modifiedOnFrom,
             DateTime? modifiedOnTo,
             int skip,
-            int take)
+            int take,
+            OrderBlotterSortingColumn sortingColumn,
+            SortingOrder sortingOrder)
         {
             var whereClause = $@"WHERE oh.ModifiedTimestamp <= @relevanceTimestamp
                 {(string.IsNullOrEmpty(accountId) ? "" : " AND oh.AccountId = @accountId")}
@@ -184,7 +206,7 @@ OUTER APPLY (
                 {(!createdOnTo.HasValue ? "" : " AND oh.CreatedTimestamp < @createdOnTo")}
                 {(!modifiedOnFrom.HasValue ? "" : " AND oh.ModifiedTimestamp >= @modifiedOnFrom")}
                 {(!modifiedOnTo.HasValue ? "" : " AND oh.ModifiedTimestamp < @modifiedOnTo")}";
-            var paginationClause = "ORDER BY CreatedTimestamp DESC OFFSET @skip ROWS FETCH NEXT @take ROWS ONLY";
+            var paginationClause = $"ORDER BY {ToOrderHistoryColumn(sortingColumn)} {(sortingOrder == SortingOrder.ASC ? "ASC" : "DESC")} OFFSET @skip ROWS FETCH NEXT @take ROWS ONLY";
             using (var conn = new SqlConnection(_connectionString))
             {
                 var gridReader = await conn.QueryMultipleAsync(

@@ -28,6 +28,8 @@ namespace MarginTrading.TradingHistory.Client
             [Query, CanBeNull] DateTime? modifiedOnFrom,
             [Query, CanBeNull] DateTime? modifiedOnTo,
             [Query, CanBeNull] int skip,
-            [Query, CanBeNull] int take);
+            [Query, CanBeNull] int take,
+            [Query, CanBeNull] OrderBlotterSortingColumnContract sortingColumn,
+            [Query, CanBeNull] SortingOrderContract sortingOrder);
     }
 }
