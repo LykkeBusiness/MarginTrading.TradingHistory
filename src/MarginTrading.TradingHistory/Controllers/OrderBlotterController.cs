@@ -43,7 +43,9 @@ namespace MarginTrading.TradingHistory.Controllers
             [FromQuery] DateTime? modifiedOnFrom,
             [FromQuery] DateTime? modifiedOnTo,
             [FromQuery] int skip,
-            [FromQuery] int take)
+            [FromQuery] int take,
+            [FromQuery] OrderBlotterSortingColumnContract sortingColumn,
+            [FromQuery] SortingOrderContract sortingOrder)
         {
             ApiValidationHelper.ValidatePagingParams(skip, take);
 
@@ -60,7 +62,9 @@ namespace MarginTrading.TradingHistory.Controllers
                 modifiedOnFrom,
                 modifiedOnTo,
                 skip,
-                take);
+                take,
+                sortingColumn.ToType<OrderBlotterSortingColumn>(),
+                sortingOrder.ToType<SortingOrder>());
 
             return new PaginatedResponseContract<OrderForOrderBlotterContract>(
                 contents: result.Contents.Select(Convert).ToList(),
