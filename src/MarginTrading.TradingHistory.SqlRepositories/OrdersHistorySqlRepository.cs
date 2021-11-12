@@ -412,7 +412,7 @@ OUTER APPLY (
                     l.ParentOrderId == x.Id && l.ModifiedTimestamp >= x.ModifiedTimestamp);
                 if (sl != null)
                 {
-                    x.TakeProfitPrice = sl.ExpectedOpenPrice;
+                    x.StopLossPrice = sl.ExpectedOpenPrice;
                 }
             });
         }
