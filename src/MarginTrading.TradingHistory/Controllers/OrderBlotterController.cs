@@ -86,7 +86,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 
             return new OrderForOrderBlotterContract
             {
-                AccountId = history.Id,
+                AccountId = history.AccountId,
                 CreatedBy = history.CreatedBy,
                 Instrument = history.AssetPairId,
                 Quantity = history.Volume,
