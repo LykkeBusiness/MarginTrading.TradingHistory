@@ -71,6 +71,6 @@ IF NOT EXISTS(SELECT 1 FROM sys.columns
           WHERE Name = N'CreatedBy'
           AND Object_ID = Object_ID(N'[dbo].[OrdersHistory]'))
 BEGIN
-    alter table [nova].[dbo].[OrdersHistory] add CreatedBy as CASE WHEN ISJSON(AdditionalInfo) > 0 THEN CAST(json_value(AdditionalInfo, '$.CreatedBy') AS NVARCHAR(256)) ELSE null END
-    create NONCLUSTERED INDEX IX_ParsedCreatedBy on [nova].[dbo].[OrdersHistory] (CreatedBy)
+    alter table [dbo].[OrdersHistory] add CreatedBy as CASE WHEN ISJSON(AdditionalInfo) > 0 THEN CAST(json_value(AdditionalInfo, '$.CreatedBy') AS NVARCHAR(256)) ELSE null END
+    create NONCLUSTERED INDEX IX_ParsedCreatedBy on [dbo].[OrdersHistory] (CreatedBy)
 END;
