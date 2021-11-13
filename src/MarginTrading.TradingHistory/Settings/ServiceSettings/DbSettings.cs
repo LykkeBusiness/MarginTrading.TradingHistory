@@ -19,5 +19,8 @@ namespace MarginTrading.TradingHistory.Settings.ServiceSettings
 
         [Optional]
         public TimeSpan OrderHistoryForSupportExecutionTimeout { get; set; } = TimeSpan.FromMinutes(1);
+
+        [Optional]
+        public TimeSpan OrderBlotterExecutionTimeout { get; set; } = TimeSpan.FromMinutes(1);
     }
 }

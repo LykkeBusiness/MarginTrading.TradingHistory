@@ -79,7 +79,9 @@ namespace MarginTrading.TradingHistory.Modules
             else if (_settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
             {
                 builder.RegisterInstance(new OrdersHistorySqlRepository(
-                        _settings.CurrentValue.Db.HistoryConnString, _log))
+                        _settings.CurrentValue.Db.HistoryConnString,
+                        _log,
+                        _settings.CurrentValue.Db.OrderBlotterExecutionTimeout))
                     .As<IOrdersHistoryRepository>()
                     .SingleInstance();
                 
