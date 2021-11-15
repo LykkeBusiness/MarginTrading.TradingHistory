@@ -5,6 +5,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
 {
     public interface IOrderHistoryForOrderBlotterWithAdditionalData: IOrderHistoryForOrderBlotter
     {
+        string AccountName { get; }
         string AssetName { get; }
         decimal? TakeProfitPrice { get; }
         decimal? StopLossPrice { get; }

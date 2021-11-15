@@ -27,6 +27,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories.Entities
         public decimal? ExpectedOpenPrice { get; set; }
         public string ExternalOrderId { get; set; }
 
+        public string AccountName { get; set; }
         public string AssetName { get; set; }
         public decimal? TakeProfitPrice { get; set; }
         public decimal? StopLossPrice { get; set; }

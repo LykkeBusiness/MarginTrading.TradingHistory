@@ -34,7 +34,7 @@ namespace MarginTrading.TradingHistory.AzureRepositories
                 DateTime.UtcNow, RowKeyDateTimeFormat.Iso);
         }
 
-        public Task<PaginatedResponse<IOrderHistoryForOrderBlotterWithAdditionalData>> GetOrderBlotterAsync(DateTime relevanceTimestamp, string accountId, string assetName, string createdBy,
+        public Task<PaginatedResponse<IOrderHistoryForOrderBlotterWithAdditionalData>> GetOrderBlotterAsync(DateTime relevanceTimestamp, string accountIdOrName, string assetName, string createdBy,
             List<OrderStatus> statuses, List<OrderType> orderTypes, List<OriginatorType> originatorTypes, DateTime? createdOnFrom, DateTime? createdOnTo,
             DateTime? modifiedOnFrom, DateTime? modifiedOnTo, int skip, int take, OrderBlotterSortingColumn sortingColumn, SortingOrder sortingOrder)
         {

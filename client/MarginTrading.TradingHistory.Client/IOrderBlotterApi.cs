@@ -17,7 +17,7 @@ namespace MarginTrading.TradingHistory.Client
         [Get("/api/order-blotter")]
         Task<PaginatedResponseContract<OrderForOrderBlotterContract>> Get(
             [Query, NotNull] DateTime? relevanceTimestamp,
-            [Query, CanBeNull] string accountId,
+            [Query, CanBeNull] string accountIdOrName,
             [Query, CanBeNull] string assetName,
             [Query, CanBeNull] string createdBy,
             [Query(CollectionFormat.Multi), CanBeNull] List<OrderStatusContract> statuses,
