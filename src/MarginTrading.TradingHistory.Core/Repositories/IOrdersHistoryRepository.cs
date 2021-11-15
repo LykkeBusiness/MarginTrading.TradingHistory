@@ -15,7 +15,7 @@ namespace MarginTrading.TradingHistory.Core.Repositories
         Task<PaginatedResponse<IOrderHistoryForOrderBlotterWithAdditionalData>> GetOrderBlotterAsync(
             DateTime relevanceTimestamp,
             string accountId,
-            string assetPairId,
+            string assetName,
             string createdBy,
             List<OrderStatus> statuses,
             List<OrderType> orderTypes,

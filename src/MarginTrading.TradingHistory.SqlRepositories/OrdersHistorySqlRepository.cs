@@ -24,6 +24,9 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         private static readonly string GetOrderBlotterPrimaryColumnsCommaSeparated =
             string.Join(",", typeof(IOrderHistoryForOrderBlotter).GetProperties().Select(x => x.Name));
 
+        private readonly string _getAssetIdByNameScript =
+            $@"SELECT Top 1 ProductId FROM dbo.Products WITH (NOLOCK) WHERE Name = @assetName";
+
         private readonly string _populateTpSlScript =
             $@"SELECT ParentOrderId, ExpectedOpenPrice, ModifiedTimestamp, Type  
 FROM {TableName} WITH (NOLOCK) 
@@ -38,6 +41,11 @@ WHERE ExternalOrderId IN @externalIds;";
 FROM dbo.AccountHistory WITH (NOLOCK) 
 WHERE ReasonType in ('Commission', 'OnBehalf') AND EventSourceId IN @ids
 GROUP BY EventSourceId, ReasonType;";
+        
+        private readonly string _populateAssetNameScript =
+            $@"SELECT ProductId, Name  
+FROM dbo.Products WITH (NOLOCK) 
+WHERE ProductId IN @assetIds";
 
         private string GetOrderBlotterScript(string whereClause, string paginationClause)
         {
@@ -181,7 +189,7 @@ OUTER APPLY (
         public async Task<PaginatedResponse<IOrderHistoryForOrderBlotterWithAdditionalData>> GetOrderBlotterAsync(
             DateTime relevanceTimestamp,
             string accountId,
-            string assetPairId,
+            string assetName,
             string createdBy,
             List<OrderStatus> statuses,
             List<OrderType> orderTypes,
@@ -195,20 +203,36 @@ OUTER APPLY (
             OrderBlotterSortingColumn sortingColumn,
             SortingOrder sortingOrder)
         {
-            var whereClause = $@"WHERE oh.ModifiedTimestamp <= @relevanceTimestamp
-                {(string.IsNullOrEmpty(accountId) ? "" : " AND oh.AccountId = @accountId")}
-                {(string.IsNullOrEmpty(assetPairId) ? "" : " AND oh.AssetPairId = @assetPairId")}
-                {(string.IsNullOrEmpty(createdBy) ? "" : " AND oh.CreatedBy = @createdBy")}
-                {(!(statuses?.Any() ?? false) ? "" : " AND oh.Status IN @statuses")}
-                {(!(orderTypes?.Any() ?? false) ? "" : " AND oh.Type IN @orderTypes")}
-                {(!(originatorTypes?.Any() ?? false) ? "" : " AND oh.Originator IN @originatorTypes")}
-                {(!createdOnFrom.HasValue ? "" : " AND oh.CreatedTimestamp >= @createdOnFrom")}
-                {(!createdOnTo.HasValue ? "" : " AND oh.CreatedTimestamp < @createdOnTo")}
-                {(!modifiedOnFrom.HasValue ? "" : " AND oh.ModifiedTimestamp >= @modifiedOnFrom")}
-                {(!modifiedOnTo.HasValue ? "" : " AND oh.ModifiedTimestamp < @modifiedOnTo")}";
-            var paginationClause = $"ORDER BY {ToOrderHistoryColumn(sortingColumn)} {(sortingOrder == SortingOrder.ASC ? "ASC" : "DESC")} OFFSET @skip ROWS FETCH NEXT @take ROWS ONLY";
             using (var conn = new SqlConnection(_connectionString))
             {
+                var assetPairId = (string)null;
+                if (!string.IsNullOrWhiteSpace(assetName))
+                {
+                    assetPairId = await conn.QueryFirstOrDefaultAsync<string>(_getAssetIdByNameScript, new {assetName});
+                    if (assetPairId == null)
+                    {
+                        return new PaginatedResponse<IOrderHistoryForOrderBlotterWithAdditionalData>(
+                            contents: new List<IOrderHistoryForOrderBlotterWithAdditionalData>(),
+                            start: skip,
+                            size: 0,
+                            totalSize: 0
+                        );
+                    }
+                }
+                
+                var whereClause = $@"WHERE oh.ModifiedTimestamp <= @relevanceTimestamp
+                    {(string.IsNullOrEmpty(accountId) ? "" : " AND oh.AccountId = @accountId")}
+                    {(string.IsNullOrEmpty(assetPairId) ? "" : " AND oh.AssetPairId = @assetPairId")}
+                    {(string.IsNullOrEmpty(createdBy) ? "" : " AND oh.CreatedBy = @createdBy")}
+                    {(!(statuses?.Any() ?? false) ? "" : " AND oh.Status IN @statuses")}
+                    {(!(orderTypes?.Any() ?? false) ? "" : " AND oh.Type IN @orderTypes")}
+                    {(!(originatorTypes?.Any() ?? false) ? "" : " AND oh.Originator IN @originatorTypes")}
+                    {(!createdOnFrom.HasValue ? "" : " AND oh.CreatedTimestamp >= @createdOnFrom")}
+                    {(!createdOnTo.HasValue ? "" : " AND oh.CreatedTimestamp < @createdOnTo")}
+                    {(!modifiedOnFrom.HasValue ? "" : " AND oh.ModifiedTimestamp >= @modifiedOnFrom")}
+                    {(!modifiedOnTo.HasValue ? "" : " AND oh.ModifiedTimestamp < @modifiedOnTo")}";
+                var paginationClause = $"ORDER BY {ToOrderHistoryColumn(sortingColumn)} {(sortingOrder == SortingOrder.ASC ? "ASC" : "DESC")} OFFSET @skip ROWS FETCH NEXT @take ROWS ONLY";
+                
                 var gridReader = await conn.QueryMultipleAsync(
                     GetOrderBlotterScript(whereClause, paginationClause),
                     new
@@ -367,21 +391,27 @@ OUTER APPLY (
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Distinct()
                 .ToList();
+            var assetIds = orderHistoryEntities
+                .Select(x => x.AssetPairId)
+                .Distinct()
+                .ToList();
 
             if (ids.Any())
             {
                 var gridReader = await conn.QueryMultipleAsync(
-                    $"{_populateTpSlScript} {_populateSpreadScript} {_populateCommissionAndOnBehalfScript}",
+                    $"{_populateTpSlScript} {_populateSpreadScript} {_populateCommissionAndOnBehalfScript} {_populateAssetNameScript}",
                     new
                     {
                         ids,
-                        externalIds
+                        externalIds,
+                        assetIds
                     },
                     commandTimeout: (int) _orderBlotterExecutionTimeout?.TotalSeconds);
 
                 await PopulateTakeProfitAndStopLossAsync(gridReader, orderHistoryEntities);
                 await PopulateSpreadAsync(gridReader, orderHistoryEntities);
                 await PopulateCommissionAndOnBehalfAsync(gridReader, orderHistoryEntities);
+                await PopulateAssetNameAsync(gridReader, orderHistoryEntities);
             }
         }
 
@@ -452,6 +482,21 @@ OUTER APPLY (
                 if (sp != null)
                 {
                     x.Spread = (decimal?)sp.Spread;
+                }
+            });
+        }
+
+        private async Task PopulateAssetNameAsync(SqlMapper.GridReader gridReader,
+            List<OrderHistoryForOrderBlotterEntity> orderHistoryEntities)
+        {
+            var productList = (await gridReader.ReadAsync()).ToList();
+
+            orderHistoryEntities.ForEach(x =>
+            {
+                var product = productList.FirstOrDefault(l => l.ProductId == x.AssetPairId);
+                if (product != null)
+                {
+                    x.AssetName = product.Name;
                 }
             });
         }
