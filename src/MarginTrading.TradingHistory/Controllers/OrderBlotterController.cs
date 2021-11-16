@@ -32,8 +32,8 @@ namespace MarginTrading.TradingHistory.Controllers
         [HttpGet]
         public async Task<PaginatedResponseContract<OrderForOrderBlotterContract>> Get(
             [FromQuery, Required] DateTime? relevanceTimestamp,
-            [FromQuery] string accountId,
-            [FromQuery] string assetPairId,
+            [FromQuery] string accountIdOrName,
+            [FromQuery] string assetName,
             [FromQuery] string createdBy,
             [FromQuery] List<OrderStatusContract> statuses,
             [FromQuery] List<OrderTypeContract> orderTypes,
@@ -51,8 +51,8 @@ namespace MarginTrading.TradingHistory.Controllers
 
             var result = await _ordersHistoryRepository.GetOrderBlotterAsync(
                 relevanceTimestamp.Value,
-                accountId,
-                assetPairId,
+                accountIdOrName,
+                assetName,
                 createdBy,
                 statuses?.Select(x => x.ToType<OrderStatus>()).ToList(),
                 orderTypes?.Select(x => x.ToType<OrderType>()).ToList(),
@@ -87,8 +87,9 @@ namespace MarginTrading.TradingHistory.Controllers
             return new OrderForOrderBlotterContract
             {
                 AccountId = history.AccountId,
+                AccountName = history.AccountName,
                 CreatedBy = history.CreatedBy,
-                Instrument = history.AssetPairId,
+                Instrument = history.AssetName,
                 Quantity = history.Volume,
                 OrderType = history.Type.ToType<OrderTypeContract>(),
                 OrderStatus = history.Status.ToType<OrderStatusContract>(),
