@@ -35,7 +35,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 FROM {TableName} WITH (NOLOCK) 
 WHERE ParentOrderID IN @ids AND Type in ('TakeProfit', 'StopLoss','TrailingStop');";
 
-        private readonly string _populateSpreadScript = $@"SELECT TOP 1 ExternalOrderId, Spread 
+        private readonly string _populateSpreadScript = $@"SELECT ExternalOrderId, Spread 
 FROM dbo.ExecutionOrderBooks WITH (NOLOCK) 
 WHERE ExternalOrderId IN @externalIds;";
 
