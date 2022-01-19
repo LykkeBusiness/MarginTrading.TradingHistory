@@ -43,7 +43,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.4" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.4" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.4" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\client\MarginTrading.TradingHistory.Client\MarginTrading.TradingHistory.Client.csproj" />
