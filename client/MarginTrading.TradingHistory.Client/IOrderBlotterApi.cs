@@ -14,6 +14,9 @@ namespace MarginTrading.TradingHistory.Client
     [PublicAPI]
     public interface IOrderBlotterApi
     {
+        [Get("/api/order-blotter/created-by-on-behalf")]
+        Task<IEnumerable<string>> GetCreatedByOnBehalfList();
+        
         [Get("/api/order-blotter")]
         Task<PaginatedResponseContract<OrderForOrderBlotterContract>> Get(
             [Query, NotNull] DateTime? relevanceTimestamp,
