@@ -29,6 +29,12 @@ namespace MarginTrading.TradingHistory.Controllers
             _ordersHistoryRepository = ordersHistoryRepository;
         }
 
+        [HttpGet, Route("created-by-on-behalf")]
+        public async Task<IEnumerable<string>> GetCreatedByOnBehalfList()
+        {
+            return await _ordersHistoryRepository.GetCreatedByOnBehalfListAsync();
+        }
+
         [HttpGet]
         public async Task<PaginatedResponseContract<OrderForOrderBlotterContract>> Get(
             [FromQuery, Required] DateTime? relevanceTimestamp,

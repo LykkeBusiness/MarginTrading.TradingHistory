@@ -12,6 +12,8 @@ namespace MarginTrading.TradingHistory.Core.Repositories
     {
         Task AddAsync(IOrderHistory order, ITrade trade);
 
+        Task<IEnumerable<string>> GetCreatedByOnBehalfListAsync();
+
         Task<PaginatedResponse<IOrderHistoryForOrderBlotterWithAdditionalData>> GetOrderBlotterAsync(
             DateTime relevanceTimestamp,
             string accountId,
