@@ -95,6 +95,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 AccountId = history.AccountId,
                 AccountName = history.AccountName,
                 CreatedBy = history.CreatedBy,
+                InstrumentId = history.AssetPairId,
                 Instrument = history.AssetName,
                 Quantity = history.Volume,
                 OrderType = history.Type.ToType<OrderTypeContract>(),
