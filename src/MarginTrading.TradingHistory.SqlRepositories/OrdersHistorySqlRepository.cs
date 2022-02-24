@@ -194,6 +194,19 @@ OUTER APPLY (
             }
         }
 
+        public async Task<IEnumerable<string>> GetCreatedByOnBehalfListAsync()
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                var query = $"SELECT DISTINCT CreatedBy FROM {TableName} where Originator = 'OnBehalf'";
+                var result = (await conn.QueryAsync<string>(query))
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .OrderBy(x => x)
+                    .ToList();
+                return result;
+            }
+        }
+
         public async Task<PaginatedResponse<IOrderHistoryForOrderBlotterWithAdditionalData>> GetOrderBlotterAsync(
             DateTime relevanceTimestamp,
             string accountIdOrName,
