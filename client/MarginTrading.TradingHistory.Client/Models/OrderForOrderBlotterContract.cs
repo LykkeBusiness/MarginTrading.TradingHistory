@@ -10,6 +10,7 @@ namespace MarginTrading.TradingHistory.Client.Models
         public string AccountId { get; set; }
         public string AccountName { get; set; }
         public string CreatedBy { get; set; }
+        public string InstrumentId { get; set; }
         public string Instrument { get; set; }
         public int Quantity { get; set; }
         public OrderTypeContract OrderType { get; set; }
