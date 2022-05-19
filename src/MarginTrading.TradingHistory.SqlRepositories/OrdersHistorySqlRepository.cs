@@ -294,7 +294,7 @@ OUTER APPLY (
 
                 var batches = orderHistoryEntities.Batch(2000); // sql limit is 2100
 
-                await PopulateAdditionalDataAsync(conn, batches);
+                await PopulateAdditionalDataAsync(batches);
 
                 return new PaginatedResponse<IOrderHistoryForOrderBlotterWithAdditionalData>(
                     contents: orderHistoryEntities,
@@ -421,8 +421,7 @@ OUTER APPLY (
             return _log.WriteErrorAsync(nameof(OrdersHistorySqlRepository), nameof(AddAsync), context, exception);
         }
 
-        private async Task PopulateAdditionalDataAsync(SqlConnection conn,
-            IEnumerable<IEnumerable<OrderHistoryForOrderBlotterEntity>> batches)
+        private async Task PopulateAdditionalDataAsync(IEnumerable<IEnumerable<OrderHistoryForOrderBlotterEntity>> batches)
         {
             var allTasks = new List<Task>();
             var maxThreads = 4;
@@ -435,7 +434,8 @@ OUTER APPLY (
                     {
                         try
                         {
-                            await PopulateAdditionalDataAsync(conn, batch.ToList());
+                            using var connection = new SqlConnection(_connectionString);
+                            await PopulateAdditionalDataAsync(connection, batch.ToList());
                         }
                         finally
                         {
