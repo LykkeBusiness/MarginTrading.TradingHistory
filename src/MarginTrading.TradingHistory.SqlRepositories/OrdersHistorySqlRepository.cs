@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
@@ -14,6 +15,7 @@ using MarginTrading.TradingHistory.Core.Extensions;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
 using Microsoft.Data.SqlClient;
+using MoreLinq;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
 {
@@ -290,7 +292,9 @@ OUTER APPLY (
                 var orderHistoryEntities = (await gridReader.ReadAsync<OrderHistoryForOrderBlotterEntity>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
 
-                await PopulateAdditionalDataAsync(conn, orderHistoryEntities);
+                var batches = orderHistoryEntities.Batch(2000); // sql limit is 2100
+
+                await PopulateAdditionalDataAsync(conn, batches);
 
                 return new PaginatedResponse<IOrderHistoryForOrderBlotterWithAdditionalData>(
                     contents: orderHistoryEntities,
@@ -415,6 +419,31 @@ OUTER APPLY (
                           trade?.ToJson();
 
             return _log.WriteErrorAsync(nameof(OrdersHistorySqlRepository), nameof(AddAsync), context, exception);
+        }
+
+        private async Task PopulateAdditionalDataAsync(SqlConnection conn,
+            IEnumerable<IEnumerable<OrderHistoryForOrderBlotterEntity>> batches)
+        {
+            var allTasks = new List<Task>();
+            var maxThreads = 4;
+            var throttler = new SemaphoreSlim(initialCount: maxThreads);
+            foreach (var batch in batches)
+            {
+                await throttler.WaitAsync();
+                allTasks.Add(
+                    Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await PopulateAdditionalDataAsync(conn, batch.ToList());
+                        }
+                        finally
+                        {
+                            throttler.Release();
+                        }
+                    }));
+            }
+            await Task.WhenAll(allTasks);
         }
 
         private async Task PopulateAdditionalDataAsync(SqlConnection conn,
