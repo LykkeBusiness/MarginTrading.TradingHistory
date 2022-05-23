@@ -292,7 +292,7 @@ OUTER APPLY (
                 var orderHistoryEntities = (await gridReader.ReadAsync<OrderHistoryForOrderBlotterEntity>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
 
-                var batches = orderHistoryEntities.Batch(500); // sql limit is 2100
+                var batches = orderHistoryEntities.Batch(500); // sql limit is 2100, subqueries use up to 4*500 = 2000 parameters
 
                 await PopulateAdditionalDataAsync(batches);
 
