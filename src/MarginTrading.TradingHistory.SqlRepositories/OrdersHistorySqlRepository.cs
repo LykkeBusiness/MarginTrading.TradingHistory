@@ -390,7 +390,8 @@ OUTER APPLY (
             await conn.ExecuteAsync(
                 $"insert into {TableName} ({GetColumns}) values ({GetFields})",
                 orderHistoryEntity,
-                transaction);
+                transaction,
+                true);
 
             if (trade != null)
             {
@@ -398,7 +399,8 @@ OUTER APPLY (
                 await conn.ExecuteAsync(
                     $"insert into {TradesSqlRepository.TableName} ({TradesSqlRepository.GetColumns}) values ({TradesSqlRepository.GetFields})",
                     tradeEntity,
-                    transaction);
+                    transaction,
+                    true);
             }
         }
 
