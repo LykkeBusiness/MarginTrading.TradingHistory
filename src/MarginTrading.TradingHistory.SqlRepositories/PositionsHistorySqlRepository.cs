@@ -68,7 +68,9 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                                     deal.CloseOrderVolume,
                                     deal.Volume,
                                 },
-                                commandType: CommandType.StoredProcedure);
+                                commandType: CommandType.StoredProcedure,
+                                ignoreDuplicates: true,
+                                log: _log);
                         }
                         catch (Exception e)
                         {
@@ -149,14 +151,17 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         private async Task DoAdd(SqlConnection conn, SqlTransaction transaction, IPositionHistory positionHistory, IDeal deal)
         {
             var positionEntity = PositionsHistoryEntity.Create(positionHistory);
+
             await conn.ExecuteAsync($"insert into {TableName} ({GetColumns}) values ({GetFields})",
                 positionEntity,
-                transaction);
+                transaction,
+                true,
+                log: _log);
 
             if (deal != null)
             {
                 var entity = DealEntity.Create(deal);
-
+                
                 await conn.ExecuteAsync(
                     $@"INSERT INTO [dbo].[Deals] ({string.Join(",", DealsSqlRepository.DealInsertColumns)}) VALUES (@{string.Join(",@", DealsSqlRepository.DealInsertColumns)})",
                     new
@@ -185,11 +190,15 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                         entity.AdditionalInfo,
                         entity.CorrelationId
                     },
-                    transaction);
+                    transaction, 
+                    true,
+                    log: _log);
 
                 await conn.ExecuteAsync("INSERT INTO [dbo].[DealCommissionParams] (DealId) VALUES (@DealId)",
                     new {deal.DealId},
-                    transaction);
+                    transaction,
+                    true,
+                    log: _log);
             }
         }
 

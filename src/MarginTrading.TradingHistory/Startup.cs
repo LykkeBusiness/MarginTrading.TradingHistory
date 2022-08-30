@@ -41,7 +41,6 @@ using LogEntity = Lykke.Logs.LogEntity;
 using Microsoft.Extensions.Logging;
 using Lykke.Snow.Common.Startup.Hosting;
 using Lykke.Snow.Common.Startup.Log;
-using MarginTrading.TradingHistory.Settings.ServiceSettings;
 using Microsoft.Extensions.Hosting;
 using Serilog.Core;
 using IApplicationLifetime = Microsoft.AspNetCore.Hosting.IApplicationLifetime;

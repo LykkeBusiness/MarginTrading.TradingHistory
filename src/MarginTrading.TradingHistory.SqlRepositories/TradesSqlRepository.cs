@@ -95,7 +95,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             {
                 await conn.ExecuteAsync(
                     $"UPDATE {TableName} SET CancelledBy = @cancelledBy WHERE Id = @cancelledTradeId",
-                    new {cancelledTradeId, cancelledBy});
+                    new {cancelledTradeId, cancelledBy},
+                    log: _log);
             }
         }
     }
