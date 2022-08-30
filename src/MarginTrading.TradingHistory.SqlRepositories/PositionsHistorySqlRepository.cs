@@ -69,6 +69,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                                     deal.Volume,
                                 },
                                 commandType: CommandType.StoredProcedure,
+                                ignoreDuplicates: true,
                                 log: _log);
                         }
                         catch (Exception e)
@@ -196,6 +197,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 await conn.ExecuteAsync("INSERT INTO [dbo].[DealCommissionParams] (DealId) VALUES (@DealId)",
                     new {deal.DealId},
                     transaction,
+                    true,
                     log: _log);
             }
         }
