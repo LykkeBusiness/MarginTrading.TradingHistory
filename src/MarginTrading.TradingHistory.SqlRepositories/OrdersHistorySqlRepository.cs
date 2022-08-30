@@ -391,7 +391,8 @@ OUTER APPLY (
                 $"insert into {TableName} ({GetColumns}) values ({GetFields})",
                 orderHistoryEntity,
                 transaction,
-                true);
+                true,
+                log: _log);
 
             if (trade != null)
             {
@@ -400,7 +401,8 @@ OUTER APPLY (
                     $"insert into {TradesSqlRepository.TableName} ({TradesSqlRepository.GetColumns}) values ({TradesSqlRepository.GetFields})",
                     tradeEntity,
                     transaction,
-                    true);
+                    true,
+                    log: _log);
             }
         }
 

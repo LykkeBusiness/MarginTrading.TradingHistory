@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Common.Log;
 using Dapper;
 using Lykke.Common.MsSql;
-using MarginTrading.TradingHistory.Core.Services;
 using Microsoft.Data.SqlClient;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
@@ -23,6 +22,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         /// <param name="ignoreDuplicates">The unique key constraint violation will be logged as warning</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
         /// <param name="commandType">Is it a stored proc or a batch?</param>
+        /// <param name="log">The logger</param>
         /// <returns>The number of rows affected.</returns>
         public static async Task<int> ExecuteAsync(this IDbConnection cnn,
             string sql,
@@ -30,7 +30,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             IDbTransaction transaction = null,
             bool ignoreDuplicates = false,
             int? commandTimeout = null,
-            CommandType? commandType = null)
+            CommandType? commandType = null,
+            ILog log = null)
         {
             if (ignoreDuplicates)
             {
@@ -46,8 +47,11 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                         .GetValue(param)?
                         .ToString();
 
-                    LogLocator.Log.WriteWarning(nameof(ExecuteAsync), "",
-                        "An attempt to add duplicate entry" + (string.IsNullOrEmpty(id) ? "" : " for " + id));
+                    if (log != null)
+                    {
+                        await log.WriteWarningAsync(nameof(ExecuteAsync), "",
+                            "An attempt to add duplicate entry" + (string.IsNullOrEmpty(id) ? "" : " for " + id));   
+                    }
 
                     return 0;
                 }
