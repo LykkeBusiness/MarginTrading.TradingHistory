@@ -68,7 +68,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                                     deal.CloseOrderVolume,
                                     deal.Volume,
                                 },
-                                commandType: CommandType.StoredProcedure);
+                                commandType: CommandType.StoredProcedure,
+                                log: _log);
                         }
                         catch (Exception e)
                         {
@@ -153,7 +154,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             await conn.ExecuteAsync($"insert into {TableName} ({GetColumns}) values ({GetFields})",
                 positionEntity,
                 transaction,
-                true);
+                true,
+                log: _log);
 
             if (deal != null)
             {
@@ -187,11 +189,14 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                         entity.AdditionalInfo,
                         entity.CorrelationId
                     },
-                    transaction, true);
+                    transaction, 
+                    true,
+                    log: _log);
 
                 await conn.ExecuteAsync("INSERT INTO [dbo].[DealCommissionParams] (DealId) VALUES (@DealId)",
                     new {deal.DealId},
-                    transaction);
+                    transaction,
+                    log: _log);
             }
         }
 
