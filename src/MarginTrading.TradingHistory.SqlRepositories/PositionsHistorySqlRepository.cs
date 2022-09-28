@@ -52,32 +52,30 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
             if (deal != null)
             {
-                Task.Run(async () =>    
+                await Task.Run(async () =>
                 {
-                    using (var conn = new SqlConnection(_connectionString))
+                    using var conn = new SqlConnection(_connectionString);
+                    try
                     {
-                        try
-                        {
-                            await conn.ExecuteAsync("[dbo].[UpdateDealCommissionParamsOnDeal]",
-                                new
-                                {
-                                    deal.DealId,
-                                    deal.OpenTradeId,
-                                    deal.OpenOrderVolume,
-                                    deal.CloseTradeId,
-                                    deal.CloseOrderVolume,
-                                    deal.Volume,
-                                },
-                                commandType: CommandType.StoredProcedure,
-                                ignoreDuplicates: true,
-                                log: _log);
-                        }
-                        catch (Exception e)
-                        {
-                            await _log.WriteErrorAsync(nameof(PositionsHistorySqlRepository),
-                                nameof(AddAsync),
-                                $"Failed to calculate commissions for the deal {deal.DealId}, skipping.", e);
-                        }
+                        await conn.ExecuteAsync("[dbo].[UpdateDealCommissionParamsOnDeal]",
+                            new
+                            {
+                                deal.DealId,
+                                deal.OpenTradeId,
+                                deal.OpenOrderVolume,
+                                deal.CloseTradeId,
+                                deal.CloseOrderVolume,
+                                deal.Volume,
+                            },
+                            commandType: CommandType.StoredProcedure,
+                            ignoreDuplicates: true,
+                            log: _log);
+                    }
+                    catch (Exception e)
+                    {
+                        await _log.WriteErrorAsync(nameof(PositionsHistorySqlRepository),
+                            nameof(AddAsync),
+                            $"Failed to calculate commissions for the deal {deal.DealId}, skipping.", e);
                     }
                 });
 
@@ -89,20 +87,18 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             DateTime? eventDateFrom,
             DateTime? eventDateTo)
         {
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                var whereClause = "Where 1=1 " +
-                                  (string.IsNullOrEmpty(accountId) ? "" : " And AccountId = @accountId") +
-                                  (string.IsNullOrEmpty(assetPairId) ? "" : " And AssetPairId = @assetPairId") +
-                                  (eventDateFrom == null ? "" : " AND CONVERT(date, HistoryTimestamp) >= @eventDateFrom") +
-                                  (eventDateTo == null ? "" : " AND CONVERT(date, HistoryTimestamp) <= @eventDateTo");
+            using var conn = new SqlConnection(_connectionString);
+            var whereClause = "Where 1=1 " +
+                              (string.IsNullOrEmpty(accountId) ? "" : " And AccountId = @accountId") +
+                              (string.IsNullOrEmpty(assetPairId) ? "" : " And AssetPairId = @assetPairId") +
+                              (eventDateFrom == null ? "" : " AND CONVERT(date, HistoryTimestamp) >= @eventDateFrom") +
+                              (eventDateTo == null ? "" : " AND CONVERT(date, HistoryTimestamp) <= @eventDateTo");
 
-                var query = $"SELECT * FROM {TableName} {whereClause}";
-                var objects =
-                    await conn.QueryAsync<PositionsHistoryEntity>(query, new { accountId, assetPairId, eventDateFrom, eventDateTo });
+            var query = $"SELECT * FROM {TableName} {whereClause}";
+            var objects =
+                await conn.QueryAsync<PositionsHistoryEntity>(query, new { accountId, assetPairId, eventDateFrom, eventDateTo });
 
-                return objects.Cast<IPositionHistory>().ToList();
-            }
+            return objects.Cast<IPositionHistory>().ToList();
         }
 
         public async Task<PaginatedResponse<IPositionHistory>> GetByPagesAsync(string accountId,
@@ -118,34 +114,30 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                               + (eventDateFrom == null ? "" : " AND CONVERT(date, HistoryTimestamp) >= @eventDateFrom")
                               + (eventDateTo == null ? "" : " AND CONVERT(date, HistoryTimestamp) <= @eventDateTo");
 
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                var paginationClause =
-                    $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
-                var gridReader = await conn.QueryMultipleAsync(
-                    $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
-                    new { accountId, assetPairId, eventDateFrom, eventDateTo });
-                var positionsHistoryEntities = (await gridReader.ReadAsync<PositionsHistoryEntity>()).ToList();
-                var totalCount = await gridReader.ReadSingleAsync<int>();
+            using var conn = new SqlConnection(_connectionString);
+            var paginationClause =
+                $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+            var gridReader = await conn.QueryMultipleAsync(
+                $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
+                new { accountId, assetPairId, eventDateFrom, eventDateTo });
+            var positionsHistoryEntities = (await gridReader.ReadAsync<PositionsHistoryEntity>()).ToList();
+            var totalCount = await gridReader.ReadSingleAsync<int>();
 
-                return new PaginatedResponse<IPositionHistory>(
-                    contents: positionsHistoryEntities,
-                    start: skip ?? 0,
-                    size: positionsHistoryEntities.Count,
-                    totalSize: totalCount
-                );
-            }
+            return new PaginatedResponse<IPositionHistory>(
+                contents: positionsHistoryEntities,
+                start: skip ?? 0,
+                size: positionsHistoryEntities.Count,
+                totalSize: totalCount
+            );
         }
 
         public async Task<List<IPositionHistory>> GetAsync(string id)
         {
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                var query = $"SELECT * FROM {TableName} Where Id = @id";
-                var objects = await conn.QueryAsync<PositionsHistoryEntity>(query, new {id});
+            using var conn = new SqlConnection(_connectionString);
+            var query = $"SELECT * FROM {TableName} Where Id = @id";
+            var objects = await conn.QueryAsync<PositionsHistoryEntity>(query, new {id});
                 
-                return objects.Cast<IPositionHistory>().ToList();
-            }
+            return objects.Cast<IPositionHistory>().ToList();
         }
         
         private async Task DoAdd(SqlConnection conn, SqlTransaction transaction, IPositionHistory positionHistory, IDeal deal)
