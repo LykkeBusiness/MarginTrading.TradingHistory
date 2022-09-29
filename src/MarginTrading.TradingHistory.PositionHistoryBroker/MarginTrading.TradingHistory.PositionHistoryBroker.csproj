@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>MarginTrading.TradingHistory.PositionHistoryBroker</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>MarginTrading.TradingHistory.PositionHistoryBroker</PackageId>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Version>2.4.0</Version>
-    <LangVersion>latest</LangVersion>
+    <Version>2.5.0</Version>
+    <LangVersion>8.0</LangVersion>
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
   </PropertyGroup>
@@ -34,15 +34,15 @@
     <PackageReference Include="Lykke.Snow.Common" Version="1.31.0" />
     <PackageReference Include="LykkeBiz.MarginTrading.BrokerBase" Version="4.5.1" />
     <PackageReference Include="LykkeBiz.RabbitMqBroker" Version="9.2.6" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.26" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="3.1.26" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.26" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.26" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.26" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.26" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.26" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.26" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.26" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
   <ItemGroup>
