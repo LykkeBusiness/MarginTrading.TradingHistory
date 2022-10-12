@@ -73,7 +73,8 @@ namespace MarginTrading.TradingHistory.TestClient
             var accountId = "AA0012";
             var assetId = "ADIDAS_AG";
 
-            var positionEvents = await api.PositionHistoryByPages(accountId, assetId, skip: 0, take: 20);
+            var positionEvents = await api.PositionHistoryByPages(accountId, assetId, 
+                null, null, skip: 0, take: 20);
 
             if (!positionEvents.Contents.Any())
             {
