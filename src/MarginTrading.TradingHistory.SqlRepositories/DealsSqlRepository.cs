@@ -36,7 +36,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                var query = $"SELECT * FROM {ViewName} WHERE DealId = @id";
+                var query = $"SELECT * FROM {ViewName} WITH (NOLOCK) WHERE DealId = @id";
                 var objects = await conn.QueryAsync<DealWithCommissionParamsEntity>(query, new {id});
                 return objects.FirstOrDefault();
             }
@@ -58,7 +58,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             using (var conn = new SqlConnection(_connectionString))
             {
                 var gridReader = await conn.QueryMultipleAsync(
-                    $"SELECT * FROM {ViewName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {ViewName} {whereClause}",
+                    $"SELECT * FROM {ViewName} WITH (NOLOCK) {whereClause} {paginationClause}; SELECT COUNT(*) FROM {ViewName} WITH (NOLOCK) {whereClause}",
                     new {accountId, assetPairId, closeTimeStart, closeTimeEnd});
                 var deals = (await gridReader.ReadAsync<DealWithCommissionParamsEntity>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
@@ -98,10 +98,10 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                         SUM({nameof(IDealWithCommissionParams.Taxes)}) AS {nameof(IAggregatedDeal.Taxes)},
                         COUNT({nameof(IDeal.DealId)}) AS {nameof(IAggregatedDeal.DealsCount)},
                         MAX({nameof(IDeal.Created)}) AS {nameof(IAggregatedDeal.LastDealDate)}
-                      FROM {ViewName}
+                      FROM {ViewName} WITH (NOLOCK)
                       {whereClause}
                       GROUP BY {nameof(IAggregatedDeal.AccountId)}, {nameof(IAggregatedDeal.AssetPairId)}
-                      {paginationClause}; SELECT COUNT(DISTINCT {nameof(IAggregatedDeal.AssetPairId)}) FROM {ViewName} {whereClause}",
+                      {paginationClause}; SELECT COUNT(DISTINCT {nameof(IAggregatedDeal.AssetPairId)}) FROM {ViewName} WITH (NOLOCK) {whereClause}",
                     new { accountId, assetPairId, closeTimeStart, closeTimeEnd });
                 var deals = (await gridReader.ReadAsync<AggregatedDeal>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
@@ -126,7 +126,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                     + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
                     + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
                 
-                var query = $"SELECT * FROM {ViewName} {clause}";
+                var query = $"SELECT * FROM {ViewName} WITH (NOLOCK) {clause}";
                 return await conn.QueryAsync<DealWithCommissionParamsEntity>(query, 
                     new {accountId, assetPairId, closeTimeStart, closeTimeEnd});
             }
@@ -143,7 +143,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                              + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
                              + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
                 
-                var query = $"SELECT ISNULL(SUM(Fpl), 0) FROM {TableName} {whereClause}";
+                var query = $"SELECT ISNULL(SUM(Fpl), 0) FROM {TableName} WITH (NOLOCK) {whereClause}";
 
                 return await conn.QuerySingleOrDefaultAsync<decimal>(query,
                     new {accountId, assetPairId, closeTimeStart, closeTimeEnd});
