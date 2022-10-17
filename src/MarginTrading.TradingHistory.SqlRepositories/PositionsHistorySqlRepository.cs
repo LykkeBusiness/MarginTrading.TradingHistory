@@ -94,7 +94,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                               (eventDateFrom == null ? "" : " AND CONVERT(date, HistoryTimestamp) >= @eventDateFrom") +
                               (eventDateTo == null ? "" : " AND CONVERT(date, HistoryTimestamp) <= @eventDateTo");
 
-            var query = $"SELECT * FROM {TableName} {whereClause}";
+            var query = $"SELECT * FROM {TableName} WITH (NOLOCK) {whereClause}";
             var objects =
                 await conn.QueryAsync<PositionsHistoryEntity>(query, new { accountId, assetPairId, eventDateFrom, eventDateTo });
 
@@ -118,7 +118,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             var paginationClause =
                 $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
             var gridReader = await conn.QueryMultipleAsync(
-                $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}",
+                $"SELECT * FROM {TableName} WITH (NOLOCK) {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} WITH (NOLOCK) {whereClause}",
                 new { accountId, assetPairId, eventDateFrom, eventDateTo });
             var positionsHistoryEntities = (await gridReader.ReadAsync<PositionsHistoryEntity>()).ToList();
             var totalCount = await gridReader.ReadSingleAsync<int>();
@@ -134,7 +134,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         public async Task<List<IPositionHistory>> GetAsync(string id)
         {
             using var conn = new SqlConnection(_connectionString);
-            var query = $"SELECT * FROM {TableName} Where Id = @id";
+            var query = $"SELECT * FROM {TableName} WITH (NOLOCK) Where Id = @id";
             var objects = await conn.QueryAsync<PositionsHistoryEntity>(query, new {id});
                 
             return objects.Cast<IPositionHistory>().ToList();
