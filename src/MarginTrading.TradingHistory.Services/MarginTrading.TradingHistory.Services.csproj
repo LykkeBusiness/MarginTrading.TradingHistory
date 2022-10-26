@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>MarginTrading.TradingHistory.Services</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.Services</RootNamespace>
-    <Version>2.3.3</Version>
-    <LangVersion>latest</LangVersion>
+    <Version>2.4.3</Version>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="7.0.0" />
-    <PackageReference Include="Lykke.Common" Version="7.5.0" />
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="Lykke.Common" Version="7.6.0" />
     <PackageReference Include="Lykke.SlackNotifications" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
