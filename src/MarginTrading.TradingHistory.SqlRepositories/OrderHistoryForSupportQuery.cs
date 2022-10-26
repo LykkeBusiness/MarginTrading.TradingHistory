@@ -74,12 +74,12 @@ select
   oh.Volume  as '{nameof(ResultItem.Volume)}',
   oh.ExecutionPrice  as '{nameof(ResultItem.ExecutionPrice)}',
   oh.AssetPairId  as '{nameof(ResultItem.AssetPairId)}'
-from OrdersHistory oh
+from OrdersHistory oh with (nolock)
 join MarginTradingAccounts a on oh.AccountId = a.Id 
 /**where**/
 /**orderby**/
 offset @{nameof(Criterion.Skip)} ROWS FETCH NEXT @{nameof(Criterion.Take)} ROWS ONLY;
-select count(*) from OrdersHistory oh join MarginTradingAccounts a on oh.AccountId = a.Id  /**where**/
+select count(*) from OrdersHistory oh with (nolock) join MarginTradingAccounts a on oh.AccountId = a.Id  /**where**/
 ";
 
         public async Task<PaginatedResponse<ResultItem>> Ask(Criterion criterion)
