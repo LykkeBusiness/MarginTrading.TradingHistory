@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2019 Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Common.Log;
@@ -8,7 +9,6 @@ using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Settings.ServiceSettings;
 using MarginTrading.TradingHistory.Services;
 using Lykke.SettingsReader;
-using MarginTrading.TradingHistory.AzureRepositories;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories;
@@ -59,24 +59,10 @@ namespace MarginTrading.TradingHistory.Modules
 
             if (_settings.CurrentValue.Db.StorageMode == StorageMode.Azure)
             {
-                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateOrdersHistoryRepository(
-                        _settings.Nested(s => s.Db.HistoryConnString), _log, convertService))
-                    .As<IOrdersHistoryRepository>()
-                    .SingleInstance();
-            
-                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreatePositionsHistoryRepository(
-                        _settings.Nested(s => s.Db.HistoryConnString), _log, new ConvertService()))
-                    .As<IPositionsHistoryRepository>().SingleInstance();
-                
-                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateTradesHistoryRepository(
-                        _settings.Nested(s => s.Db.HistoryConnString), _log, new ConvertService()))
-                    .As<ITradesRepository>();
-                
-                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateDealsHistoryRepository(
-                        _settings.Nested(s => s.Db.HistoryConnString), _log, new ConvertService()))
-                    .As<IDealsRepository>().SingleInstance();
+               throw new NotImplementedException("Azure storage is not implemented yet");
             }
-            else if (_settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
+
+            if (_settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
             {
                 builder.RegisterInstance(new OrdersHistorySqlRepository(
                         _settings.CurrentValue.Db.HistoryConnString,
@@ -99,7 +85,7 @@ namespace MarginTrading.TradingHistory.Modules
 
                 builder.RegisterInstance(new OrderHistoryForSupportQuery(_settings.CurrentValue.Db.HistoryConnString, _settings.CurrentValue.Db.OrderHistoryForSupportExecutionTimeout));
             }
-            
+
             builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();
 
             builder.Populate(_services);
