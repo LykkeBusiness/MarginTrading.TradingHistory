@@ -47,7 +47,9 @@ namespace MarginTrading.TradingHistory.Controllers
         {
             var data = await _dealsRepository.GetAsync(accountId, instrument, closeTimeStart, closeTimeEnd);
 
-            return data.Where(d => d != null).Select(Convert).ToList();
+            return data.Where(d => d != null)
+                .Select(_convertService.Convert<IDealWithCommissionParams, DealContract>)
+                .ToList();
         }
 
         /// <summary>
@@ -121,7 +123,8 @@ namespace MarginTrading.TradingHistory.Controllers
                 closeTimeStart, closeTimeEnd, skip: skip, take: take, isAscending: isAscending);
 
             return new PaginatedResponseContract<DealContract>(
-                contents: data.Contents.Select(Convert).ToList(),
+                contents: data.Contents.Select(
+                    _convertService.Convert<IDealWithCommissionParams, DealContract>).ToList(),
                 start: data.Start,
                 size: data.Size,
                 totalSize: data.TotalSize
@@ -145,7 +148,8 @@ namespace MarginTrading.TradingHistory.Controllers
                 closeTimeStart, closeTimeEnd, skip: skip, take: take, isAscending: isAscending);
 
             return new PaginatedResponseContract<AggregatedDealContract>(
-                contents: data.Contents.Select(Convert).ToList(),
+                contents: data.Contents.Select(
+                    _convertService.Convert<IAggregatedDeal, AggregatedDealContract>).ToList(),
                 start: data.Start,
                 size: data.Size,
                 totalSize: data.TotalSize
@@ -167,19 +171,7 @@ namespace MarginTrading.TradingHistory.Controllers
             
             var deal = await _dealsRepository.GetAsync(dealId);
 
-            return deal == null ? null : Convert(deal);
-        }
-
-        private DealContract Convert(IDeal deal)
-        {
-            return _convertService.Convert<IDeal, DealContract>(deal, opts => opts.ConfigureMap()
-                .ForMember(x => x.Direction, 
-                    o => o.ResolveUsing(z => z.Direction.ToType<PositionDirectionContract>())));
-        }
-
-        private AggregatedDealContract Convert(IAggregatedDeal aggregate)
-        {
-            return _convertService.Convert<IAggregatedDeal, AggregatedDealContract>(aggregate, opts => opts.ConfigureMap());
+            return deal == null ? null : _convertService.Convert<IDealWithCommissionParams, DealContract>(deal);
         }
     }
 }

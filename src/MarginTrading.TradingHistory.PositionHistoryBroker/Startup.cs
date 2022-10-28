@@ -1,21 +1,18 @@
 ﻿// Copyright (c) 2019 Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using Autofac;
 using Common.Log;
 using JetBrains.Annotations;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.SettingsReader;
-using Lykke.Snow.Common.Correlation;
-using MarginTrading.TradingHistory.AzureRepositories;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Services;
 using MarginTrading.TradingHistory.SqlRepositories;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace MarginTrading.TradingHistory.PositionHistoryBroker
@@ -36,15 +33,10 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
             
             if (settings.CurrentValue.Db.StorageMode == StorageMode.Azure)
             {
-                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreatePositionsHistoryRepository(
-                        settings.Nested(s => s.Db.ConnString), log, new ConvertService()))
-                    .As<IPositionsHistoryRepository>().SingleInstance();
-                builder.RegisterInstance(AzureRepoFactories.MarginTrading.CreateDealsHistoryRepository(
-                        settings.Nested(s => s.Db.ConnString), log, new ConvertService()))
-                    .As<IDealsRepository>().SingleInstance();
-
+                throw new NotImplementedException("Azure storage is not implemented yet");
             }
-            else if (settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
+
+            if (settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
             {
                 builder.RegisterInstance(new PositionsHistorySqlRepository(
                         settings.CurrentValue.Db.ConnString, log))

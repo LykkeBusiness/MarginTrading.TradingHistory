@@ -20,8 +20,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\client\MarginTrading.TradingHistory.Client\MarginTrading.TradingHistory.Client.csproj" />
-    <ProjectReference Include="..\..\src\MarginTrading.TradingHistory.AzureRepositories\MarginTrading.TradingHistory.AzureRepositories.csproj" />
     <ProjectReference Include="..\..\src\MarginTrading.TradingHistory.Core\MarginTrading.TradingHistory.Core.csproj" />
+    <ProjectReference Include="..\..\src\MarginTrading.TradingHistory.Services\MarginTrading.TradingHistory.Services.csproj" />
   </ItemGroup>
 
 
