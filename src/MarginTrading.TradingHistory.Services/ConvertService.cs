@@ -1,14 +1,12 @@
 ﻿// Copyright (c) 2019 Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using AutoMapper;
 using JetBrains.Annotations;
+using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
+using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Services;
-using Microsoft.AspNetCore.Routing;
 
 namespace MarginTrading.TradingHistory.Services
 {
@@ -17,36 +15,15 @@ namespace MarginTrading.TradingHistory.Services
     {
         private readonly IMapper _mapper = CreateMapper();
 
-        private readonly ConcurrentDictionary<(Type Source, Type Result), Type> _constructorArgsTypes =
-            new ConcurrentDictionary<(Type Source, Type Destination), Type>();
-
         private static IMapper CreateMapper()
         {
-            return new MapperConfiguration(cfg => { }).CreateMapper();
-        }
-
-        public TResult Convert<TSource, TResult>(TSource source,
-            Action<IMappingOperationOptions<TSource, TResult>> opts)
-        {
-            return _mapper.Map(source, opts);
-        }
-
-        public TResult ConvertWithConstructorArgs<TSource, TResult>(TSource source, object argumentsObject)
-        {
-            _constructorArgsTypes.AddOrUpdate((typeof(TSource), typeof(TResult)), k => argumentsObject.GetType(),
-                (k, old) => argumentsObject.GetType()
-                    .RequiredEqualsTo(old, "argumentsObject should always be of the same type"));
-            var arguments = GetProperties(argumentsObject);
-            return _mapper.Map<TSource, TResult>(source, o =>
+            return new MapperConfiguration(cfg =>
             {
-                var conf = o.ConfigureMap();
-                foreach (var pair in arguments)
-                {
-                    conf.ForCtorParam(pair.Key,
-                        e => e.ResolveUsing((contract, context) => (string) context.Items[pair.Key]));
-                    o.Items[pair.Key] = pair.Value;
-                }
-            });
+                cfg.CreateMap<IDealWithCommissionParams, DealContract>()
+                    .ForMember(dest => dest.Direction,
+                        opt => opt.MapFrom(src => src.Direction.ToType<PositionDirectionContract>()));
+                cfg.CreateMap<IAggregatedDeal, AggregatedDealContract>();
+            }).CreateMapper();
         }
 
         public TResult Convert<TSource, TResult>(TSource source)
@@ -54,12 +31,9 @@ namespace MarginTrading.TradingHistory.Services
             return _mapper.Map<TSource, TResult>(source);
         }
 
-        /// <summary>
-        /// Get the properties and values of an object using an existing opimized implementation 
-        /// </summary>
-        private static IReadOnlyDictionary<string, object> GetProperties(object obj)
+        public void AssertConfigurationIsValid()
         {
-            return new RouteValueDictionary(obj);
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
     }
 }
