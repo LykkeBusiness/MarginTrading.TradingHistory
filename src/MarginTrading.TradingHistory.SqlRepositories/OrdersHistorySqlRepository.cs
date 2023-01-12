@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Dapper;
+using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Extensions;
@@ -331,6 +332,9 @@ OUTER APPLY (
             int? skip = null, int? take = null, bool isAscending = true,
             bool executedOrdersEssentialFieldsOnly = false)
         {
+
+            (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
+
             var whereClause = " WHERE 1=1 "
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
@@ -346,7 +350,7 @@ OUTER APPLY (
                               + (modifiedTimeEnd == null ? "" : " AND ModifiedTimestamp < @modifiedTimeEnd");
             var order = isAscending ? string.Empty : Constants.DescendingOrder;
             var paginationClause =
-                $" ORDER BY [ModifiedTimestamp] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+                $" ORDER BY [ModifiedTimestamp] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {take} ROWS ONLY";
 
             using (var conn = new SqlConnection(_connectionString))
             {
