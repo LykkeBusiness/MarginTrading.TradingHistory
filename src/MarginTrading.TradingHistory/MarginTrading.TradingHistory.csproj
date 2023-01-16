@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <Version>2.10.0</Version>
+    <Version>2.10.1</Version>
     <AssemblyName>MarginTrading.TradingHistory</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory</RootNamespace>
     <LangVersion>8.0</LangVersion>
@@ -45,7 +45,6 @@
     <PackageReference Include="Lykke.MonitoringServiceApiCaller" Version="1.8.0" />
     <PackageReference Include="Lykke.Service.Session" Version="1.0.33" />
     <PackageReference Include="Lykke.SettingsReader" Version="5.3.0" />
-    <PackageReference Include="Lykke.Snow.Common" Version="1.31.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.26" />
     <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.5" />
     <PackageReference Include="Lykke.Snow.Common.Startup" Version="2.3.0" />

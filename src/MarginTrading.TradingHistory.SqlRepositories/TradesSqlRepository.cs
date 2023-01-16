@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Dapper;
+using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
@@ -66,11 +67,14 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         public async Task<PaginatedResponse<ITrade>> GetByPagesAsync(string accountId, string assetPairId,
             int? skip = null, int? take = null, bool isAscending = true)
         {
+
+            (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
+
             var whereClause = "WHERE 1=1 "
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId");
             var order = isAscending ? string.Empty : Constants.DescendingOrder;
-            var paginationClause = $" ORDER BY [TradeTimestamp] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+            var paginationClause = $" ORDER BY [TradeTimestamp] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {take} ROWS ONLY";
             
             using (var conn = new SqlConnection(_connectionString))
             {
