@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Dapper;
+using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Core.Domain;
 using Microsoft.Data.SqlClient;
 
@@ -84,6 +85,7 @@ select count(*) from OrdersHistory oh with (nolock) join MarginTradingAccounts a
 
         public async Task<PaginatedResponse<ResultItem>> Ask(Criterion criterion)
         {
+            (criterion.Skip, criterion.Take) = PaginationUtils.ValidateSkipAndTake(criterion.Skip, criterion.Take);
             var builder = new SqlBuilder();
             var selector = builder.AddTemplate(_template);
             var parameters = GetDynamicParameters(criterion);
