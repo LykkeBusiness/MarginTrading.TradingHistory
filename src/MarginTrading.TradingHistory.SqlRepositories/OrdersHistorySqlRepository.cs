@@ -227,6 +227,8 @@ OUTER APPLY (
             OrderBlotterSortingColumn sortingColumn,
             SortingOrder sortingOrder)
         {
+            (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
+
             using (var conn = new SqlConnection(_connectionString))
             {
                 var assetPairId = (string)null;
