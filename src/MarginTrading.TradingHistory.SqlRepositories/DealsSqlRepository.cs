@@ -13,6 +13,7 @@ using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
 {
@@ -25,8 +26,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
         public static readonly List<string> DealInsertColumns = typeof(IDeal).GetProperties().Select(x => x.Name).ToList();
 
-        public DealsSqlRepository(string connectionString, ILog log)
-            : base(connectionString)
+        public DealsSqlRepository(string connectionString, ILog log, ILogger<DealsSqlRepository> logger)
+            : base(connectionString, logger)
         {
             _connectionString = connectionString;
 

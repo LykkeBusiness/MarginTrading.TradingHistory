@@ -7,7 +7,7 @@
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="Lykke.Common" Version="7.6.0" />
     <PackageReference Include="Lykke.SlackNotifications" Version="2.0.0" />
   </ItemGroup>
