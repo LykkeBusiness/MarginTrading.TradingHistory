@@ -13,6 +13,7 @@ using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace MarginTrading.TradingHistory.Modules
 {
@@ -79,9 +80,12 @@ namespace MarginTrading.TradingHistory.Modules
                         _settings.CurrentValue.Db.HistoryConnString, _log))
                     .As<ITradesRepository>();
                 
-                builder.RegisterInstance(new DealsSqlRepository(
-                        _settings.CurrentValue.Db.HistoryConnString, _log))
-                    .As<IDealsRepository>();
+                builder.Register(ctx => new DealsSqlRepository(
+                        _settings.CurrentValue.Db.HistoryConnString,
+                        _log,
+                        ctx.Resolve<ILogger<DealsSqlRepository>>()))
+                    .As<IDealsRepository>()
+                    .SingleInstance();
 
                 builder.RegisterInstance(new OrderHistoryForSupportQuery(_settings.CurrentValue.Db.HistoryConnString, _settings.CurrentValue.Db.OrderHistoryForSupportExecutionTimeout));
             }
