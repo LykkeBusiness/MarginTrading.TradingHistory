@@ -13,6 +13,8 @@ namespace MarginTrading.TradingHistory.Core.Repositories
     {
         [ItemCanBeNull]
         Task<IDealWithCommissionParams> GetAsync(string id);
+        [ItemCanBeNull]
+        Task<IDealDetails> GetDetailsAsync(string id);
         Task<PaginatedResponse<IDealWithCommissionParams>> GetByPagesAsync(string accountId, string assetPairId,
             DateTime? closeTimeStart, DateTime? closeTimeEnd,
             int? skip = null, int? take = null, bool isAscending = true);

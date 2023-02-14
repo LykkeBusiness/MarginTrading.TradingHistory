@@ -7,6 +7,7 @@ using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Services;
+using Newtonsoft.Json;
 
 namespace MarginTrading.TradingHistory.Services
 {
@@ -22,6 +23,11 @@ namespace MarginTrading.TradingHistory.Services
                 cfg.CreateMap<IDealWithCommissionParams, DealContract>()
                     .ForMember(dest => dest.Direction,
                         opt => opt.MapFrom(src => src.Direction.ToType<PositionDirectionContract>()));
+                cfg.CreateMap<IDealDetails, DealDetailsContract>()
+                    .ForMember(dest => dest.TaxInfo,
+                        opt => opt.MapFrom(src => string.IsNullOrEmpty(src.TaxInfo)
+                            ? null
+                            : JsonConvert.DeserializeObject<TaxInfoContract>(src.TaxInfo)));
                 cfg.CreateMap<IAggregatedDeal, AggregatedDealContract>();
             }).CreateMapper();
         }
