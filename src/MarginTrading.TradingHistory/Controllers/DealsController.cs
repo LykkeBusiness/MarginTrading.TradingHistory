@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common.Log;
 using Lykke.Common.ApiLibrary.Validation;
+using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Client;
 using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
@@ -117,7 +118,7 @@ namespace MarginTrading.TradingHistory.Controllers
             [FromQuery] int? skip = null, [FromQuery] int? take = null,
             [FromQuery] bool isAscending = false)
         {
-            ApiValidationHelper.ValidatePagingParams(skip, take);
+            (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
             
             var data = await _dealsRepository.GetByPagesAsync(accountId, instrument, 
                 closeTimeStart, closeTimeEnd, skip: skip, take: take, isAscending: isAscending);
@@ -142,7 +143,12 @@ namespace MarginTrading.TradingHistory.Controllers
             [FromQuery] int? skip = null, [FromQuery] int? take = null,
             [FromQuery] bool isAscending = false)
         {
-            ApiValidationHelper.ValidateAggregatedParams(accountId, skip, take);
+            if(string.IsNullOrWhiteSpace(accountId))
+            {
+                throw new ArgumentNullException(nameof(accountId), $"{nameof(accountId)} must be provided");
+            }
+
+            (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
 
             var data = await _dealsRepository.GetAggregated(accountId, instrument,
                 closeTimeStart, closeTimeEnd, skip: skip, take: take, isAscending: isAscending);

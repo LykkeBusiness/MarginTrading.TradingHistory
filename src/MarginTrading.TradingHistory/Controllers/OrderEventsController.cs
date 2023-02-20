@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Client;
 using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
@@ -45,7 +46,7 @@ namespace MarginTrading.TradingHistory.Controllers
             [FromQuery] int? skip = 0, [FromQuery] int? take = 20, 
             [FromQuery] bool isAscending = false)
         {
-            ApiValidationHelper.ValidatePagingParams(skip, take);
+            (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
             
             var data = await _ordersHistoryRepository.GetHistoryByPagesAsync(
                 accountId: filters?.AccountId, 
@@ -74,7 +75,7 @@ namespace MarginTrading.TradingHistory.Controllers
         [HttpPost("/api/order-events/for-support")]
         public async Task<PaginatedResponseContract<OrderEventForSupportContract>> OrderHistoryForSupport([FromBody]OrderEventsForSupportRequest request)
         {
-            ApiValidationHelper.ValidatePagingParams(request.Skip, request.Take);
+            (request.Skip, request.Take) = PaginationUtils.ValidateSkipAndTake(request.Skip, request.Take);
 
             var result = await _orderHistoryForSupportQuery.Ask(request.FromContract());
             var items = result.Contents.Select(p => p.ToContract()).ToList();
