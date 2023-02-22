@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Client;
 using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
@@ -49,7 +50,7 @@ namespace MarginTrading.TradingHistory.Controllers
         [HttpGet, Route("by-pages")] 
         public async Task<PaginatedResponseContract<PositionEventContract>> PositionHistoryByPages([FromQuery] string accountId, [FromQuery] string instrument, [FromQuery] DateTime? eventDateFrom, [FromQuery] DateTime? eventDateTo, int? skip = null, int? take = null)
         {
-            ApiValidationHelper.ValidatePagingParams(skip, take);
+            (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
             
             var data = await _positionsHistoryRepository.GetByPagesAsync(accountId, instrument, eventDateFrom, eventDateTo, skip, take);
 

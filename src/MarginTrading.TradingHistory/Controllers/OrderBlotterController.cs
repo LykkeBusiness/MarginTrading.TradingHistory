@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Client;
 using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
@@ -53,7 +54,7 @@ namespace MarginTrading.TradingHistory.Controllers
             [FromQuery] OrderBlotterSortingColumnContract sortingColumn,
             [FromQuery] SortingOrderContract sortingOrder)
         {
-            ApiValidationHelper.ValidatePagingParams(skip, take);
+            (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
 
             var result = await _ordersHistoryRepository.GetOrderBlotterAsync(
                 relevanceTimestamp.Value,
