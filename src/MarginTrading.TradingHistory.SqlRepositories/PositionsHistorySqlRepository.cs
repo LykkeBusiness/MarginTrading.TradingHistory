@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Dapper;
+using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Extensions;
@@ -108,6 +109,9 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             int? skip = null,
             int? take = null)
         {
+
+            (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
+
             var whereClause = " WHERE 1=1 "
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
@@ -116,7 +120,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
             using var conn = new SqlConnection(_connectionString);
             var paginationClause =
-                $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+                $" ORDER BY [Oid] OFFSET {skip ?? 0} ROWS FETCH NEXT {take} ROWS ONLY";
             var gridReader = await conn.QueryMultipleAsync(
                 $"SELECT * FROM {TableName} WITH (NOLOCK) {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} WITH (NOLOCK) {whereClause}",
                 new { accountId, assetPairId, eventDateFrom, eventDateTo });

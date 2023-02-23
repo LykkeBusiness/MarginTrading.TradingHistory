@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Common.ApiLibrary.Validation;
+using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Client;
 using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
@@ -71,8 +72,8 @@ namespace MarginTrading.TradingHistory.Controllers
             [FromQuery] string assetPairId = null, [FromQuery] int? skip = null, [FromQuery] int? take = null,
             [FromQuery] bool isAscending = false)
         {
-            ApiValidationHelper.ValidatePagingParams(skip, take);
-            
+            (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
+
             var data = await _tradesRepository.GetByPagesAsync(accountId, assetPairId, skip, take,
                 isAscending);
 

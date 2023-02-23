@@ -99,13 +99,15 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             DateTime? closeTimeStart, DateTime? closeTimeEnd,
             int? skip = null, int? take = null, bool isAscending = true)
         {
+            (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
+
             var whereClause = "WHERE 1=1 "
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
                               + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
                               + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
             var order = isAscending ? string.Empty : Constants.DescendingOrder;
-            var paginationClause = $" ORDER BY [Created] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+            var paginationClause = $" ORDER BY [Created] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {take} ROWS ONLY";
             
             using (var conn = new SqlConnection(_connectionString))
             {
@@ -128,12 +130,15 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             DateTime? closeTimeStart, DateTime? closeTimeEnd,
             int? skip = null, int? take = null, bool isAscending = true)
         {
+
+            (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
+
             var whereClause = "WHERE AccountId=@accountId"
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
                               + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
                               + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
             var order = isAscending ? string.Empty : Constants.DescendingOrder;
-            var paginationClause = $" ORDER BY [{nameof(IAggregatedDeal.LastDealDate)}] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {PaginationHelper.GetTake(take)} ROWS ONLY";
+            var paginationClause = $" ORDER BY [{nameof(IAggregatedDeal.LastDealDate)}] {order} OFFSET {skip ?? 0} ROWS FETCH NEXT {take} ROWS ONLY";
 
             using (var conn = new SqlConnection(_connectionString))
             {
