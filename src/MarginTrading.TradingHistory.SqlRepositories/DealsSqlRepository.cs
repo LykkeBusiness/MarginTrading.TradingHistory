@@ -13,23 +13,27 @@ using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
 {
-    public class DealsSqlRepository : IDealsRepository
+    public class DealsSqlRepository : SqlRepositoryBase, IDealsRepository
     {
         private const string ViewName = "[dbo].[V_DealsWithCommissionParams]";
         private const string TableName = "[dbo].[Deals]";
+        private const string GetDealDetailsProcName = "[dbo].[getDealDetails]";
         private readonly string _connectionString;
 
         public static readonly List<string> DealInsertColumns = typeof(IDeal).GetProperties().Select(x => x.Name).ToList();
 
-        public DealsSqlRepository(string connectionString, ILog log)
+        public DealsSqlRepository(string connectionString, ILog log, ILogger<DealsSqlRepository> logger)
+            : base(connectionString, logger)
         {
             _connectionString = connectionString;
 
             connectionString.InitializeSqlObject("dbo.Deals.sql", log);
             connectionString.InitializeSqlObject("dbo.DealCommissionParams.sql", log);
+            connectionString.InitializeSqlObject("dbo.getDealDetails.sql", log);
             connectionString.InitializeSqlObject("dbo.V_DealsWithCommissionParams.sql", log);
         }
         
@@ -41,6 +45,53 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 var objects = await conn.QueryAsync<DealWithCommissionParamsEntity>(query, new {id});
                 return objects.FirstOrDefault();
             }
+        }
+        
+        public async Task<IDealDetails> GetDetailsAsync(string id)
+        {
+            return await GetAsync(
+                GetDealDetailsProcName,
+                new[] { new SqlParameter(nameof(IDealDetails.DealId), id) },
+                Map);
+        }
+
+        private DealDetailsEntity Map(SqlDataReader reader)
+        {
+            return new DealDetailsEntity
+            {
+                AccountId = reader[nameof(DealDetailsEntity.AccountId)] as string,
+                AssetPairId = reader[nameof(DealDetailsEntity.AssetPairId)] as string,
+                PositionId = reader[nameof(DealDetailsEntity.PositionId)] as string,
+                DealId = reader[nameof(DealDetailsEntity.DealId)] as string,
+                DealSize = (reader[nameof(DealDetailsEntity.DealSize)] as int?).GetValueOrDefault(),
+                DealTimestamp = (reader[nameof(DealDetailsEntity.DealTimestamp)] as DateTime?).GetValueOrDefault(),
+                OpenTradeId = reader[nameof(DealDetailsEntity.OpenTradeId)] as string,
+                OpenTimestamp = (reader[nameof(DealDetailsEntity.OpenTimestamp)] as DateTime?).GetValueOrDefault(),
+                OpenDirection = reader[nameof(DealDetailsEntity.OpenDirection)] as string,
+                OpenSize = (reader[nameof(DealDetailsEntity.OpenSize)] as int?).GetValueOrDefault(),
+                OpenPrice = (reader[nameof(DealDetailsEntity.OpenPrice)] as decimal?).GetValueOrDefault(),
+                OpenContractVolume = (reader[nameof(DealDetailsEntity.OpenContractVolume)] as decimal?).GetValueOrDefault(),
+                TotalOpenDirection = reader[nameof(DealDetailsEntity.TotalOpenDirection)] as string,
+                TotalOpenSize = (reader[nameof(DealDetailsEntity.TotalOpenSize)] as int?).GetValueOrDefault(),
+                TotalOpenPrice = (reader[nameof(DealDetailsEntity.TotalOpenPrice)] as decimal?).GetValueOrDefault(),
+                TotalOpenContractVolume = (reader[nameof(DealDetailsEntity.TotalOpenContractVolume)] as decimal?).GetValueOrDefault(),
+                CloseTradeId = reader[nameof(DealDetailsEntity.CloseTradeId)] as string,
+                CloseTimestamp = (reader[nameof(DealDetailsEntity.CloseTimestamp)] as DateTime?).GetValueOrDefault(),
+                CloseDirection = reader[nameof(DealDetailsEntity.CloseDirection)] as string,
+                CloseSize = (reader[nameof(DealDetailsEntity.CloseSize)] as int?).GetValueOrDefault(),
+                ClosePrice = (reader[nameof(DealDetailsEntity.ClosePrice)] as decimal?).GetValueOrDefault(),
+                CloseContractVolume = (reader[nameof(DealDetailsEntity.CloseContractVolume)] as decimal?).GetValueOrDefault(),
+                GrossPnLTc = (reader[nameof(DealDetailsEntity.GrossPnLTc)] as decimal?).GetValueOrDefault(),
+                GrossPnLFxPrice = (reader[nameof(DealDetailsEntity.GrossPnLFxPrice)] as decimal?).GetValueOrDefault(),
+                GrossPnLSc = (reader[nameof(DealDetailsEntity.GrossPnLSc)] as decimal?).GetValueOrDefault(),
+                OverallOnBehalfFees = (reader[nameof(DealDetailsEntity.OverallOnBehalfFees)] as decimal?).GetValueOrDefault(),
+                OverallFinancingCost = (reader[nameof(DealDetailsEntity.OverallFinancingCost)] as decimal?).GetValueOrDefault(),
+                OverallCommissions = (reader[nameof(DealDetailsEntity.OverallCommissions)] as decimal?).GetValueOrDefault(),
+                RealizedPnLDaySc = (reader[nameof(DealDetailsEntity.RealizedPnLDaySc)] as decimal?).GetValueOrDefault(),
+                RealisedPnLBtxSc = (reader[nameof(DealDetailsEntity.RealisedPnLBtxSc)] as decimal?).GetValueOrDefault(),
+                NettingOfPreviouslySettledPnLs = (reader[nameof(DealDetailsEntity.NettingOfPreviouslySettledPnLs)] as decimal?).GetValueOrDefault(),
+                TaxInfo = reader[nameof(DealDetailsEntity.TaxInfo)] as string,
+            };
         }
 
         public async Task<PaginatedResponse<IDealWithCommissionParams>> GetByPagesAsync(string accountId,

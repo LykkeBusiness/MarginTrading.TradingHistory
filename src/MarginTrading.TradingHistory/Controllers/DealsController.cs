@@ -179,5 +179,18 @@ namespace MarginTrading.TradingHistory.Controllers
 
             return deal == null ? null : _convertService.Convert<IDealWithCommissionParams, DealContract>(deal);
         }
+        
+        [HttpGet, Route("{dealId}/details")]
+        public async Task<DealDetailsContract> GetDetails(string dealId)
+        {
+            if (string.IsNullOrWhiteSpace(dealId))
+            {
+                throw new ArgumentException("Deal id must be set", nameof(dealId));
+            }
+
+            var dealDetailsModel = await _dealsRepository.GetDetailsAsync(dealId);
+            
+            return dealDetailsModel == null ? null : _convertService.Convert<IDealDetails, DealDetailsContract>(dealDetailsModel);
+        }
     }
 }

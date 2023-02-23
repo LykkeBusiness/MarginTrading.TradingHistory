@@ -14,6 +14,7 @@ using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Services;
 using MarginTrading.TradingHistory.SqlRepositories;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace MarginTrading.TradingHistory.PositionHistoryBroker
 {
@@ -41,9 +42,12 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
                 builder.RegisterInstance(new PositionsHistorySqlRepository(
                         settings.CurrentValue.Db.ConnString, log))
                     .As<IPositionsHistoryRepository>();
-                builder.RegisterInstance(new DealsSqlRepository(
-                        settings.CurrentValue.Db.ConnString, log))
-                    .As<IDealsRepository>();
+                builder.Register(ctx => new DealsSqlRepository(
+                        settings.CurrentValue.Db.ConnString,
+                        log,
+                        ctx.Resolve<ILogger<DealsSqlRepository>>()))
+                    .As<IDealsRepository>()
+                    .SingleInstance();
             }
         }
     }
