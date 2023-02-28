@@ -110,7 +110,7 @@ FROM deal
 ON deal.DealId = position.DealId
     INNER JOIN dbo.OvernightSwapHistory (NOLOCK) AS swapHistory
     ON position.PositionId = swapHistory.PositionId AND swapHistory.IsSuccess = 1
-WHERE FLOOR(CAST(swapHistory.TradingDay as float)) < FLOOR(CAST(deal.DealTimestamp as float))
+WHERE FLOOR(CAST(swapHistory.TradingDay as float)) <= FLOOR(CAST(deal.DealTimestamp as float))
 GROUP BY deal.DealId, deal.Size
     ),
     pnl AS
