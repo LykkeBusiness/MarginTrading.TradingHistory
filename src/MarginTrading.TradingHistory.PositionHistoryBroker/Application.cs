@@ -9,11 +9,9 @@ using AutoMapper;
 using Common.Log;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
-using Lykke.SlackNotifications;
 using Lykke.Snow.Common.Correlation;
 using Lykke.Snow.Common.Correlation.RabbitMq;
 using MarginTrading.Backend.Contracts.Events;
-using MarginTrading.Backend.Contracts.Positions;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
@@ -40,9 +38,8 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
             ILog logger,
             IConvertService convertService,
             Settings settings, 
-            CurrentApplicationInfo applicationInfo,
-            ISlackNotificationsSender slackNotificationsSender)
-            : base(correlationManager, loggerFactory, logger, slackNotificationsSender, applicationInfo)
+            CurrentApplicationInfo applicationInfo)
+            : base(correlationManager, loggerFactory, loggerFactory.CreateLogger<Application>(), applicationInfo)
         {
             _correlationContextAccessor = correlationContextAccessor;
             _positionsHistoryRepository = positionsHistoryRepository;

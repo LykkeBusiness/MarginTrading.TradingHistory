@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Client;
-using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
@@ -41,7 +40,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// </summary>
         [HttpPost, Route("")]
         [HttpPost, Route("by-pages")]
-        public async Task<PaginatedResponseContract<OrderEventWithAdditionalContract>> OrderHistoryByPages(
+        public async Task<Lykke.Contracts.Responses.PaginatedResponse<OrderEventWithAdditionalContract>> OrderHistoryByPages(
             [FromBody] OrderEventsFilterRequest filters, 
             [FromQuery] int? skip = 0, [FromQuery] int? take = 20, 
             [FromQuery] bool isAscending = false)
@@ -64,7 +63,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 isAscending: isAscending,
                 executedOrdersEssentialFieldsOnly: filters?.RequestType == OrderEventsRequestType.ExecutedOrders);
 
-            return new PaginatedResponseContract<OrderEventWithAdditionalContract>(
+            return new Lykke.Contracts.Responses.PaginatedResponse<OrderEventWithAdditionalContract>(
                 contents: data.Contents.Select(Convert).ToList(),
                 start: data.Start,
                 size: data.Size,
@@ -73,14 +72,14 @@ namespace MarginTrading.TradingHistory.Controllers
         }
 
         [HttpPost("/api/order-events/for-support")]
-        public async Task<PaginatedResponseContract<OrderEventForSupportContract>> OrderHistoryForSupport([FromBody]OrderEventsForSupportRequest request)
+        public async Task<Lykke.Contracts.Responses.PaginatedResponse<OrderEventForSupportContract>> OrderHistoryForSupport([FromBody]OrderEventsForSupportRequest request)
         {
             (request.Skip, request.Take) = PaginationUtils.ValidateSkipAndTake(request.Skip, request.Take);
 
             var result = await _orderHistoryForSupportQuery.Ask(request.FromContract());
             var items = result.Contents.Select(p => p.ToContract()).ToList();
 
-            return new PaginatedResponseContract<OrderEventForSupportContract>(contents: items,
+            return new Lykke.Contracts.Responses.PaginatedResponse<OrderEventForSupportContract>(contents: items,
                 start: result.Start, 
                 size: result.Size, 
                 totalSize: result.TotalSize);

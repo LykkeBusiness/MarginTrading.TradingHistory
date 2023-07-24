@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Lykke.Contracts.Responses;
 using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
 using Refit;
@@ -20,14 +21,14 @@ namespace MarginTrading.TradingHistory.Client
         /// Get orders with optional filtering and with pagination.
         /// </summary>
         [Post("/api/order-events")]
-        Task<PaginatedResponseContract<OrderEventWithAdditionalContract>> OrderHistoryByPages(
+        Task<PaginatedResponse<OrderEventWithAdditionalContract>> OrderHistoryByPages(
             [Body] [CanBeNull] OrderEventsFilterRequest filters,
             [Query] [CanBeNull] int? skip = 0,
             [Query] [CanBeNull] int? take = 20,
             [Query] bool isAscending = false);
         
         [Post("/api/order-events/for-support")]
-        Task<PaginatedResponseContract<OrderEventForSupportContract>> OrderHistoryForSupport(
+        Task<PaginatedResponse<OrderEventForSupportContract>> OrderHistoryForSupport(
             [Body] OrderEventsForSupportRequest request);
 
         /// <summary>
