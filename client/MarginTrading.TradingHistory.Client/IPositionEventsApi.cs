@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Lykke.Contracts.Responses;
 using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
 using Refit;
@@ -31,7 +32,7 @@ namespace MarginTrading.TradingHistory.Client
         /// Get paginated position events with optional filtering.
         /// </summary> 
         [Get("/api/position-events/by-pages")]
-        Task<PaginatedResponseContract<PositionEventContract>> PositionHistoryByPages(
+        Task<PaginatedResponse<PositionEventContract>> PositionHistoryByPages(
             [Query, CanBeNull] string accountId,
             [Query, CanBeNull] string instrument,
             [Query, CanBeNull] DateTime? eventDateFrom,

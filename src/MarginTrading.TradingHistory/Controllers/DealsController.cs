@@ -10,7 +10,6 @@ using Common.Log;
 using Lykke.Common.ApiLibrary.Validation;
 using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Client;
-using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
@@ -112,7 +111,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// Get deals with optional filtering and pagination 
         /// </summary>
         [HttpGet, Route("by-pages")]
-        public async Task<PaginatedResponseContract<DealContract>> ListByPages(
+        public async Task<Lykke.Contracts.Responses.PaginatedResponse<DealContract>> ListByPages(
             [FromQuery] string accountId, [FromQuery] string instrument, 
             [FromQuery] DateTime? closeTimeStart = null, [FromQuery] DateTime? closeTimeEnd = null,
             [FromQuery] int? skip = null, [FromQuery] int? take = null,
@@ -123,7 +122,7 @@ namespace MarginTrading.TradingHistory.Controllers
             var data = await _dealsRepository.GetByPagesAsync(accountId, instrument, 
                 closeTimeStart, closeTimeEnd, skip: skip, take: take, isAscending: isAscending);
 
-            return new PaginatedResponseContract<DealContract>(
+            return new Lykke.Contracts.Responses.PaginatedResponse<DealContract>(
                 contents: data.Contents.Select(
                     _convertService.Convert<IDealWithCommissionParams, DealContract>).ToList(),
                 start: data.Start,
@@ -137,7 +136,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// </summary>
         [HttpGet, Route("aggregated")]
         [ValidateModel]
-        public async Task<PaginatedResponseContract<AggregatedDealContract>> GetAggregated(
+        public async Task<Lykke.Contracts.Responses.PaginatedResponse<AggregatedDealContract>> GetAggregated(
             [FromQuery] [Required] string accountId, [FromQuery] string instrument,
             [FromQuery] DateTime? closeTimeStart = null, [FromQuery] DateTime? closeTimeEnd = null,
             [FromQuery] int? skip = null, [FromQuery] int? take = null,
@@ -153,7 +152,7 @@ namespace MarginTrading.TradingHistory.Controllers
             var data = await _dealsRepository.GetAggregated(accountId, instrument,
                 closeTimeStart, closeTimeEnd, skip: skip, take: take, isAscending: isAscending);
 
-            return new PaginatedResponseContract<AggregatedDealContract>(
+            return new Lykke.Contracts.Responses.PaginatedResponse<AggregatedDealContract>(
                 contents: data.Contents.Select(
                     _convertService.Convert<IAggregatedDeal, AggregatedDealContract>).ToList(),
                 start: data.Start,

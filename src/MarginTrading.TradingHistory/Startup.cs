@@ -21,7 +21,6 @@ using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Settings;
 using MarginTrading.TradingHistory.Modules;
 using Lykke.SettingsReader;
-using Lykke.SlackNotification.AzureQueue;
 using Lykke.Snow.Common.Correlation;
 using Lykke.Snow.Common.Correlation.Cqrs;
 using Lykke.Snow.Common.Correlation.Http;
@@ -100,7 +99,7 @@ namespace MarginTrading.TradingHistory
                 services.AddSingleton<CqrsCorrelationManager>();
                 services.AddTransient<HttpCorrelationHandler>();
 
-                Log = CreateLogWithSlack(Configuration, services, _mtSettingsManager, correlationContextAccessor);
+                Log = CreateLog(Configuration, services, _mtSettingsManager, correlationContextAccessor);
 
                 services.AddSingleton<ILoggerFactory>(x => new WebHostLoggerFactory(Log));
             }
@@ -229,7 +228,7 @@ namespace MarginTrading.TradingHistory
             }
         }
 
-        private static ILog CreateLogWithSlack(IConfiguration configuration, IServiceCollection services, 
+        private static ILog CreateLog(IConfiguration configuration, IServiceCollection services, 
             IReloadingManager<AppSettings> settings, CorrelationContextAccessor correlationContextAccessor)
         {
             var consoleLogger = new LogToConsole();
@@ -246,20 +245,6 @@ namespace MarginTrading.TradingHistory
             }
 
             #endregion Logs settings validation
-
-            // Creating slack notification service, which logs own azure queue processing messages to aggregate log
-            ILykkeLogToAzureSlackNotificationsManager slackNotificationsManager = null;
-            if (settings.CurrentValue.SlackNotifications != null)
-            {
-                var slackService = services.UseSlackNotificationsSenderViaAzureQueue(
-                    new Lykke.AzureQueueIntegration.AzureQueueSettings
-                    {
-                        ConnectionString = settings.CurrentValue.SlackNotifications.AzureQueue.ConnectionString,
-                        QueueName = settings.CurrentValue.SlackNotifications.AzureQueue.QueueName
-                    }, aggregateLogger);
-
-                slackNotificationsManager = new LykkeLogToAzureSlackNotificationsManager(slackService, consoleLogger);
-            }
 
             if (settings.CurrentValue.TradingHistoryService.UseSerilog)
             {
@@ -278,7 +263,7 @@ namespace MarginTrading.TradingHistory
                 // Creating azure storage logger, which logs own messages to concole log
                 var azureStorageLogger = new LykkeLogToAzureStorage(
                     persistenceManager,
-                    slackNotificationsManager,
+                    null,
                     consoleLogger);
 
                 azureStorageLogger.Start();

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Common.Log;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
-using Lykke.SlackNotifications;
 using Lykke.Snow.Common.Correlation;
 using Lykke.Snow.Common.Correlation.RabbitMq;
 using MarginTrading.Backend.Contracts.Events;
@@ -34,9 +33,8 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
             IOrdersHistoryRepository ordersHistoryRepository,
             ITradesRepository tradesRepository,
             ILog logger,
-            Settings settings, CurrentApplicationInfo applicationInfo,
-            ISlackNotificationsSender slackNotificationsSender) : base(correlationManager,
-            loggerFactory, logger, slackNotificationsSender, applicationInfo)
+            Settings settings, CurrentApplicationInfo applicationInfo) : base(correlationManager,
+            loggerFactory, loggerFactory.CreateLogger<Application>(), applicationInfo)
         {
             _correlationContextAccessor = correlationContextAccessor;
             _ordersHistoryRepository = ordersHistoryRepository;

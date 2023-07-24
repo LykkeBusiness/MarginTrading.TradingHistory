@@ -3,7 +3,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>MarginTrading.TradingHistory.SqlRepositories</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.SqlRepositories</RootNamespace>
-    <Version>2.11.2</Version>
+    <Version>2.11.3</Version>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
@@ -12,8 +12,9 @@
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="Dapper.SqlBuilder" Version="2.0.78" />
+    <PackageReference Include="Lykke.Snow.Common" Version="3.0.0" />
     <PackageReference Include="LykkeBiz.Common.MsSql" Version="3.0.1" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
     <PackageReference Include="morelinq" Version="3.3.2" />
   </ItemGroup>
   <ItemGroup>

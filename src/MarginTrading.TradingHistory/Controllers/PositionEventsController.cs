@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Client;
-using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
@@ -48,13 +47,13 @@ namespace MarginTrading.TradingHistory.Controllers
         /// Get paginated position events with optional filtering by accountId, instrument and event date period.
         /// </summary> 
         [HttpGet, Route("by-pages")] 
-        public async Task<PaginatedResponseContract<PositionEventContract>> PositionHistoryByPages([FromQuery] string accountId, [FromQuery] string instrument, [FromQuery] DateTime? eventDateFrom, [FromQuery] DateTime? eventDateTo, int? skip = null, int? take = null)
+        public async Task<Lykke.Contracts.Responses.PaginatedResponse<PositionEventContract>> PositionHistoryByPages([FromQuery] string accountId, [FromQuery] string instrument, [FromQuery] DateTime? eventDateFrom, [FromQuery] DateTime? eventDateTo, int? skip = null, int? take = null)
         {
             (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
             
             var data = await _positionsHistoryRepository.GetByPagesAsync(accountId, instrument, eventDateFrom, eventDateTo, skip, take);
 
-            return new PaginatedResponseContract<PositionEventContract>(
+            return new Lykke.Contracts.Responses.PaginatedResponse<PositionEventContract>(
                 contents: data.Contents.Where(d => d != null).Select(Convert).ToList(),
                 start: data.Start,
                 size: data.Size,
