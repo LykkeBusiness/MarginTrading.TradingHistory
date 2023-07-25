@@ -65,24 +65,27 @@ namespace MarginTrading.TradingHistory.Modules
 
             if (_settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
             {
-                builder.RegisterInstance(new OrdersHistorySqlRepository(
+                builder.Register(ctx => new OrdersHistorySqlRepository(
                         _settings.CurrentValue.Db.HistoryConnString,
-                        _log,
+                        ctx.Resolve<ILogger<OrdersHistorySqlRepository>>(),
                         _settings.CurrentValue.Db.OrderBlotterExecutionTimeout))
                     .As<IOrdersHistoryRepository>()
                     .SingleInstance();
                 
-                builder.RegisterInstance(new PositionsHistorySqlRepository(
-                        _settings.CurrentValue.Db.HistoryConnString, _log))
-                    .As<IPositionsHistoryRepository>();
+                builder.Register(ctx => new PositionsHistorySqlRepository(
+                        _settings.CurrentValue.Db.HistoryConnString,
+                        ctx.Resolve<ILogger<PositionsHistorySqlRepository>>()))
+                    .As<IPositionsHistoryRepository>()
+                    .SingleInstance();
                 
-                builder.RegisterInstance(new TradesSqlRepository(
-                        _settings.CurrentValue.Db.HistoryConnString, _log))
-                    .As<ITradesRepository>();
+                builder.Register(ctx => new TradesSqlRepository(
+                        _settings.CurrentValue.Db.HistoryConnString, 
+                        ctx.Resolve<ILogger<TradesSqlRepository>>()))
+                    .As<ITradesRepository>()
+                    .SingleInstance();
                 
                 builder.Register(ctx => new DealsSqlRepository(
                         _settings.CurrentValue.Db.HistoryConnString,
-                        _log,
                         ctx.Resolve<ILogger<DealsSqlRepository>>()))
                     .As<IDealsRepository>()
                     .SingleInstance();

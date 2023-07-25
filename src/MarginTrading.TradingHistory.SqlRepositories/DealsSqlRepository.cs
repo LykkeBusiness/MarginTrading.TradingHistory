@@ -26,15 +26,15 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
         public static readonly List<string> DealInsertColumns = typeof(IDeal).GetProperties().Select(x => x.Name).ToList();
 
-        public DealsSqlRepository(string connectionString, ILog log, ILogger<DealsSqlRepository> logger)
+        public DealsSqlRepository(string connectionString, ILogger<DealsSqlRepository> logger)
             : base(connectionString, logger)
         {
             _connectionString = connectionString;
 
-            connectionString.InitializeSqlObject("dbo.Deals.sql", log);
-            connectionString.InitializeSqlObject("dbo.DealCommissionParams.sql", log);
-            connectionString.InitializeSqlObject("dbo.getDealDetails.sql", log);
-            connectionString.InitializeSqlObject("dbo.V_DealsWithCommissionParams.sql", log);
+            connectionString.InitializeSqlObject("dbo.Deals.sql", logger);
+            connectionString.InitializeSqlObject("dbo.DealCommissionParams.sql", logger);
+            connectionString.InitializeSqlObject("dbo.getDealDetails.sql", logger);
+            connectionString.InitializeSqlObject("dbo.V_DealsWithCommissionParams.sql", logger);
         }
         
         public async Task<IDealWithCommissionParams> GetAsync(string id)

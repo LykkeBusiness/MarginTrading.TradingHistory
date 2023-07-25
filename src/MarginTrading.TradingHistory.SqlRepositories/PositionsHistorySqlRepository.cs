@@ -7,15 +7,14 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Common;
-using Common.Log;
 using Dapper;
 using Lykke.Snow.Common;
-using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Extensions;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
 {
@@ -24,7 +23,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         private const string TableName = "PositionsHistory";
 
         private readonly string _connectionString;
-        private readonly ILog _log;
+        private readonly ILogger _logger;
 
         private static readonly string GetColumns =
             string.Join(",", typeof(PositionsHistoryEntity).GetProperties().Select(x => x.Name));
@@ -32,15 +31,15 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         private static readonly string GetFields =
             string.Join(",", typeof(PositionsHistoryEntity).GetProperties().Select(x => "@" + x.Name));
 
-        public PositionsHistorySqlRepository(string connectionString, ILog log)
+        public PositionsHistorySqlRepository(string connectionString, ILogger<PositionsHistorySqlRepository> logger)
         {
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
-            _log = log ?? throw new ArgumentNullException(nameof(log));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             
-            connectionString.InitializeSqlObject("dbo.Deals.sql", log);
-            connectionString.InitializeSqlObject("dbo.DealCommissionParams.sql", log);
-            connectionString.InitializeSqlObject("dbo.UpdateDealCommissionParamsOnDeal.sql", log);
-            connectionString.InitializeSqlObject("dbo.PositionHistory.sql", log);
+            connectionString.InitializeSqlObject("dbo.Deals.sql", logger);
+            connectionString.InitializeSqlObject("dbo.DealCommissionParams.sql", logger);
+            connectionString.InitializeSqlObject("dbo.UpdateDealCommissionParamsOnDeal.sql", logger);
+            connectionString.InitializeSqlObject("dbo.PositionHistory.sql", logger);
         }
 
         public async Task AddAsync(IPositionHistory positionHistory, IDeal deal)
@@ -70,13 +69,11 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                             },
                             commandType: CommandType.StoredProcedure,
                             ignoreDuplicates: true,
-                            log: _log);
+                            logger: _logger);
                     }
                     catch (Exception e)
                     {
-                        await _log.WriteErrorAsync(nameof(PositionsHistorySqlRepository),
-                            nameof(AddAsync),
-                            $"Failed to calculate commissions for the deal {deal.DealId}, skipping.", e);
+                        _logger.LogError(e, $"Failed to calculate commissions for the deal {deal.DealId}, skipping.");
                     }
                 });
 
@@ -152,7 +149,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 positionEntity,
                 transaction,
                 true,
-                log: _log);
+                logger: _logger);
 
             if (deal != null)
             {
@@ -188,13 +185,13 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                     },
                     transaction, 
                     true,
-                    log: _log);
+                    logger: _logger);
 
                 await conn.ExecuteAsync("INSERT INTO [dbo].[DealCommissionParams] (DealId) VALUES (@DealId)",
                     new {deal.DealId},
                     transaction,
                     true,
-                    log: _log);
+                    logger: _logger);
             }
         }
 
@@ -203,7 +200,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             var context =
                 $"An attempt to rollback transaction failed due to the following exception: {exception.Message}";
 
-            return _log.WriteErrorAsync(nameof(PositionsHistorySqlRepository), nameof(AddAsync), context, exception);
+            _logger.LogError(exception, context);
+            return Task.CompletedTask;
         }
 
         private Task CommitExceptionHandler(Exception exception, IPositionHistory positionHistory, IDeal deal)
@@ -214,7 +212,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                       $"Entity <{nameof(IDeal)}>: \n" +
                       deal?.ToJson();
 
-            return _log.WriteErrorAsync(nameof(PositionsHistorySqlRepository), nameof(AddAsync), context, exception);
+            _logger.LogError(exception, context);
+            return Task.CompletedTask;
         }
     }
 }

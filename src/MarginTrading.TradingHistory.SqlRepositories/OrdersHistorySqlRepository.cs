@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
-using Common.Log;
 using Dapper;
 using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Core;
@@ -16,6 +15,7 @@ using MarginTrading.TradingHistory.Core.Extensions;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using MoreLinq;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
@@ -147,7 +147,7 @@ OUTER APPLY (
         }
 
         private readonly string _connectionString;
-        private readonly ILog _log;
+        private readonly ILogger _logger;
         private readonly TimeSpan? _orderBlotterExecutionTimeout;
 
         private static readonly string GetColumns =
@@ -159,13 +159,13 @@ OUTER APPLY (
         private static readonly string GetUpdateClause = string.Join(",",
             typeof(IOrderHistory).GetProperties().Select(x => "[" + x.Name + "]=@" + x.Name));
 
-        public OrdersHistorySqlRepository(string connectionString, ILog log, TimeSpan? orderBlotterExecutionTimeout = null)
+        public OrdersHistorySqlRepository(string connectionString, ILogger<OrdersHistorySqlRepository> logger, TimeSpan? orderBlotterExecutionTimeout = null)
         {
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
-            _log = log ?? throw new ArgumentNullException(nameof(log));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _orderBlotterExecutionTimeout = orderBlotterExecutionTimeout;
 
-            connectionString.InitializeSqlObject("dbo.OrdersHistory.sql", log);
+            connectionString.InitializeSqlObject("dbo.OrdersHistory.sql", logger);
         }
 
         public Task AddAsync(IOrderHistory order, ITrade trade)
@@ -398,7 +398,7 @@ OUTER APPLY (
                 orderHistoryEntity,
                 transaction,
                 true,
-                log: _log);
+                logger: _logger);
 
             if (trade != null)
             {
@@ -408,7 +408,7 @@ OUTER APPLY (
                     tradeEntity,
                     transaction,
                     true,
-                    log: _log);
+                    logger: _logger);
             }
         }
 
@@ -417,7 +417,8 @@ OUTER APPLY (
             var context =
                 $"An attempt to rollback transaction failed due to the following exception: {exception.Message}";
 
-            return _log.WriteErrorAsync(nameof(OrdersHistorySqlRepository), nameof(AddAsync), context, exception);
+            _logger.LogError(exception, context);
+            return Task.CompletedTask;
         }
 
         private Task CommitExceptionHandler(Exception exception, IOrderHistory order, ITrade trade)
@@ -428,7 +429,8 @@ OUTER APPLY (
                           $"Entity <{nameof(ITrade)}>: \n" +
                           trade?.ToJson();
 
-            return _log.WriteErrorAsync(nameof(OrdersHistorySqlRepository), nameof(AddAsync), context, exception);
+            _logger.LogError(exception, context);
+            return Task.CompletedTask;
         }
 
         private async Task PopulateAdditionalDataAsync(IEnumerable<IEnumerable<OrderHistoryForOrderBlotterEntity>> batches)

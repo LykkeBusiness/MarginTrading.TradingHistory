@@ -14,6 +14,7 @@ using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace MarginTrading.TradingHistory.OrderHistoryBroker
 {
@@ -39,11 +40,11 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
             if (settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
             {
                 builder.Register(c => new SqlRepositories.OrdersHistorySqlRepository(
-                        settings.CurrentValue.Db.ConnString, c.Resolve<ILog>()))
+                        settings.CurrentValue.Db.ConnString, c.Resolve<ILogger<SqlRepositories.OrdersHistorySqlRepository>>()))
                     .As<IOrdersHistoryRepository>()
                     .SingleInstance();
                 builder.Register(c => new SqlRepositories.TradesSqlRepository(
-                        settings.CurrentValue.Db.ConnString, c.Resolve<ILog>()))
+                        settings.CurrentValue.Db.ConnString, c.Resolve<ILogger<SqlRepositories.TradesSqlRepository>>()))
                     .As<ITradesRepository>()
                     .SingleInstance();
             }
