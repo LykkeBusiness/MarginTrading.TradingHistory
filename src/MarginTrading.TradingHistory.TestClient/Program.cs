@@ -13,6 +13,7 @@ using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.SqlRepositories;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Refit;
@@ -62,7 +63,7 @@ namespace MarginTrading.TradingHistory.TestClient
         private static async Task CheckPositionHistoryRepoAsync()
         {
             var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
-            await new PositionsHistorySqlRepository(config["connstr"], Mock.Of<ILog>())
+            await new PositionsHistorySqlRepository(config["connstr"], Mock.Of<ILogger<PositionsHistorySqlRepository>>())
                 .AddAsync(JsonConvert.DeserializeObject<PositionHistory>(""), null);
         }
 

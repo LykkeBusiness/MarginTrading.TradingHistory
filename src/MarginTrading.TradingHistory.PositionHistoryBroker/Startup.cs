@@ -41,12 +41,11 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
             if (settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
             {
                 builder.Register(c => new PositionsHistorySqlRepository(
-                        settings.CurrentValue.Db.ConnString, c.Resolve<ILog>()))
+                        settings.CurrentValue.Db.ConnString, c.Resolve<ILogger<PositionsHistorySqlRepository>>()))
                     .As<IPositionsHistoryRepository>()
                     .SingleInstance();
                 builder.Register(ctx => new DealsSqlRepository(
                         settings.CurrentValue.Db.ConnString,
-                        ctx.Resolve<ILog>(),
                         ctx.Resolve<ILogger<DealsSqlRepository>>()))
                     .As<IDealsRepository>()
                     .SingleInstance();

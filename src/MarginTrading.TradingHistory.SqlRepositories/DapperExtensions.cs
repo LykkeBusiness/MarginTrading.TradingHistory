@@ -7,6 +7,7 @@ using Common.Log;
 using Dapper;
 using Lykke.Common.MsSql;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
 {
@@ -31,7 +32,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             bool ignoreDuplicates = false,
             int? commandTimeout = null,
             CommandType? commandType = null,
-            ILog log = null)
+            ILogger logger = null)
         {
             if (ignoreDuplicates)
             {
@@ -47,10 +48,10 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                         .GetValue(param)?
                         .ToString();
 
-                    if (log != null)
+                    if (logger != null)
                     {
-                        await log.WriteWarningAsync(nameof(ExecuteAsync), "",
-                            "An attempt to add duplicate entry" + (string.IsNullOrEmpty(id) ? "" : " for " + id));   
+                        logger.LogWarning("An attempt to add duplicate entry" +
+                                                (string.IsNullOrEmpty(id) ? "" : " for " + id));
                     }
 
                     return 0;

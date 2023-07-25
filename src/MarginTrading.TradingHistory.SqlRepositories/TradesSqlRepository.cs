@@ -1,12 +1,9 @@
 ﻿// Copyright (c) 2019 Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Common;
-using Common.Log;
 using Dapper;
 using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Core;
@@ -14,6 +11,7 @@ using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.SqlRepositories.Entities;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
 {
@@ -22,7 +20,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         public const string TableName = "Trades";
 
         private readonly string _connectionString;
-        private readonly ILog _log;
+        private readonly ILogger _logger;
 
         public static readonly string GetColumns =
             string.Join(",", typeof(ITrade).GetProperties().Select(x => x.Name));
@@ -30,12 +28,12 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         public static readonly string GetFields =
             string.Join(",", typeof(ITrade).GetProperties().Select(x => "@" + x.Name));
 
-        public TradesSqlRepository(string connectionString, ILog log)
+        public TradesSqlRepository(string connectionString, ILogger<TradesSqlRepository> logger)
         {
             _connectionString = connectionString;
-            _log = log;
+            _logger = logger;
             
-            connectionString.InitializeSqlObject("dbo.Trades.sql", log);
+            connectionString.InitializeSqlObject("dbo.Trades.sql", logger);
         }
 
         public async Task<ITrade> GetAsync(string tradeId)
@@ -100,7 +98,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 await conn.ExecuteAsync(
                     $"UPDATE {TableName} SET CancelledBy = @cancelledBy WHERE Id = @cancelledTradeId",
                     new {cancelledTradeId, cancelledBy},
-                    log: _log);
+                    logger: _logger);
             }
         }
     }
