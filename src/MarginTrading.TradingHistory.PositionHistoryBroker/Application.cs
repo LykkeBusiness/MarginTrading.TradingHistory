@@ -1,19 +1,13 @@
 ﻿// Copyright (c) 2019 Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using Common.Log;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
-using Lykke.SlackNotifications;
 using Lykke.Snow.Common.Correlation;
 using Lykke.Snow.Common.Correlation.RabbitMq;
 using MarginTrading.Backend.Contracts.Events;
-using MarginTrading.Backend.Contracts.Positions;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
@@ -27,7 +21,7 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
         private readonly IPositionsHistoryRepository _positionsHistoryRepository;
         private readonly IDealsRepository _dealsRepository;
         private readonly IConvertService _convertService;
-        private readonly ILog _log;
+        private readonly ILogger _logger;
         private readonly Settings _settings;
         private readonly CorrelationContextAccessor _correlationContextAccessor;
 
@@ -37,17 +31,16 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
             ILoggerFactory loggerFactory, 
             IPositionsHistoryRepository positionsHistoryRepository, 
             IDealsRepository dealsRepository,
-            ILog logger,
+            ILogger<Application> logger,
             IConvertService convertService,
             Settings settings, 
-            CurrentApplicationInfo applicationInfo,
-            ISlackNotificationsSender slackNotificationsSender)
-            : base(correlationManager, loggerFactory, logger, slackNotificationsSender, applicationInfo)
+            CurrentApplicationInfo applicationInfo)
+            : base(correlationManager, loggerFactory, logger, applicationInfo)
         {
             _correlationContextAccessor = correlationContextAccessor;
             _positionsHistoryRepository = positionsHistoryRepository;
             _dealsRepository = dealsRepository;
-            _log = logger;
+            _logger = logger;
             _settings = settings;
             _convertService = convertService;
         }
@@ -62,10 +55,7 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
             var correlationId = _correlationContextAccessor.CorrelationContext?.CorrelationId;
             if (string.IsNullOrWhiteSpace(correlationId))
             {
-                await _log.WriteMonitorAsync(
-                    nameof(HandleMessage), 
-                    nameof(PositionHistoryEvent),
-                    $"Correlation id is empty for postition {positionHistoryEvent.PositionSnapshot.Id}");
+                _logger.LogDebug($"Correlation id is empty for postition {positionHistoryEvent.PositionSnapshot.Id}");
             }
             
             var position = Map(positionHistoryEvent, correlationId);

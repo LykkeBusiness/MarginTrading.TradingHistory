@@ -7,6 +7,7 @@ using Common.Log;
 using Dapper;
 using MarginTrading.TradingHistory.Core.Extensions;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 
 namespace MarginTrading.TradingHistory.SqlRepositories
 {
@@ -33,7 +34,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public static void InitializeSqlObject(this string connectionString, string scriptFileName, ILog log = null)
+        public static void InitializeSqlObject(this string connectionString, string scriptFileName, ILogger logger = null)
         {
             var creationScript = FileExtensions.ReadFromFile(scriptFileName);
             
@@ -45,8 +46,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 }
                 catch (Exception ex)
                 {
-                    log?.WriteErrorAsync(typeof(SqlExtensions).FullName, nameof(InitializeSqlObject), 
-                        scriptFileName, ex).Wait();
+                    logger?.LogError(ex, scriptFileName);
                     throw;
                 }
             }

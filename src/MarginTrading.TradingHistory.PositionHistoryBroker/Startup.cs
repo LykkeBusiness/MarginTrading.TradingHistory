@@ -13,6 +13,7 @@ using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Services;
 using MarginTrading.TradingHistory.SqlRepositories;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -21,13 +22,13 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
     [UsedImplicitly]
     public class Startup : BrokerStartupBase<DefaultBrokerApplicationSettings<Settings>, Settings>
     {
-        public Startup(IHostEnvironment env) : base(env)
+        public Startup(IHostEnvironment env, IConfiguration configuration) : base(env, configuration)
         {
         }
 
         protected override string ApplicationName => "PositionHistoryBroker";
 
-        protected override void RegisterCustomServices(ContainerBuilder builder, IReloadingManager<Settings> settings, ILog log)
+        protected override void RegisterCustomServices(ContainerBuilder builder, IReloadingManager<Settings> settings)
         {
             builder.RegisterType<Application>().As<IBrokerApplication>().SingleInstance();
             builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();
@@ -39,12 +40,12 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
 
             if (settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
             {
-                builder.RegisterInstance(new PositionsHistorySqlRepository(
-                        settings.CurrentValue.Db.ConnString, log))
-                    .As<IPositionsHistoryRepository>();
+                builder.Register(c => new PositionsHistorySqlRepository(
+                        settings.CurrentValue.Db.ConnString, c.Resolve<ILogger<PositionsHistorySqlRepository>>()))
+                    .As<IPositionsHistoryRepository>()
+                    .SingleInstance();
                 builder.Register(ctx => new DealsSqlRepository(
                         settings.CurrentValue.Db.ConnString,
-                        log,
                         ctx.Resolve<ILogger<DealsSqlRepository>>()))
                     .As<IDealsRepository>()
                     .SingleInstance();

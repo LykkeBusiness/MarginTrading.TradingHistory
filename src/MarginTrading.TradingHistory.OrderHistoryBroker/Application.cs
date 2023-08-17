@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Common.Log;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
-using Lykke.SlackNotifications;
 using Lykke.Snow.Common.Correlation;
 using Lykke.Snow.Common.Correlation.RabbitMq;
 using MarginTrading.Backend.Contracts.Events;
@@ -23,7 +22,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
     {
         private readonly IOrdersHistoryRepository _ordersHistoryRepository;
         private readonly ITradesRepository _tradesRepository;
-        private readonly ILog _log;
+        private readonly ILogger _logger;
         private readonly Settings _settings;
         private readonly CorrelationContextAccessor _correlationContextAccessor;
 
@@ -33,15 +32,14 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
             ILoggerFactory loggerFactory, 
             IOrdersHistoryRepository ordersHistoryRepository,
             ITradesRepository tradesRepository,
-            ILog logger,
-            Settings settings, CurrentApplicationInfo applicationInfo,
-            ISlackNotificationsSender slackNotificationsSender) : base(correlationManager,
-            loggerFactory, logger, slackNotificationsSender, applicationInfo)
+            ILogger<Application> logger,
+            Settings settings, CurrentApplicationInfo applicationInfo) : base(correlationManager,
+            loggerFactory, logger, applicationInfo)
         {
             _correlationContextAccessor = correlationContextAccessor;
             _ordersHistoryRepository = ordersHistoryRepository;
             _tradesRepository = tradesRepository;
-            _log = logger;
+            _logger = logger;
             _settings = settings;
         }
 
@@ -54,10 +52,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
             var correlationId = _correlationContextAccessor.CorrelationContext?.CorrelationId;
             if (string.IsNullOrWhiteSpace(correlationId))
             {
-                await _log.WriteMonitorAsync(
-                    nameof(HandleMessage), 
-                    nameof(OrderHistoryEvent),
-                    $"Correlation id is empty for order {historyEvent.OrderSnapshot.Id}");
+                _logger.LogDebug($"Correlation id is empty for order {historyEvent.OrderSnapshot.Id}");
             }
 
             var orderHistory = historyEvent.OrderSnapshot.ToOrderHistoryDomain(historyEvent.Type, correlationId);
@@ -101,7 +96,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                 }
                 catch (Exception ex)
                 {
-                    await _log.WriteErrorAsync(nameof(HandleMessage), "SetCancelledByAsync", "", ex);
+                    _logger.LogError(ex,"SetCancelledByAsync");
                 }
             }
         }
@@ -126,8 +121,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
             }
             catch (Exception ex)
             {
-                _log.WriteWarningAsync(nameof(TryGetCancelledTradeId), order.AdditionalInfo,
-                    "Error getting of cancelled trade id", ex);
+                _logger.LogWarning(ex, "Error getting of cancelled trade id");
             }
 
             return null;

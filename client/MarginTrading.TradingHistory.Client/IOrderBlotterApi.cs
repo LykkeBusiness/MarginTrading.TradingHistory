@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Lykke.Contracts.Responses;
 using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
 using Refit;
@@ -18,7 +19,7 @@ namespace MarginTrading.TradingHistory.Client
         Task<IEnumerable<string>> GetCreatedByOnBehalfList();
         
         [Get("/api/order-blotter")]
-        Task<PaginatedResponseContract<OrderForOrderBlotterContract>> Get(
+        Task<PaginatedResponse<OrderForOrderBlotterContract>> Get(
             [Query, NotNull] DateTime? relevanceTimestamp,
             [Query, CanBeNull] string accountIdOrName,
             [Query, CanBeNull] string assetName,

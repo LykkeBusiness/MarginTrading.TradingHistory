@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Lykke.Common.ApiLibrary.Validation;
 using Lykke.Snow.Common;
 using MarginTrading.TradingHistory.Client;
-using MarginTrading.TradingHistory.Client.Common;
 using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
@@ -68,7 +67,7 @@ namespace MarginTrading.TradingHistory.Controllers
         /// </summary>
         [HttpGet, Route("by-pages")]
         [ValidateModel]
-        public async Task<PaginatedResponseContract<TradeContract>> ListByPages([FromQuery] [Required] string accountId, 
+        public async Task<Lykke.Contracts.Responses.PaginatedResponse<TradeContract>> ListByPages([FromQuery] [Required] string accountId, 
             [FromQuery] string assetPairId = null, [FromQuery] int? skip = null, [FromQuery] int? take = null,
             [FromQuery] bool isAscending = false)
         {
@@ -77,7 +76,7 @@ namespace MarginTrading.TradingHistory.Controllers
             var data = await _tradesRepository.GetByPagesAsync(accountId, assetPairId, skip, take,
                 isAscending);
 
-            return new PaginatedResponseContract<TradeContract>(
+            return new Lykke.Contracts.Responses.PaginatedResponse<TradeContract>(
                 contents: data.Contents.Select(Convert).ToList(),
                 start: data.Start,
                 size: data.Size,

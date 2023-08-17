@@ -37,7 +37,7 @@ namespace MarginTrading.TradingHistory.Controllers
         }
 
         [HttpGet]
-        public async Task<PaginatedResponseContract<OrderForOrderBlotterContract>> Get(
+        public async Task<Lykke.Contracts.Responses.PaginatedResponse<OrderForOrderBlotterContract>> Get(
             [FromQuery, Required] DateTime? relevanceTimestamp,
             [FromQuery] string accountIdOrName,
             [FromQuery] string assetName,
@@ -73,7 +73,7 @@ namespace MarginTrading.TradingHistory.Controllers
                 sortingColumn.ToType<OrderBlotterSortingColumn>(),
                 sortingOrder.ToType<SortingOrder>());
 
-            return new PaginatedResponseContract<OrderForOrderBlotterContract>(
+            return new Lykke.Contracts.Responses.PaginatedResponse<OrderForOrderBlotterContract>(
                 contents: result.Contents.Select(Convert).ToList(),
                 start: result.Start, 
                 size: result.Size, 

@@ -12,20 +12,22 @@ using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace MarginTrading.TradingHistory.OrderHistoryBroker
 {
     [UsedImplicitly]
     public class Startup : BrokerStartupBase<DefaultBrokerApplicationSettings<Settings>, Settings>
     {
-        public Startup(IHostEnvironment env) : base(env)
+        public Startup(IHostEnvironment env, IConfiguration configuration) : base(env, configuration)
         {
         }
 
         protected override string ApplicationName => "OrderHistoryBroker";
 
-        protected override void RegisterCustomServices(ContainerBuilder builder, IReloadingManager<Settings> settings, ILog log)
+        protected override void RegisterCustomServices(ContainerBuilder builder, IReloadingManager<Settings> settings)
         {
             builder.RegisterType<Application>().As<IBrokerApplication>().SingleInstance();
             builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();
@@ -37,12 +39,14 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
 
             if (settings.CurrentValue.Db.StorageMode == StorageMode.SqlServer)
             {
-                builder.RegisterInstance(new SqlRepositories.OrdersHistorySqlRepository(
-                        settings.CurrentValue.Db.ConnString, log))
-                    .As<IOrdersHistoryRepository>();
-                builder.RegisterInstance(new SqlRepositories.TradesSqlRepository(
-                        settings.CurrentValue.Db.ConnString, log))
-                    .As<ITradesRepository>();
+                builder.Register(c => new SqlRepositories.OrdersHistorySqlRepository(
+                        settings.CurrentValue.Db.ConnString, c.Resolve<ILogger<SqlRepositories.OrdersHistorySqlRepository>>()))
+                    .As<IOrdersHistoryRepository>()
+                    .SingleInstance();
+                builder.Register(c => new SqlRepositories.TradesSqlRepository(
+                        settings.CurrentValue.Db.ConnString, c.Resolve<ILogger<SqlRepositories.TradesSqlRepository>>()))
+                    .As<ITradesRepository>()
+                    .SingleInstance();
             }
         }
     }
