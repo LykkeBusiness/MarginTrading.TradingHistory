@@ -115,11 +115,12 @@ namespace MarginTrading.TradingHistory.Controllers
             [FromQuery] string accountId, [FromQuery] string instrument, 
             [FromQuery] DateTime? closeTimeStart = null, [FromQuery] DateTime? closeTimeEnd = null,
             [FromQuery] int? skip = null, [FromQuery] int? take = null,
-            [FromQuery] bool isAscending = false)
+            [FromQuery] bool isAscending = false, [FromQuery] List<PositionDirectionContract> directions = null)
         {
             (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
             
-            var data = await _dealsRepository.GetByPagesAsync(accountId, instrument, 
+            var data = await _dealsRepository.GetByPagesAsync(accountId, instrument,
+                directions?.Select(x => x.ToType<PositionDirection>()).ToList(),
                 closeTimeStart, closeTimeEnd, skip: skip, take: take, isAscending: isAscending);
 
             return new Lykke.Contracts.Responses.PaginatedResponse<DealContract>(
@@ -140,7 +141,7 @@ namespace MarginTrading.TradingHistory.Controllers
             [FromQuery] [Required] string accountId, [FromQuery] string instrument,
             [FromQuery] DateTime? closeTimeStart = null, [FromQuery] DateTime? closeTimeEnd = null,
             [FromQuery] int? skip = null, [FromQuery] int? take = null,
-            [FromQuery] bool isAscending = false)
+            [FromQuery] bool isAscending = false, [FromQuery] List<PositionDirectionContract> directions = null)
         {
             if(string.IsNullOrWhiteSpace(accountId))
             {
@@ -150,6 +151,7 @@ namespace MarginTrading.TradingHistory.Controllers
             (skip, take) = PaginationUtils.ValidateSkipAndTake(skip, take);
 
             var data = await _dealsRepository.GetAggregated(accountId, instrument,
+                directions?.Select(x => x.ToType<PositionDirection>()).ToList(),
                 closeTimeStart, closeTimeEnd, skip: skip, take: take, isAscending: isAscending);
 
             return new Lykke.Contracts.Responses.PaginatedResponse<AggregatedDealContract>(
