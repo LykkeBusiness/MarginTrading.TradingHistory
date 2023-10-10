@@ -55,7 +55,8 @@ namespace MarginTrading.TradingHistory.Client
             [Query, CanBeNull] string accountId, [Query, CanBeNull] string instrument,
             [Query, CanBeNull] DateTime? closeTimeStart = null, [Query, CanBeNull] DateTime? closeTimeEnd = null,
             [Query, CanBeNull] int? skip = null, [Query, CanBeNull] int? take = null,
-            [Query] bool isAscending = false);
+            [Query] bool isAscending = false,
+            [Query(CollectionFormat.Multi), CanBeNull] List<PositionDirectionContract> directions = null);
 
         /// <summary> 
         /// Get aggregated deals by account and asset pair id with optional filtering and pagination 
@@ -65,7 +66,8 @@ namespace MarginTrading.TradingHistory.Client
             [Query, NotNull] string accountId, [Query, CanBeNull] string instrument,
             [Query, CanBeNull] DateTime? closeTimeStart = null, [Query, CanBeNull] DateTime? closeTimeEnd = null,
             [Query, CanBeNull] int? skip = null, [Query, CanBeNull] int? take = null,
-            [Query] bool isAscending = false);
+            [Query] bool isAscending = false,
+            [Query(CollectionFormat.Multi), CanBeNull] List<PositionDirectionContract> directions = null);
 
         /// <summary>
         /// Get deal by Id

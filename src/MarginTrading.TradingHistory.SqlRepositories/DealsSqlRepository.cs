@@ -94,7 +94,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         }
 
         public async Task<PaginatedResponse<IDealWithCommissionParams>> GetByPagesAsync(string accountId,
-            string assetPairId,
+            string assetPairId, List<PositionDirection> directions,
             DateTime? closeTimeStart, DateTime? closeTimeEnd,
             int? skip = null, int? take = null, bool isAscending = true)
         {
@@ -103,6 +103,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             var whereClause = "WHERE 1=1 "
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
+                              + (directions?.Count == 0 ? "" : " AND Direction IN @directions")
                               + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
                               + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
             var order = isAscending ? string.Empty : Constants.DescendingOrder;
@@ -112,7 +113,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             {
                 var gridReader = await conn.QueryMultipleAsync(
                     $"SELECT * FROM {ViewName} WITH (NOLOCK) {whereClause} {paginationClause}; SELECT COUNT(*) FROM {ViewName} WITH (NOLOCK) {whereClause}",
-                    new {accountId, assetPairId, closeTimeStart, closeTimeEnd});
+                    new {accountId, assetPairId, directions = directions.Select(x => x.ToString()), closeTimeStart, closeTimeEnd});
                 var deals = (await gridReader.ReadAsync<DealWithCommissionParamsEntity>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
             
@@ -125,7 +126,8 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public async Task<PaginatedResponse<IAggregatedDeal>> GetAggregated(string accountId, string assetPairId,
+        public async Task<PaginatedResponse<IAggregatedDeal>> GetAggregated(string accountId,
+            string assetPairId, List<PositionDirection> directions,
             DateTime? closeTimeStart, DateTime? closeTimeEnd,
             int? skip = null, int? take = null, bool isAscending = true)
         {
@@ -134,6 +136,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
             var whereClause = "WHERE AccountId=@accountId"
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
+                              + (directions?.Count == 0 ? "" : " AND Direction IN @directions")
                               + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
                               + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
             var order = isAscending ? string.Empty : Constants.DescendingOrder;
@@ -158,7 +161,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                       {whereClause}
                       GROUP BY {nameof(IAggregatedDeal.AccountId)}, {nameof(IAggregatedDeal.AssetPairId)}
                       {paginationClause}; SELECT COUNT(DISTINCT {nameof(IAggregatedDeal.AssetPairId)}) FROM {ViewName} WITH (NOLOCK) {whereClause}",
-                    new { accountId, assetPairId, closeTimeStart, closeTimeEnd });
+                    new { accountId, assetPairId, directions = directions.Select(x => x.ToString()), closeTimeStart, closeTimeEnd });
                 var deals = (await gridReader.ReadAsync<AggregatedDeal>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
 
