@@ -191,21 +191,23 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public async Task<decimal> GetTotalPnlAsync(string accountId, string assetPairId, DateTime? closeTimeStart = null,
-            DateTime? closeTimeEnd = null)
+        public async Task<decimal> GetTotalPnlAsync(string accountId,
+            string assetPairId, List<PositionDirection> directions,
+            DateTime? closeTimeStart = null, DateTime? closeTimeEnd = null)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
                 var whereClause = "WHERE 1=1 "
                              + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId = @accountId")
                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId = @assetPairId")
+                             + (directions?.Count == 0 ? "" : " AND Direction IN @directions")
                              + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
                              + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
                 
                 var query = $"SELECT ISNULL(SUM(Fpl), 0) FROM {TableName} WITH (NOLOCK) {whereClause}";
 
                 return await conn.QuerySingleOrDefaultAsync<decimal>(query,
-                    new {accountId, assetPairId, closeTimeStart, closeTimeEnd});
+                    new {accountId, assetPairId, directions = directions.Select(x => x.ToString()), closeTimeStart, closeTimeEnd});
             }
         }
 

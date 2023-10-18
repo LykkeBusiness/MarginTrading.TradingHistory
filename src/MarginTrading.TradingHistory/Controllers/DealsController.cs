@@ -63,9 +63,12 @@ namespace MarginTrading.TradingHistory.Controllers
         [HttpGet]
         [Route("totalPnl")]
         public async Task<TotalPnlContract> GetTotalPnL([FromQuery] string accountId, [FromQuery] string instrument,
-            [FromQuery] DateTime? closeTimeStart = null, [FromQuery] DateTime? closeTimeEnd = null)
+            [FromQuery] DateTime? closeTimeStart = null, [FromQuery] DateTime? closeTimeEnd = null,
+            [FromQuery] List<PositionDirectionContract> directions = null)
         {
-            var totalPnl = await _dealsRepository.GetTotalPnlAsync(accountId, instrument, closeTimeStart, closeTimeEnd);
+            var totalPnl = await _dealsRepository.GetTotalPnlAsync(accountId, instrument,
+                directions?.Select(x => x.ToType<PositionDirection>()).ToList(),
+                closeTimeStart, closeTimeEnd);
 
             return new TotalPnlContract {Value = totalPnl};
         }
