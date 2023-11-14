@@ -62,6 +62,9 @@ IF NOT EXISTS(SELECT 'X'
 
     END;
 
+IF NOT EXISTS(SELECT 1 FROM sys.columns
+              WHERE Name = N'CorrelationId'
+                AND Object_ID = Object_ID(N'[dbo].[OrdersHistory]'))
 BEGIN
     ALTER TABLE [dbo].[OrdersHistory]
     ALTER COLUMN CorrelationId NVARCHAR(250) NULL;
