@@ -33,7 +33,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             _connectionString = connectionString;
             _logger = logger;
             
-            connectionString.InitializeSqlObject("dbo.Trades.sql", logger);
+            connectionString.InitializeSqlObject("dbo.Trades.sql", logger: logger);
         }
 
         public async Task<ITrade> GetAsync(string tradeId)
