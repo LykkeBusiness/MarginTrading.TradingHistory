@@ -77,3 +77,33 @@ BEGIN
     alter table [dbo].[OrdersHistory] add CreatedBy as CASE WHEN ISJSON(AdditionalInfo) > 0 THEN CAST(json_value(AdditionalInfo, '$.CreatedBy') AS NVARCHAR(256)) ELSE null END
     create NONCLUSTERED INDEX IX_ParsedCreatedBy on [dbo].[OrdersHistory] (CreatedBy)
 END;
+
+IF NOT EXISTS(
+    SELECT * FROM sys.indexes
+    WHERE name = 'IX_OrdersHistory_AccountId_Status_Type_Originator_ModifiedTimestamp'
+      AND Object_ID = Object_ID(N'[dbo].[OrdersHistory]')
+)
+BEGIN
+    CREATE INDEX [IX_OrdersHistory_AccountId_Status_Type_Originator_ModifiedTimestamp] 
+        ON [dbo].[OrdersHistory] ([AccountId], [Status], [Type], [Originator], [ModifiedTimestamp])
+END
+
+IF NOT EXISTS(
+    SELECT * FROM sys.indexes
+    WHERE name = 'IX_OrdersHistory_AccountId_Type_Status_Originator_ModifiedTimestamp' 
+      AND Object_ID = Object_ID(N'[dbo].[OrdersHistory]')
+)
+BEGIN
+    CREATE INDEX [IX_OrdersHistory_AccountId_Type_Status_Originator_ModifiedTimestamp] 
+        ON [dbo].[OrdersHistory] ([AccountId], [Type], [Status], [Originator], [ModifiedTimestamp])
+END
+
+IF NOT EXISTS(
+    SELECT * FROM sys.indexes
+    WHERE name = 'IX_OrdersHistory_CreatedTimestamp_ModifiedTimestamp'
+      AND Object_ID = Object_ID(N'[dbo].[OrdersHistory]')
+)
+BEGIN
+    CREATE INDEX [IX_OrdersHistory_CreatedTimestamp_ModifiedTimestamp] 
+        ON [dbo].[OrdersHistory] ([CreatedTimestamp], [ModifiedTimestamp]) INCLUDE ([Id], [Status])
+END
