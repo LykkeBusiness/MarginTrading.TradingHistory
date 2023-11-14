@@ -81,7 +81,7 @@ END;
 IF NOT EXISTS(
     SELECT * FROM sys.indexes
     WHERE name = 'IX_OrdersHistory_AccountId_Status_Type_Originator_ModifiedTimestamp'
-      AND Object_ID = Object_ID(N'[dbo].[OrdersHistory]'))
+      AND Object_ID = Object_ID(N'[dbo].[OrdersHistory]')
 )
 BEGIN
     CREATE INDEX [IX_OrdersHistory_AccountId_Status_Type_Originator_ModifiedTimestamp] 
@@ -91,7 +91,7 @@ END
 IF NOT EXISTS(
     SELECT * FROM sys.indexes
     WHERE name = 'IX_OrdersHistory_AccountId_Type_Status_Originator_ModifiedTimestamp' 
-      AND Object_ID = Object_ID(N'[dbo].[OrdersHistory]'))
+      AND Object_ID = Object_ID(N'[dbo].[OrdersHistory]')
 )
 BEGIN
     CREATE INDEX [IX_OrdersHistory_AccountId_Type_Status_Originator_ModifiedTimestamp] 
@@ -101,8 +101,8 @@ END
 IF NOT EXISTS(
     SELECT * FROM sys.indexes
     WHERE name = 'IX_OrdersHistory_CreatedTimestamp_ModifiedTimestamp'
-      AND Object_ID = Object_ID(N'[dbo].[OrdersHistory]'))
-    )
+      AND Object_ID = Object_ID(N'[dbo].[OrdersHistory]')
+)
 BEGIN
     CREATE INDEX [IX_OrdersHistory_CreatedTimestamp_ModifiedTimestamp] 
         ON [dbo].[OrdersHistory] ([CreatedTimestamp], [ModifiedTimestamp]) INCLUDE ([Id], [Status])
