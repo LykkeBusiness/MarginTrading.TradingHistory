@@ -34,24 +34,37 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             }
         }
 
-        public static void InitializeSqlObject(this string connectionString, string scriptFileName, ILogger logger = null)
+        /// <summary>
+        /// Runs SQL objects initializations scripts.
+        /// Potentially it can be long running operation therefore optional command timeout can be provided.
+        /// </summary>
+        /// <param name="connectionString">Connection string</param>
+        /// <param name="scriptFileName">Script file name</param>
+        /// <param name="commandTimeout">Command timeout in seconds, infinite by default</param>
+        /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException">When <paramref name="scriptFileName"/> is null or empty</exception>
+        public static void InitializeSqlObject(this string connectionString,
+            string scriptFileName,
+            int commandTimeout = 0,
+            ILogger logger = null)
         {
+            if (string.IsNullOrWhiteSpace(scriptFileName))
+                throw new ArgumentNullException(nameof(scriptFileName));
+
             var creationScript = FileExtensions.ReadFromFile(scriptFileName);
-            
-            using (var conn = new SqlConnection(connectionString))
+
+            using var conn = new SqlConnection(connectionString);
+            try
             {
-                try
-                {
-                    conn.Execute(creationScript);
-                }
-                catch (Exception ex)
-                {
-                    logger?.LogError(ex, scriptFileName);
-                    throw;
-                }
+                conn.Execute(creationScript, commandTimeout: commandTimeout);
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, scriptFileName);
+                throw;
             }
         }
-        
+
         public static void ExecuteCreateOrAlter(this IDbConnection connection, string query)
         {
             connection.Open();

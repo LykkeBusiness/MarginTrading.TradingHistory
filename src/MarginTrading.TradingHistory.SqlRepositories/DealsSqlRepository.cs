@@ -30,10 +30,10 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         {
             _connectionString = connectionString;
 
-            connectionString.InitializeSqlObject("dbo.Deals.sql", logger);
-            connectionString.InitializeSqlObject("dbo.DealCommissionParams.sql", logger);
-            connectionString.InitializeSqlObject("dbo.getDealDetails.sql", logger);
-            connectionString.InitializeSqlObject("dbo.V_DealsWithCommissionParams.sql", logger);
+            connectionString.InitializeSqlObject("dbo.Deals.sql", logger: logger);
+            connectionString.InitializeSqlObject("dbo.DealCommissionParams.sql", logger: logger);
+            connectionString.InitializeSqlObject("dbo.getDealDetails.sql", logger: logger);
+            connectionString.InitializeSqlObject("dbo.V_DealsWithCommissionParams.sql", logger: logger);
         }
         
         public async Task<IDealWithCommissionParams> GetAsync(string id)
