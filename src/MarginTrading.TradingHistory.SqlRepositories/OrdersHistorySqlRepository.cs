@@ -165,7 +165,7 @@ OUTER APPLY (
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _orderBlotterExecutionTimeout = orderBlotterExecutionTimeout;
 
-            connectionString.InitializeSqlObject("dbo.OrdersHistory.sql", logger);
+            connectionString.InitializeSqlObject("dbo.OrdersHistory.sql", logger: logger);
         }
 
         public Task AddAsync(IOrderHistory order, ITrade trade)

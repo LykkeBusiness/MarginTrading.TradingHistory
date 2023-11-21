@@ -36,10 +36,10 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             
-            connectionString.InitializeSqlObject("dbo.Deals.sql", logger);
-            connectionString.InitializeSqlObject("dbo.DealCommissionParams.sql", logger);
-            connectionString.InitializeSqlObject("dbo.UpdateDealCommissionParamsOnDeal.sql", logger);
-            connectionString.InitializeSqlObject("dbo.PositionHistory.sql", logger);
+            connectionString.InitializeSqlObject("dbo.Deals.sql", logger: logger);
+            connectionString.InitializeSqlObject("dbo.DealCommissionParams.sql", logger: logger);
+            connectionString.InitializeSqlObject("dbo.UpdateDealCommissionParamsOnDeal.sql", logger: logger);
+            connectionString.InitializeSqlObject("dbo.PositionHistory.sql", logger: logger);
         }
 
         public async Task AddAsync(IPositionHistory positionHistory, IDeal deal)

@@ -66,7 +66,7 @@ IF NOT EXISTS (
 BEGIN
 ALTER TABLE [dbo].[PositionsHistory]
     ADD CorrelationId nvarchar(250) NULL;
-END
+END;
     
 IF NOT EXISTS(
     SELECT 'X'
@@ -76,4 +76,24 @@ IF NOT EXISTS(
 BEGIN
     CREATE UNIQUE INDEX IX_PositionHistory_Id_DealId_AccountId_AssetPairId_Direction_Volume_HistoryTimestamp
         ON PositionsHistory (Id, DealId, AccountId, AssetPairId, Direction, Volume, HistoryTimestamp)
+END;
+
+IF NOT EXISTS(
+    SELECT 'X'
+    FROM sys.indexes
+    WHERE name = 'IX_PositionsHistory_HistoryType'
+      AND object_id = OBJECT_ID('dbo.PositionsHistory'))
+BEGIN
+    CREATE INDEX [IX_PositionsHistory_HistoryType] 
+        ON [dbo].[PositionsHistory] ([HistoryType])
+END;
+
+IF NOT EXISTS(
+    SELECT 'X'
+    FROM sys.indexes
+    WHERE name = 'IX_PositionsHistory_AccountId_OpenDate_CloseDate'
+      AND object_id = OBJECT_ID('dbo.PositionsHistory'))
+BEGIN
+    CREATE INDEX [IX_PositionsHistory_AccountId_OpenDate_CloseDate] 
+        ON [dbo].[PositionsHistory] ([AccountId],[OpenDate], [CloseDate])
 END;
