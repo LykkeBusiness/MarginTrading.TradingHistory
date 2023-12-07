@@ -34,7 +34,8 @@ namespace MarginTrading.TradingHistory.Client
             [Query, CanBeNull] string accountId, 
             [Query, CanBeNull] string instrument,
             [Query, CanBeNull] DateTime? closeTimeStart = null, 
-            [Query, CanBeNull] DateTime? closeTimeEnd = null);
+            [Query, CanBeNull] DateTime? closeTimeEnd = null,
+            [Query(CollectionFormat.Multi), CanBeNull] List<PositionDirectionContract> directions = null);
 
         /// <summary>
         /// Get total profit of deals with filtering by set of days
