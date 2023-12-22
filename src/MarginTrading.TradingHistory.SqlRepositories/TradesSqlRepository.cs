@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2019 Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -99,6 +100,20 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                     $"UPDATE {TableName} SET CancelledBy = @cancelledBy WHERE Id = @cancelledTradeId",
                     new {cancelledTradeId, cancelledBy},
                     logger: _logger);
+            }
+        }
+
+        public async Task<IEnumerable<string>> GetMostTradedProductsAsync(DateTime date, int? max)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                var top = max.HasValue ? $"TOP {max}" : string.Empty;
+                var query = @$"SELECT {top} AssetPairId
+                    FROM {TableName}
+                    WHERE DATEDIFF(DAY, TradeTimestamp, @{nameof(date)}) = 0
+                    GROUP BY AssetPairId
+                    ORDER BY COUNT(*) DESC";
+                return await conn.QueryAsync<string>(query, new {date});
             }
         }
     }
