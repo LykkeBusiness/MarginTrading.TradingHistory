@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2019 Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -16,5 +17,7 @@ namespace MarginTrading.TradingHistory.Core.Repositories
             int? skip = null, int? take = null, bool isAscending = true);
 
         Task SetCancelledByAsync(string cancelledTradeId, string cancelledBy);
+
+        Task<IEnumerable<string>> GetMostTradedProductsAsync(DateTime date, int? max);
     }
 }
