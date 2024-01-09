@@ -43,6 +43,6 @@ namespace MarginTrading.TradingHistory.Client
         /// Get most traded products <param name="max"/> 
         /// </summary>
         [Get("/api/trades/most-traded-products")]
-        Task<List<string>> GetMostTradedProducts([Query] DateTime date, [Query, CanBeNull] int? max = null);
+        Task<List<string>> GetMostTradedProducts([Query] DateTime onDate, [Query, CanBeNull] int? max = null);
     }
 }
