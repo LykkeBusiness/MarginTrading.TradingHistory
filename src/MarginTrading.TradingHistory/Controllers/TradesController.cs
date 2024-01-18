@@ -84,6 +84,15 @@ namespace MarginTrading.TradingHistory.Controllers
             );
         }
 
+        /// <summary>
+        /// Get most traded products <param name="max"/> 
+        /// </summary>
+        [HttpGet, Route("most-traded-products")] 
+        public async Task<List<string>> GetMostTradedProducts([FromQuery] [Required] DateTime onDate, [FromQuery] int? max = null)
+        {
+            return (await _tradesRepository.GetMostTradedProductsAsync(onDate, max)).ToList();
+        }
+
         private TradeContract Convert(ITrade tradeEntity)
         {
             return new TradeContract
