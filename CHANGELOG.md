@@ -1,3 +1,14 @@
+## 2.17.0 - Nova 2. Delivery 39 (January 30, 2024)
+### What's changed
+* LT-5143: Ghangelog.md for trading history.
+* LT-5142: Add most trading products api.
+
+### Deployment
+* Added a new endpoint: `/api/trades/most-traded-products`
+
+
+
+
 ## 2.16.0 - Nova 2. Delivery 38 (December 12, 2023)
 ### What's changed
 * LT-5076: Sql timeout errors.
