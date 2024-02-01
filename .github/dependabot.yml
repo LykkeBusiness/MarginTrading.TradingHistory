@@ -24,11 +24,7 @@ updates:
         patterns:
           - "Lykke*"
           - "MarginTrading*"
-      other-libraries:
-        patterns:
-          - "JetBrains*"
     allow:
       - dependency-name: "Lykke*"
       - dependency-name: "MarginTrading*"
-      - dependency-name: "JetBrains*"
     open-pull-requests-limit: 10
