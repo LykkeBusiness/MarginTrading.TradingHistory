@@ -19,8 +19,12 @@ updates:
       - "tarurar"
     reviewers:
       - "tarurar"
+    groups:
+      lykke-libraries:
+        patterns:
+          - "Lykke*"
+          - "MarginTrading*"
     allow:
-      - dependency-name: "Lykke.*"
-      - dependency-name: "LykkeBiz.*"
-      - dependency-name: "MarginTrading.*"
-    open-pull-requests-limit: 15
+      - dependency-name: "Lykke*"
+      - dependency-name: "MarginTrading*"
+    open-pull-requests-limit: 10
