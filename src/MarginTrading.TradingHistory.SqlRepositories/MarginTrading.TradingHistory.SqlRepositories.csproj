@@ -12,7 +12,7 @@
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="Dapper.SqlBuilder" Version="2.0.78" />
-    <PackageReference Include="Lykke.Snow.Common" Version="3.0.0" />
+    <PackageReference Include="Lykke.Snow.Common" Version="3.0.26" />
     <PackageReference Include="LykkeBiz.Common.MsSql" Version="3.0.1" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
     <PackageReference Include="morelinq" Version="3.3.2" />
