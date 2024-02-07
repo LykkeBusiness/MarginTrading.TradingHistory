@@ -1,3 +1,7 @@
+## 2.17.1 - Nova 2. Delivery 39. Hotfix 2 (February 7, 2024)
+### What's changed
+* LT-5246: Update vulnerable packages
+
 ## 2.17.0 - Nova 2. Delivery 39 (January 30, 2024)
 ### What's changed
 * LT-5143: Ghangelog.md for trading history.
