@@ -3,7 +3,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>MarginTrading.TradingHistory.Services</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.Services</RootNamespace>
-    <Version>2.17.0</Version>
+    <Version>2.17.1</Version>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -11,7 +11,9 @@
     <PackageReference Include="Lykke.Common" Version="7.6.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\client\MarginTrading.TradingHistory.Client\MarginTrading.TradingHistory.Client.csproj" />
-    <ProjectReference Include="..\MarginTrading.TradingHistory.Core\MarginTrading.TradingHistory.Core.csproj" />
+    <ProjectReference
+      Include="..\..\client\MarginTrading.TradingHistory.Client\MarginTrading.TradingHistory.Client.csproj" />
+    <ProjectReference
+      Include="..\MarginTrading.TradingHistory.Core\MarginTrading.TradingHistory.Core.csproj" />
   </ItemGroup>
 </Project>
