@@ -14,10 +14,11 @@
     <PackageReference Include="Dapper.SqlBuilder" Version="2.0.78" />
     <PackageReference Include="Lykke.Snow.Common" Version="3.0.0" />
     <PackageReference Include="LykkeBiz.Common.MsSql" Version="3.0.1" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.3" />
     <PackageReference Include="morelinq" Version="3.3.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MarginTrading.TradingHistory.Core\MarginTrading.TradingHistory.Core.csproj" />
+    <ProjectReference
+      Include="..\MarginTrading.TradingHistory.Core\MarginTrading.TradingHistory.Core.csproj" />
   </ItemGroup>
 </Project>
