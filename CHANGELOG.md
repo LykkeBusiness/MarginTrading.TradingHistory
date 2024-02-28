@@ -1,3 +1,13 @@
+## 2.18.0 - Nova 2. Delivery 40 (February 28, 2024)
+### What's changed
+* LT-5289:[PositionHistoryBroker] Step: deprecated packages validation is failed.
+* LT-5288: [OrderHistoryBroker] Step: deprecated packages validation is failed.
+* LT-5287: [TradingHistory] Step: deprecated packages validation is failed.
+* LT-5255: Update lykke.httpclientgenerator to 5.6.2.
+
+
+
+
 ## 2.17.1 - Nova 2. Delivery 39. Hotfix 2 (February 7, 2024)
 ### What's changed
 * LT-5246: Update vulnerable packages
