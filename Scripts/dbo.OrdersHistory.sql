@@ -107,3 +107,11 @@ BEGIN
     CREATE INDEX [IX_OrdersHistory_CreatedTimestamp_ModifiedTimestamp] 
         ON [dbo].[OrdersHistory] ([CreatedTimestamp], [ModifiedTimestamp]) INCLUDE ([Id], [Status])
 END;
+
+-- for nvarchar columns the real length is this value divided by 2
+-- 128 means it's [nvarchar](64)
+if COL_LENGTH('[dbo].[OrdersHistory]', 'AssetPairId') = 128
+BEGIN
+ALTER TABLE OrdersHistory
+ALTER COLUMN AssetPairId NVARCHAR(100)
+END;
