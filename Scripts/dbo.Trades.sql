@@ -26,36 +26,53 @@ IF NOT EXISTS(SELECT 'X'
         );
 
     END
-	
-	
-IF NOT EXISTS (
-  SELECT * 
-  FROM   sys.columns 
-  WHERE  object_id = OBJECT_ID(N'[dbo].[Trades]') 
-         AND name = 'ExternalOrderId'
-)
-BEGIN
-	ALTER TABLE [dbo].[Trades]
-	ADD ExternalOrderId nvarchar(64) NULL;
-END
 
-IF NOT EXISTS (
-  SELECT * 
-  FROM   sys.columns 
-  WHERE  object_id = OBJECT_ID(N'[dbo].[Trades]') 
-         AND name = 'CorrelationId'
-)
-BEGIN
-ALTER TABLE [dbo].[Trades]
-    ADD CorrelationId nvarchar(250) NULL;
-END
 
-IF NOT EXISTS(
-        SELECT 'X'
-        FROM sys.indexes
-        WHERE name = 'IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume'
-          AND object_id = OBJECT_ID('dbo.Trades'))
+IF NOT EXISTS (SELECT *
+               FROM sys.columns
+               WHERE object_id = OBJECT_ID(N'[dbo].[Trades]')
+                 AND name = 'ExternalOrderId')
+    BEGIN
+        ALTER TABLE [dbo].[Trades]
+            ADD ExternalOrderId nvarchar(64) NULL;
+    END
+
+IF NOT EXISTS (SELECT *
+               FROM sys.columns
+               WHERE object_id = OBJECT_ID(N'[dbo].[Trades]')
+                 AND name = 'CorrelationId')
+    BEGIN
+        ALTER TABLE [dbo].[Trades]
+            ADD CorrelationId nvarchar(250) NULL;
+    END
+
+IF NOT EXISTS(SELECT 'X'
+              FROM sys.indexes
+              WHERE name = 'IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume'
+                AND object_id = OBJECT_ID('dbo.Trades'))
     BEGIN
         CREATE UNIQUE INDEX IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume
             ON Trades (Id, AccountId, AssetPairId, TradeTimestamp, Volume)
     END;
+
+IF NOT EXISTS (SELECT c.name, t.name AS typename
+               FROM sys.columns c
+                        LEFT JOIN sys.types t ON t.system_type_id = c.system_type_id
+               WHERE c.object_id = OBJECT_ID(N'[dbo].[Trades]')
+                 AND c.name = 'OrderCreatedDate'
+                 AND t.name = 'datetime2')
+    BEGIN
+        ALTER TABLE [dbo].[Trades]
+            ALTER COLUMN OrderCreatedDate datetime2 NOT NULL;
+    END
+
+IF NOT EXISTS (SELECT c.name, t.name AS typename
+               FROM sys.columns c
+                        LEFT JOIN sys.types t ON t.system_type_id = c.system_type_id
+               WHERE c.object_id = OBJECT_ID(N'[dbo].[Trades]')
+                 AND c.name = 'TradeTimestamp'
+                 AND t.name = 'datetime2')
+    BEGIN
+        ALTER TABLE [dbo].[Trades]
+            ALTER COLUMN TradeTimestamp datetime2 NOT NULL;
+    END
