@@ -81,14 +81,14 @@ IF NOT EXISTS (SELECT c.name, t.name AS typename
                  AND t.name = 'datetime2')
     BEGIN
         -- drop dependent indexes first
-        DROP INDEX IX_Trades_Id_AccountId_AssetPairId_OrderCreatedDate;
+        DROP INDEX IX_Trades_Id_AccountId_AssetPairId_OrderCreatedDate ON [dbo].[Trades];
 
         ALTER TABLE [dbo].[Trades]
             ALTER COLUMN OrderCreatedDate datetime2 NOT NULL;
 
         -- recreate indexes
         CREATE UNIQUE INDEX IX_Trades_Id_AccountId_AssetPairId_OrderCreatedDate
-            ON dbo.Trades (Id, AccountId, AssetPairId, OrderCreatedDate);
+            ON [dbo].[Trades] (Id, AccountId, AssetPairId, OrderCreatedDate);
     END
 
 IF NOT EXISTS (SELECT c.name, t.name AS typename
@@ -99,12 +99,12 @@ IF NOT EXISTS (SELECT c.name, t.name AS typename
                  AND t.name = 'datetime2')
     BEGIN
         -- drop dependent indexes first
-        DROP INDEX IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume;
+        DROP INDEX IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume ON [dbo].[Trades];
         
         ALTER TABLE [dbo].[Trades]
             ALTER COLUMN TradeTimestamp datetime2 NOT NULL;
         
         -- recreate indexes
         CREATE UNIQUE INDEX IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume
-            ON dbo.Trades (Id, AccountId, AssetPairId, TradeTimestamp, Volume);
+            ON [dbo].[Trades] (Id, AccountId, AssetPairId, TradeTimestamp, Volume);
     END
