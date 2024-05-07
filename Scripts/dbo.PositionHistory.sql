@@ -101,7 +101,7 @@ IF NOT EXISTS (SELECT c.name, t.name AS typename
                  AND t.name = 'datetime2')
     BEGIN
         -- drop dependent indexes first
-        DROP INDEX IX_PositionsHistory_AccountId_OpenDate_CloseDate;
+        DROP INDEX IX_PositionsHistory_AccountId_OpenDate_CloseDate ON [dbo].[PositionsHistory];
         
         ALTER TABLE [dbo].[PositionsHistory]
             ALTER COLUMN OpenDate datetime2 NOT NULL;
