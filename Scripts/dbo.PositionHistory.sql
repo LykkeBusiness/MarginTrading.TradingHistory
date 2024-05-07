@@ -100,13 +100,17 @@ IF NOT EXISTS (SELECT c.name, t.name AS typename
                  AND c.name = 'OpenDate'
                  AND t.name = 'datetime2')
     BEGIN
-        -- drop dependent indexes first
-        DROP INDEX IX_PositionsHistory_AccountId_OpenDate_CloseDate;
-        
         ALTER TABLE [dbo].[PositionsHistory]
             ALTER COLUMN OpenDate datetime2 NOT NULL;
+    END
 
-        -- recreate indexes
-        CREATE INDEX [IX_PositionsHistory_AccountId_OpenDate_CloseDate]
-            ON [dbo].[PositionsHistory] ([AccountId], [OpenDate], [CloseDate]);
+IF NOT EXISTS (SELECT c.name, t.name AS typename
+               FROM sys.columns c
+                        LEFT JOIN sys.types t ON t.system_type_id = c.system_type_id
+               WHERE c.object_id = OBJECT_ID(N'[dbo].[PositionsHistory]')
+                 AND c.name = 'HistoryTimestamp'
+                 AND t.name = 'datetime2')
+    BEGIN
+        ALTER TABLE [dbo].[PositionsHistory]
+            ALTER COLUMN HistoryTimestamp datetime2 NOT NULL;
     END

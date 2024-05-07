@@ -46,32 +46,14 @@ IF NOT EXISTS (SELECT *
             ADD CorrelationId nvarchar(250) NULL;
     END
 
--- for nvarchar columns the real length is this value divided by 2
--- 128 means it's [nvarchar](64)
-if COL_LENGTH('[dbo].[Trades]', 'AssetPairId') = 128
-    BEGIN
-        ALTER TABLE Trades
-            ALTER COLUMN AssetPairId NVARCHAR(100)
-    END;
-
 IF NOT EXISTS(SELECT 'X'
               FROM sys.indexes
               WHERE name = 'IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume'
                 AND object_id = OBJECT_ID('dbo.Trades'))
     BEGIN
         CREATE UNIQUE INDEX IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume
-            ON dbo.Trades (Id, AccountId, AssetPairId, TradeTimestamp, Volume)
+            ON Trades (Id, AccountId, AssetPairId, TradeTimestamp, Volume)
     END;
-
-IF NOT EXISTS(SELECT 'X'
-              FROM sys.indexes
-              WHERE name = 'IX_Trades_Id_AccountId_AssetPairId_OrderCreatedDate'
-                AND object_id = OBJECT_ID('dbo.Trades'))
-    BEGIN
-        CREATE UNIQUE INDEX IX_Trades_Id_AccountId_AssetPairId_OrderCreatedDate
-            ON dbo.Trades (Id, AccountId, AssetPairId, OrderCreatedDate)
-    END
-
 
 IF NOT EXISTS (SELECT c.name, t.name AS typename
                FROM sys.columns c
@@ -80,15 +62,8 @@ IF NOT EXISTS (SELECT c.name, t.name AS typename
                  AND c.name = 'OrderCreatedDate'
                  AND t.name = 'datetime2')
     BEGIN
-        -- drop dependent indexes first
-        DROP INDEX IX_Trades_Id_AccountId_AssetPairId_OrderCreatedDate;
-
         ALTER TABLE [dbo].[Trades]
             ALTER COLUMN OrderCreatedDate datetime2 NOT NULL;
-
-        -- recreate indexes
-        CREATE UNIQUE INDEX IX_Trades_Id_AccountId_AssetPairId_OrderCreatedDate
-            ON dbo.Trades (Id, AccountId, AssetPairId, OrderCreatedDate);
     END
 
 IF NOT EXISTS (SELECT c.name, t.name AS typename
@@ -98,13 +73,6 @@ IF NOT EXISTS (SELECT c.name, t.name AS typename
                  AND c.name = 'TradeTimestamp'
                  AND t.name = 'datetime2')
     BEGIN
-        -- drop dependent indexes first
-        DROP INDEX IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume;
-        
         ALTER TABLE [dbo].[Trades]
             ALTER COLUMN TradeTimestamp datetime2 NOT NULL;
-        
-        -- recreate indexes
-        CREATE UNIQUE INDEX IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume
-            ON dbo.Trades (Id, AccountId, AssetPairId, TradeTimestamp, Volume);
     END
