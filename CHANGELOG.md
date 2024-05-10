@@ -1,3 +1,8 @@
+## 2.18.1 - Nova 2. Delivery 40. Hotfix 4 (May 10, 2024)
+### What's changed
+* LT-5486: EMIR reporting - wrong EXECUTION-TIMESTAMP in Position file
+
+
 ## 2.18.0 - Nova 2. Delivery 40 (February 28, 2024)
 ### What's changed
 * LT-5289:[PositionHistoryBroker] Step: deprecated packages validation is failed.
