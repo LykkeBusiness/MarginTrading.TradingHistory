@@ -52,3 +52,12 @@ BEGIN
     CREATE UNIQUE INDEX IX_Deals_DealId_AccountId_AssetPairId_Direction_Volume_Created
         ON Deals (DealId, AccountId, AssetPairId, Direction, Volume, Created)
 END;
+
+
+-- for nvarchar columns the real length is this value divided by 2
+-- 128 means it's [nvarchar](64)
+if COL_LENGTH('[dbo].[Deals]', 'AssetPairId') = 128
+BEGIN
+ALTER TABLE Deals
+ALTER COLUMN AssetPairId NVARCHAR(100)
+END;

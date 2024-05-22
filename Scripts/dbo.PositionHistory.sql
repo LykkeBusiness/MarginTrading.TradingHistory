@@ -97,3 +97,11 @@ BEGIN
     CREATE INDEX [IX_PositionsHistory_AccountId_OpenDate_CloseDate] 
         ON [dbo].[PositionsHistory] ([AccountId],[OpenDate], [CloseDate])
 END;
+
+-- for nvarchar columns the real length is this value divided by 2
+-- 128 means it's [nvarchar](64)
+if COL_LENGTH('[dbo].[PositionsHistory]', 'AssetPairId') = 128
+BEGIN
+ALTER TABLE PositionsHistory
+ALTER COLUMN AssetPairId NVARCHAR(100)
+END;

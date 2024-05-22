@@ -54,6 +54,15 @@ IF NOT EXISTS(SELECT 'X'
         CREATE UNIQUE INDEX IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume
             ON Trades (Id, AccountId, AssetPairId, TradeTimestamp, Volume)
     END;
+    
+    
+-- for nvarchar columns the real length is this value divided by 2
+-- 128 means it's [nvarchar](64)
+if COL_LENGTH('[dbo].[Trades]', 'AssetPairId') = 128
+BEGIN
+ALTER TABLE Trades
+ALTER COLUMN AssetPairId NVARCHAR(100)
+END;
 
 IF NOT EXISTS(SELECT 'X'
               FROM sys.indexes
