@@ -11,11 +11,11 @@ IF NOT EXISTS(SELECT 'X'
             [AccountId]          [nvarchar](64)  NOT NULL,
             [OrderId]            [nvarchar](64)  NOT NULL,
             [AssetPairId]        [nvarchar](64)  NOT NULL,
-            [OrderCreatedDate]   [datetime]      NOT NULL,
+            [OrderCreatedDate]   [datetime2]     NOT NULL,
             [OrderType]          [nvarchar](64)  NOT NULL,
             [Type]               [nvarchar](64)  NOT NULL,
             [Originator]         [nvarchar](64)  NOT NULL,
-            [TradeTimestamp]     [datetime]      NOT NULL,
+            [TradeTimestamp]     [datetime2]     NOT NULL,
             [Price]              [float]         NULL,
             [Volume]             [float]         NULL,
             [OrderExpectedPrice] [float]         NULL,
@@ -26,35 +26,30 @@ IF NOT EXISTS(SELECT 'X'
         );
 
     END
-	
-	
-IF NOT EXISTS (
-  SELECT * 
-  FROM   sys.columns 
-  WHERE  object_id = OBJECT_ID(N'[dbo].[Trades]') 
-         AND name = 'ExternalOrderId'
-)
-BEGIN
-	ALTER TABLE [dbo].[Trades]
-	ADD ExternalOrderId nvarchar(64) NULL;
-END
 
-IF NOT EXISTS (
-  SELECT * 
-  FROM   sys.columns 
-  WHERE  object_id = OBJECT_ID(N'[dbo].[Trades]') 
-         AND name = 'CorrelationId'
-)
-BEGIN
-ALTER TABLE [dbo].[Trades]
-    ADD CorrelationId nvarchar(250) NULL;
-END
 
-IF NOT EXISTS(
-        SELECT 'X'
-        FROM sys.indexes
-        WHERE name = 'IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume'
-          AND object_id = OBJECT_ID('dbo.Trades'))
+IF NOT EXISTS (SELECT *
+               FROM sys.columns
+               WHERE object_id = OBJECT_ID(N'[dbo].[Trades]')
+                 AND name = 'ExternalOrderId')
+    BEGIN
+        ALTER TABLE [dbo].[Trades]
+            ADD ExternalOrderId nvarchar(64) NULL;
+    END
+
+IF NOT EXISTS (SELECT *
+               FROM sys.columns
+               WHERE object_id = OBJECT_ID(N'[dbo].[Trades]')
+                 AND name = 'CorrelationId')
+    BEGIN
+        ALTER TABLE [dbo].[Trades]
+            ADD CorrelationId nvarchar(250) NULL;
+    END
+
+IF NOT EXISTS(SELECT 'X'
+              FROM sys.indexes
+              WHERE name = 'IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume'
+                AND object_id = OBJECT_ID('dbo.Trades'))
     BEGIN
         CREATE UNIQUE INDEX IX_Trades_Id_AccountId_AssetPairId_TradeTimestamp_Volume
             ON Trades (Id, AccountId, AssetPairId, TradeTimestamp, Volume)
@@ -68,3 +63,12 @@ BEGIN
 ALTER TABLE Trades
 ALTER COLUMN AssetPairId NVARCHAR(100)
 END;
+
+IF NOT EXISTS(SELECT 'X'
+              FROM sys.indexes
+              WHERE name = 'IX_Trades_Id_AccountId_AssetPairId_OrderCreatedDate'
+                AND object_id = OBJECT_ID('dbo.Trades'))
+    BEGIN
+        CREATE UNIQUE INDEX IX_Trades_Id_AccountId_AssetPairId_OrderCreatedDate
+            ON dbo.Trades (Id, AccountId, AssetPairId, OrderCreatedDate)
+    END;

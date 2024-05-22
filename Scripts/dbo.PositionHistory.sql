@@ -17,7 +17,7 @@ IF NOT EXISTS(SELECT 'X'
             [AccountAssetId]         [nvarchar](64)   NULL,
             [ExpectedOpenPrice]      [float]          NULL,
             [OpenMatchingEngineId]   [nvarchar](64)   NULL,
-            [OpenDate]               [datetime]       NULL,
+            [OpenDate]               [datetime2]      NULL,
             [OpenTradeId]            [nvarchar](64)   NULL,
             [OpenOrderType]          [nvarchar](64)   NULL,
             [OpenOrderVolume]        [float]          NULL,
