@@ -38,6 +38,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistory.TestClient", "src\MarginTrading.TradingHistory.TestClient\MarginTrading.TradingHistory.TestClient.csproj", "{12D5E341-6CEC-41CA-9456-D5C6D0428950}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarginTrading.TradingHistory.DapperExtensions", "src\MarginTrading.TradingHistory.DapperExtensions\MarginTrading.TradingHistory.DapperExtensions.csproj", "{8ECD1016-6B1B-49BB-AD2D-44E306725894}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,10 @@ Global
 		{12D5E341-6CEC-41CA-9456-D5C6D0428950}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12D5E341-6CEC-41CA-9456-D5C6D0428950}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12D5E341-6CEC-41CA-9456-D5C6D0428950}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8ECD1016-6B1B-49BB-AD2D-44E306725894}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8ECD1016-6B1B-49BB-AD2D-44E306725894}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8ECD1016-6B1B-49BB-AD2D-44E306725894}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8ECD1016-6B1B-49BB-AD2D-44E306725894}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -94,5 +100,6 @@ Global
 		{C29E609C-1A0F-466C-8712-9E0CF74342FD} = {BF745453-B940-470E-81BC-43FB67703D4E}
 		{EB67E9DA-D29F-4FA1-9F12-3D758DCA98F5} = {75B9374F-F803-4B14-8F1A-C86FFC8E10C5}
 		{12D5E341-6CEC-41CA-9456-D5C6D0428950} = {75B9374F-F803-4B14-8F1A-C86FFC8E10C5}
+		{8ECD1016-6B1B-49BB-AD2D-44E306725894} = {CC2067D7-1971-47BB-B491-5649EA3C18B2}
 	EndGlobalSection
 EndGlobal

@@ -13,6 +13,7 @@ using MarginTrading.Backend.Contracts.Events;
 using MarginTrading.Backend.Contracts.Orders;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
+using MarginTrading.TradingHistory.DapperExtensions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -25,6 +26,11 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         private readonly ILogger _logger;
         private readonly Settings _settings;
         private readonly CorrelationContextAccessor _correlationContextAccessor;
+
+        static Application()
+        {
+            DapperHandlers.Register();
+        }
 
         public Application(
             CorrelationContextAccessor correlationContextAccessor,
