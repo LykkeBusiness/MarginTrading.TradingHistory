@@ -3,6 +3,7 @@
 
 using System;
 using JetBrains.Annotations;
+using MarginTrading.Backend.Contracts.Events;
 
 namespace MarginTrading.TradingHistory.Core.Domain
 {
@@ -62,6 +63,35 @@ namespace MarginTrading.TradingHistory.Core.Domain
             AdditionalInfo = additionalInfo;
             PnlOfTheLastDay = pnlOfTheLastDay;
             CorrelationId = correlationId;
+        }
+
+        public static Deal FromPositionHistoryEvent(PositionHistoryEvent evt, string correlationId)
+        {
+            return new Deal(
+                dealId: evt.Deal.DealId,
+                created: evt.Deal.Created,
+                accountId: evt.PositionSnapshot.AccountId,
+                assetPairId: evt.PositionSnapshot.AssetPairId,
+                openTradeId: evt.Deal.OpenTradeId,
+                openOrderType: evt.Deal.OpenOrderType.ToType<OrderType>(),
+                openOrderVolume: evt.Deal.OpenOrderVolume,
+                openOrderExpectedPrice: evt.Deal.OpenOrderExpectedPrice,
+                closeTradeId: evt.Deal.CloseTradeId,
+                closeOrderType: evt.Deal.CloseOrderType.ToType<OrderType>(),
+                closeOrderVolume: evt.Deal.CloseOrderVolume,
+                closeOrderExpectedPrice: evt.Deal.CloseOrderExpectedPrice,
+                direction: evt.PositionSnapshot.Direction.ToType<PositionDirection>(),
+                volume: evt.Deal.Volume,
+                originator: evt.Deal.Originator.ToType<OriginatorType>(),
+                openPrice: evt.Deal.OpenPrice,
+                openFxPrice: evt.Deal.OpenFxPrice,
+                closePrice: evt.Deal.ClosePrice,
+                closeFxPrice: evt.Deal.CloseFxPrice,
+                fpl: evt.Deal.Fpl,
+                additionalInfo: evt.Deal.AdditionalInfo,
+                pnlOfTheLastDay: evt.Deal.PnlOfTheLastDay,
+                correlationId: correlationId
+            );
         }
     }
 }
