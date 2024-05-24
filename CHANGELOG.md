@@ -1,11 +1,25 @@
+## 2.18.2 - Nova 2. Delivery 42. Hotfix 2 (May 14, 2024)
+### What's changed
+* LT-5486: EMIR reporting - wrong EXECUTION-TIMESTAMP in Position file
+
+### Deployment
+* Stop the component
+* Run the SQL script to migrate to datetime2 column type. Script file: ./scripts/20240507-datetime2-migration.sql.
+* Run the component
+* Ensure there are no errors in the log
+
+
+## 2.18.1 - Nova 2. Delivery 40. Hotfix 4 (May 10, 2024)
+### What's changed
+* LT-5486: EMIR reporting - wrong EXECUTION-TIMESTAMP in Position file
+
+
 ## 2.18.0 - Nova 2. Delivery 40 (February 28, 2024)
 ### What's changed
 * LT-5289:[PositionHistoryBroker] Step: deprecated packages validation is failed.
 * LT-5288: [OrderHistoryBroker] Step: deprecated packages validation is failed.
 * LT-5287: [TradingHistory] Step: deprecated packages validation is failed.
 * LT-5255: Update lykke.httpclientgenerator to 5.6.2.
-
-
 
 
 ## 2.17.1 - Nova 2. Delivery 39. Hotfix 2 (February 7, 2024)
@@ -19,8 +33,6 @@
 
 ### Deployment
 * Added a new endpoint: `/api/trades/most-traded-products`
-
-
 
 
 ## 2.16.0 - Nova 2. Delivery 38 (December 12, 2023)

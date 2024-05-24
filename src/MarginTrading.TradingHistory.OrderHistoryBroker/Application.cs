@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Common.Log;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.Snow.Common.Correlation;
@@ -13,6 +12,7 @@ using MarginTrading.Backend.Contracts.Events;
 using MarginTrading.Backend.Contracts.Orders;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
+using MarginTrading.TradingHistory.DapperExtensions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -22,19 +22,24 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
     {
         private readonly IOrdersHistoryRepository _ordersHistoryRepository;
         private readonly ITradesRepository _tradesRepository;
-        private readonly ILogger _logger;
-        private readonly Settings _settings;
         private readonly CorrelationContextAccessor _correlationContextAccessor;
+        private readonly Settings _settings;
+        private readonly ILogger _logger;
+
+        static Application()
+        {
+            DapperHandlers.Register();
+        }
 
         public Application(
             CorrelationContextAccessor correlationContextAccessor,
             RabbitMqCorrelationManager correlationManager,
-            ILoggerFactory loggerFactory, 
             IOrdersHistoryRepository ordersHistoryRepository,
             ITradesRepository tradesRepository,
-            ILogger<Application> logger,
-            Settings settings, CurrentApplicationInfo applicationInfo) : base(correlationManager,
-            loggerFactory, logger, applicationInfo)
+            CurrentApplicationInfo applicationInfo,
+            Settings settings, 
+            ILoggerFactory loggerFactory, 
+            ILogger<Application> logger) : base(correlationManager, loggerFactory, logger, applicationInfo)
         {
             _correlationContextAccessor = correlationContextAccessor;
             _ordersHistoryRepository = ordersHistoryRepository;
