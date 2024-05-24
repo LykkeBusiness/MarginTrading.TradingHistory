@@ -12,6 +12,7 @@ using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
+using MarginTrading.TradingHistory.DapperExtensions;
 using Microsoft.Extensions.Logging;
 
 namespace MarginTrading.TradingHistory.PositionHistoryBroker
@@ -24,6 +25,11 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
         private readonly ILogger _logger;
         private readonly Settings _settings;
         private readonly CorrelationContextAccessor _correlationContextAccessor;
+
+        static Application()
+        {
+            DapperHandlers.Register();
+        }
 
         public Application(
             CorrelationContextAccessor correlationContextAccessor,
