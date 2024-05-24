@@ -1,3 +1,7 @@
+## 2.18.4 - Nova 2. Delivery 42. Hotfix 4 (May 28, 2024)
+### What's changed
+* LT-5505: EMIR reporting wrong timestamp again
+
 ## 2.18.2 - Nova 2. Delivery 42. Hotfix 2 (May 14, 2024)
 ### What's changed
 * LT-5486: EMIR reporting - wrong EXECUTION-TIMESTAMP in Position file
