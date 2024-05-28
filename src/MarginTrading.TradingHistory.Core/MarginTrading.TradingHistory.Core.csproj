@@ -3,7 +3,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>MarginTrading.TradingHistory.Core</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.Core</RootNamespace>
-    <Version>2.15.3</Version>
+    <Version>2.18.3</Version>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
