@@ -1,3 +1,7 @@
+## 2.18.4 - Nova 2. Delivery 42. Hotfix 4 (May 28, 2024)
+### What's changed
+* LT-5505: EMIR reporting wrong timestamp again
+
 ## 2.18.3 - Nova 2. Delivery 40. Hotfix 6 (May 28, 2024)
 ### What's changed
 * LT-5505: EMIR reporting wrong timestamp again
