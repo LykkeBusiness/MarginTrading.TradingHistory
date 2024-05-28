@@ -3,7 +3,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>MarginTrading.TradingHistory.SqlRepositories</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.SqlRepositories</RootNamespace>
-    <Version>2.18.1</Version>
+    <Version>2.18.3</Version>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
