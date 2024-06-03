@@ -1,3 +1,12 @@
+## 2.19.0 - Nova 2. Delivery 43 (June 03, 2024)
+### What's changed
+* LT-5505: - emir reporting wrong timestamp again.
+* LT-5479: An error in the log "string or binary data would be truncated.".
+
+### Deployment
+* Since the changes affect all the components within git repository you'll have to redeploy all of them: TradingHistory, OrderHistoryBroker, PositionHistoryBroker.
+
+
 ## 2.18.4 - Nova 2. Delivery 42. Hotfix 4 (May 28, 2024)
 ### What's changed
 * LT-5505: EMIR reporting wrong timestamp again
