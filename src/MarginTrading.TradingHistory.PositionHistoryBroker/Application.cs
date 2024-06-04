@@ -3,6 +3,7 @@
 
 using System.Threading.Tasks;
 using Lykke.MarginTrading.BrokerBase;
+using Lykke.MarginTrading.BrokerBase.Messaging;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.Snow.Common.Correlation;
 using Lykke.Snow.Common.Correlation.RabbitMq;
@@ -19,7 +20,6 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
         private readonly IPositionsHistoryRepository _positionsHistoryRepository;
         private readonly CorrelationContextAccessor _correlationContextAccessor;
         private readonly Settings _settings;
-        private readonly ILogger _logger;
 
         static Application()
         {
@@ -33,12 +33,11 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
             IPositionsHistoryRepository positionsHistoryRepository, 
             Settings settings, 
             CurrentApplicationInfo applicationInfo,
-            ILogger<Application> logger)
-            : base(correlationManager, loggerFactory, logger, applicationInfo)
+            IMessagingComponentFactory<PositionHistoryEvent> messagingComponentFactory)
+            : base(correlationManager, loggerFactory, applicationInfo, messagingComponentFactory)
         {
             _correlationContextAccessor = correlationContextAccessor;
             _positionsHistoryRepository = positionsHistoryRepository;
-            _logger = logger;
             _settings = settings;
         }
 
@@ -52,7 +51,7 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
             var correlationId = _correlationContextAccessor.CorrelationContext?.CorrelationId;
             if (string.IsNullOrWhiteSpace(correlationId))
             {
-                _logger.LogDebug($"Correlation id is empty for postition {positionHistoryEvent.PositionSnapshot.Id}");
+                Logger.LogDebug($"Correlation id is empty for postition {positionHistoryEvent.PositionSnapshot.Id}");
             }
             
             var position = positionHistoryEvent
