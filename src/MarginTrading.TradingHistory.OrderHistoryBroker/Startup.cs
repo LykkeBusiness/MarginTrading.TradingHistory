@@ -3,11 +3,11 @@
 
 using System;
 using Autofac;
-using Common.Log;
 using JetBrains.Annotations;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.SettingsReader;
+using MarginTrading.Backend.Contracts.Events;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
@@ -29,6 +29,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
 
         protected override void RegisterCustomServices(ContainerBuilder builder, IReloadingManager<Settings> settings)
         {
+            builder.AddJsonBrokerMessagingFactory<OrderHistoryEvent>();
             builder.RegisterType<Application>().As<IBrokerApplication>().SingleInstance();
             builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();
             

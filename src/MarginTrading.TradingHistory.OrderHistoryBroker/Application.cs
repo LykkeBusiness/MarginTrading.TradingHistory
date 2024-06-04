@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Lykke.MarginTrading.BrokerBase;
+using Lykke.MarginTrading.BrokerBase.Messaging;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.Snow.Common.Correlation;
 using Lykke.Snow.Common.Correlation.RabbitMq;
@@ -24,7 +25,6 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         private readonly ITradesRepository _tradesRepository;
         private readonly CorrelationContextAccessor _correlationContextAccessor;
         private readonly Settings _settings;
-        private readonly ILogger _logger;
 
         static Application()
         {
@@ -32,19 +32,19 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         }
 
         public Application(
-            CorrelationContextAccessor correlationContextAccessor,
-            RabbitMqCorrelationManager correlationManager,
-            IOrdersHistoryRepository ordersHistoryRepository,
-            ITradesRepository tradesRepository,
-            CurrentApplicationInfo applicationInfo,
-            Settings settings, 
-            ILoggerFactory loggerFactory, 
-            ILogger<Application> logger) : base(correlationManager, loggerFactory, logger, applicationInfo)
+        CorrelationContextAccessor correlationContextAccessor,
+        RabbitMqCorrelationManager correlationManager,
+        IOrdersHistoryRepository ordersHistoryRepository,
+        ITradesRepository tradesRepository,
+        CurrentApplicationInfo applicationInfo,
+        Settings settings,
+        ILoggerFactory loggerFactory,
+        IMessagingComponentFactory<OrderHistoryEvent> messagingComponentFactory)
+            : base(correlationManager, loggerFactory, applicationInfo, messagingComponentFactory)
         {
             _correlationContextAccessor = correlationContextAccessor;
             _ordersHistoryRepository = ordersHistoryRepository;
             _tradesRepository = tradesRepository;
-            _logger = logger;
             _settings = settings;
         }
 
@@ -57,7 +57,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
             var correlationId = _correlationContextAccessor.CorrelationContext?.CorrelationId;
             if (string.IsNullOrWhiteSpace(correlationId))
             {
-                _logger.LogDebug($"Correlation id is empty for order {historyEvent.OrderSnapshot.Id}");
+                Logger.LogDebug($"Correlation id is empty for order {historyEvent.OrderSnapshot.Id}");
             }
 
             var orderHistory = historyEvent.OrderSnapshot.ToOrderHistoryDomain(historyEvent.Type, correlationId);
@@ -82,26 +82,26 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                     correlationId
                 )
                 : null;
-            
+
             await _ordersHistoryRepository.AddAsync(orderHistory, trade);
 
             if (trade == null)
             {
                 return;
             }
-            
+
             var cancelledTradeId = TryGetCancelledTradeId(historyEvent.OrderSnapshot);
 
             if (!string.IsNullOrEmpty(cancelledTradeId))
             {
                 try
                 {
-                    await _tradesRepository.SetCancelledByAsync(cancelledTradeId, 
+                    await _tradesRepository.SetCancelledByAsync(cancelledTradeId,
                         historyEvent.OrderSnapshot.Id);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex,"SetCancelledByAsync");
+                    Logger.LogError(ex, "SetCancelledByAsync");
                 }
             }
         }
@@ -126,7 +126,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error getting of cancelled trade id");
+                Logger.LogWarning(ex, "Error getting of cancelled trade id");
             }
 
             return null;

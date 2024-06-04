@@ -152,7 +152,6 @@ namespace MarginTrading.TradingHistory
                 app.UseStaticFiles();
 
                 appLifetime.ApplicationStarted.Register(() => StartApplication().GetAwaiter().GetResult());
-                appLifetime.ApplicationStopping.Register(() => StopApplication().GetAwaiter().GetResult());
                 appLifetime.ApplicationStopped.Register(() => CleanUp().GetAwaiter().GetResult());
             }
             catch (Exception ex)
@@ -173,8 +172,6 @@ namespace MarginTrading.TradingHistory
             {
                 // NOTE: Service not yet receive and process requests here
 
-                await ApplicationContainer.Resolve<IStartupManager>().StartAsync();
-
                 Program.AppHost.WriteLogs(Environment, LogLocator.Log);
 
                 await Log.WriteMonitorAsync("", $"Env: {Program.EnvInfo}", "Started");
@@ -182,24 +179,6 @@ namespace MarginTrading.TradingHistory
             catch (Exception ex)
             {
                 await Log.WriteFatalErrorAsync(nameof(Startup), nameof(StartApplication), "", ex);
-                throw;
-            }
-        }
-
-        private async Task StopApplication()
-        {
-            try
-            {
-                // NOTE: Service still can receive and process requests here, so take care about it if you add logic here.
-
-                await ApplicationContainer.Resolve<IShutdownManager>().StopAsync();
-            }
-            catch (Exception ex)
-            {
-                if (Log != null)
-                {
-                    await Log.WriteFatalErrorAsync(nameof(Startup), nameof(StopApplication), "", ex);
-                }
                 throw;
             }
         }
