@@ -11,7 +11,6 @@ using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
-using MarginTrading.TradingHistory.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,14 +21,10 @@ namespace MarginTrading.TradingHistory.Controllers
     public class PositionEventsController : Controller, IPositionEventsApi
     {
         private readonly IPositionsHistoryRepository _positionsHistoryRepository;
-        private readonly IConvertService _convertService;
-        
-        public PositionEventsController(
-            IPositionsHistoryRepository positionsHistoryRepository,
-            IConvertService convertService)
+
+        public PositionEventsController(IPositionsHistoryRepository positionsHistoryRepository)
         {
             _positionsHistoryRepository = positionsHistoryRepository;
-            _convertService = convertService;
         }
 
         /// <summary>

@@ -10,7 +10,6 @@ using MarginTrading.TradingHistory.Client.Models;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
-using MarginTrading.TradingHistory.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,16 +22,13 @@ namespace MarginTrading.TradingHistory.Controllers
     {
         private readonly IPositionsHistoryRepository _positionsHistoryRepository;
         private readonly IDealsRepository _dealsRepository;
-        private readonly IConvertService _convertService;
-        
+
         public PositionsController(
             IPositionsHistoryRepository positionsHistoryRepository,
-            IDealsRepository dealsRepository,
-            IConvertService convertService)
+            IDealsRepository dealsRepository)
         {
             _positionsHistoryRepository = positionsHistoryRepository;
             _dealsRepository = dealsRepository;
-            _convertService = convertService;
         }
         
         /// <summary> 

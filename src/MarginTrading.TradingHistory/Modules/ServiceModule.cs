@@ -34,12 +34,6 @@ namespace MarginTrading.TradingHistory.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            // TODO: Do not register entire settings in container, pass necessary settings to services which requires them
-            // ex:
-            //  builder.RegisterType<QuotesPublisher>()
-            //      .As<IQuotesPublisher>()
-            //      .WithParameter(TypedParameter.From(_settings.CurrentValue.QuotesPublication))
-
             builder.RegisterInstance(_log)
                 .As<ILog>()
                 .SingleInstance();
@@ -47,16 +41,6 @@ namespace MarginTrading.TradingHistory.Modules
             builder.RegisterType<HealthService>()
                 .As<IHealthService>()
                 .SingleInstance();
-
-            builder.RegisterType<StartupManager>()
-                .As<IStartupManager>();
-
-            builder.RegisterType<ShutdownManager>()
-                .As<IShutdownManager>();
-
-            // TODO: Add your dependencies here
-
-            var convertService = new ConvertService();
 
             if (_settings.CurrentValue.Db.StorageMode == StorageMode.Azure)
             {
