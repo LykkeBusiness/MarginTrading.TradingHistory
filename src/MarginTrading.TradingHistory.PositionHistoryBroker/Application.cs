@@ -2,15 +2,18 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Threading.Tasks;
+
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Messaging;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.Snow.Common.Correlation;
 using Lykke.Snow.Common.Correlation.RabbitMq;
+
 using MarginTrading.Backend.Contracts.Events;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.DapperExtensions;
+
 using Microsoft.Extensions.Logging;
 
 namespace MarginTrading.TradingHistory.PositionHistoryBroker
@@ -34,7 +37,11 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
             Settings settings,
             CurrentApplicationInfo applicationInfo,
             IMessagingComponentFactory<PositionHistoryEvent> messagingComponentFactory)
-            : base(correlationManager, loggerFactory, applicationInfo, messagingComponentFactory)
+            : base(
+                correlationManager,
+                loggerFactory,
+                applicationInfo,
+                messagingComponentFactory)
         {
             _correlationContextAccessor = correlationContextAccessor;
             _positionsHistoryRepository = positionsHistoryRepository;
