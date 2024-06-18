@@ -19,6 +19,7 @@ namespace MarginTrading.TradingHistory.Core.Domain
         InvalidTakeProfit,
         InvalidStoploss,
         InvalidInstrument,
+        InstrumentTradingDisabled,
         InvalidAccount,
         InvalidParent,
         TradingConditionError,
@@ -30,5 +31,6 @@ namespace MarginTrading.TradingHistory.Core.Domain
         MaxPositionLimit,
         MinOrderSizeLimit,
         MaxOrderSizeLimit,
+        MaxPositionNotionalLimit
     }
 }
