@@ -12,9 +12,6 @@
     <DocumentationFile>bin\Release\netcoreapp3.1\MarginTrading.TradingHistory.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-  <ItemGroup>
     <None Update="Dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
@@ -49,10 +46,14 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\client\MarginTrading.TradingHistory.Client\MarginTrading.TradingHistory.Client.csproj" />
-    <ProjectReference Include="..\MarginTrading.TradingHistory.Core\MarginTrading.TradingHistory.Core.csproj" />
-    <ProjectReference Include="..\MarginTrading.TradingHistory.Services\MarginTrading.TradingHistory.Services.csproj" />
-    <ProjectReference Include="..\MarginTrading.TradingHistory.SqlRepositories\MarginTrading.TradingHistory.SqlRepositories.csproj" />
+    <ProjectReference
+      Include="..\..\client\MarginTrading.TradingHistory.Client\MarginTrading.TradingHistory.Client.csproj" />
+    <ProjectReference
+      Include="..\MarginTrading.TradingHistory.Core\MarginTrading.TradingHistory.Core.csproj" />
+    <ProjectReference
+      Include="..\MarginTrading.TradingHistory.Services\MarginTrading.TradingHistory.Services.csproj" />
+    <ProjectReference
+      Include="..\MarginTrading.TradingHistory.SqlRepositories\MarginTrading.TradingHistory.SqlRepositories.csproj" />
   </ItemGroup>
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
     <ItemGroup>
