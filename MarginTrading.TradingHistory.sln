@@ -20,6 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution items", "Solution 
 		.gitignore = .gitignore
 		README.md = README.md
 		CHANGELOG.md = CHANGELOG.md
+		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Client", "3. Client", "{C9A2CFDE-EA32-4946-B679-7CE6EFA816B8}"
