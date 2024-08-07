@@ -4,17 +4,21 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Messaging;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.Snow.Common.Correlation;
 using Lykke.Snow.Common.Correlation.RabbitMq;
+
 using MarginTrading.Backend.Contracts.Events;
 using MarginTrading.Backend.Contracts.Orders;
 using MarginTrading.TradingHistory.Core.Domain;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.DapperExtensions;
+
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
 
 namespace MarginTrading.TradingHistory.OrderHistoryBroker
@@ -32,14 +36,14 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
         }
 
         public Application(
-        CorrelationContextAccessor correlationContextAccessor,
-        RabbitMqCorrelationManager correlationManager,
-        IOrdersHistoryRepository ordersHistoryRepository,
-        ITradesRepository tradesRepository,
-        CurrentApplicationInfo applicationInfo,
-        Settings settings,
-        ILoggerFactory loggerFactory,
-        IMessagingComponentFactory<OrderHistoryEvent> messagingComponentFactory) 
+            CorrelationContextAccessor correlationContextAccessor,
+            RabbitMqCorrelationManager correlationManager,
+            IOrdersHistoryRepository ordersHistoryRepository,
+            ITradesRepository tradesRepository,
+            CurrentApplicationInfo applicationInfo,
+            Settings settings,
+            ILoggerFactory loggerFactory,
+            IMessagingComponentFactory<OrderHistoryEvent> messagingComponentFactory)
             : base(correlationManager, loggerFactory, applicationInfo, messagingComponentFactory)
         {
             _correlationContextAccessor = correlationContextAccessor;
@@ -82,26 +86,27 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
                     correlationId
                 )
                 : null;
-            
+
             await _ordersHistoryRepository.AddAsync(orderHistory, trade);
 
             if (trade == null)
             {
                 return;
             }
-            
+
             var cancelledTradeId = TryGetCancelledTradeId(historyEvent.OrderSnapshot);
 
             if (!string.IsNullOrEmpty(cancelledTradeId))
             {
                 try
                 {
-                    await _tradesRepository.SetCancelledByAsync(cancelledTradeId, 
+                    await _tradesRepository.SetCancelledByAsync(
+                        cancelledTradeId,
                         historyEvent.OrderSnapshot.Id);
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex,"SetCancelledByAsync");
+                    Logger.LogError(ex, "SetCancelledByAsync");
                 }
             }
         }
