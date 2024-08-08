@@ -27,7 +27,7 @@
     <Copy SourceFiles="appsettings.Serilog.json" DestinationFolder="$(PublishDir)" />
   </Target>
   <ItemGroup>
-    <PackageReference Include="LykkeBiz.MarginTrading.BrokerBase" Version="8.2.0" />
+    <PackageReference Include="LykkeBiz.MarginTrading.BrokerBase" Version="8.3.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference
