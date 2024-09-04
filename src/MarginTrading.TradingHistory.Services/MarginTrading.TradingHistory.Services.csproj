@@ -1,19 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>MarginTrading.TradingHistory.Services</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.Services</RootNamespace>
-    <Version>2.15.7</Version>
-    <LangVersion>8.0</LangVersion>
+    <Version>2.20.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="Lykke.Common" Version="7.6.0" />
+    <PackageReference Include="AutoMapper" />
+    <PackageReference Include="Lykke.Common" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference
-      Include="..\..\client\MarginTrading.TradingHistory.Client\MarginTrading.TradingHistory.Client.csproj" />
-    <ProjectReference
-      Include="..\MarginTrading.TradingHistory.Core\MarginTrading.TradingHistory.Core.csproj" />
+    <ProjectReference Include="..\..\client\MarginTrading.TradingHistory.Client\MarginTrading.TradingHistory.Client.csproj" />
+    <ProjectReference Include="..\MarginTrading.TradingHistory.Core\MarginTrading.TradingHistory.Core.csproj" />
   </ItemGroup>
 </Project>
