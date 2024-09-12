@@ -4,6 +4,7 @@
     <AssemblyName>MarginTrading.TradingHistory.SqlRepositories</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.SqlRepositories</RootNamespace>
     <Version>2.20.0</Version>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
   <PropertyGroup>
     <NoWarn>1701;1702;1705;CA2007;0612;0618;1591;NU1608</NoWarn>

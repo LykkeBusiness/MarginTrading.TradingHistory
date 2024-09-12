@@ -7,6 +7,7 @@
     <RootNamespace>MarginTrading.TradingHistory</RootNamespace>
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
   <PropertyGroup>
     <DocumentationFile>bin\Release\netcoreapp3.1\MarginTrading.TradingHistory.xml</DocumentationFile>

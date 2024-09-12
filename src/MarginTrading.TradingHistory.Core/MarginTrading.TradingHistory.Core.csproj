@@ -4,6 +4,7 @@
     <AssemblyName>MarginTrading.TradingHistory.Core</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.Core</RootNamespace>
     <Version>2.20.0</Version>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Domain\" />
