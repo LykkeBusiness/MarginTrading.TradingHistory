@@ -6,14 +6,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using AzureStorage.Tables;
 using Common.Log;
 using JetBrains.Annotations;
 using Microsoft.OpenApi.Models;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
-using Lykke.Logs;
 using Lykke.Logs.MsSql;
 using Lykke.Logs.MsSql.Repositories;
 using Lykke.Logs.Serilog;
@@ -36,7 +34,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json.Serialization;
-using LogEntity = Lykke.Logs.LogEntity;
 using Microsoft.Extensions.Logging;
 using Lykke.Snow.Common.Startup.Hosting;
 using Lykke.Snow.Common.Startup.Log;
@@ -78,10 +75,10 @@ namespace MarginTrading.TradingHistory
                     {
                         options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                     });
-                
+
                 _mtSettingsManager = Configuration.LoadSettings<AppSettings>(
                     throwExceptionOnCheckError: !Configuration.NotThrowExceptionsOnServiceValidation());
-                
+
                 services.AddApiKeyAuth(_mtSettingsManager.CurrentValue.TradingHistoryClient);
 
                 services.AddSwaggerGen(options =>
@@ -116,7 +113,7 @@ namespace MarginTrading.TradingHistory
             try
             {
                 ApplicationContainer = app.ApplicationServices.GetAutofacRoot();
-                
+
                 if (env.IsDevelopment())
                 {
                     app.UseDeveloperExceptionPage();
@@ -130,9 +127,9 @@ namespace MarginTrading.TradingHistory
 
                 app.UseCorrelation();
 #if DEBUG
-                app.UseLykkeMiddleware(ServiceName, ex => ex.ToString());
+                app.UseLykkeMiddleware(ServiceName, ex => new ErrorResponse { ErrorMessage = ex.Message }, false, false);
 #else
-                app.UseLykkeMiddleware(ServiceName, ex => new ErrorResponse {ErrorMessage = ex.Message});
+                app.UseLykkeMiddleware(ServiceName, ex => new ErrorResponse { ErrorMessage = "Technical Problem" }, false, false);
 #endif
                 app.UseRouting();
                 app.UseAuthentication();
@@ -160,7 +157,7 @@ namespace MarginTrading.TradingHistory
                 throw;
             }
         }
-        
+
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.RegisterModule(new ServiceModule(_mtSettingsManager.Nested(x => x.TradingHistoryService), Log));
@@ -207,7 +204,7 @@ namespace MarginTrading.TradingHistory
             }
         }
 
-        private static ILog CreateLog(IConfiguration configuration, IServiceCollection services, 
+        private static ILog CreateLog(IConfiguration configuration, IServiceCollection services,
             IReloadingManager<AppSettings> settings, CorrelationContextAccessor correlationContextAccessor)
         {
             var consoleLogger = new LogToConsole();
@@ -217,7 +214,7 @@ namespace MarginTrading.TradingHistory
 
             #region Logs settings validation
 
-            if (!settings.CurrentValue.TradingHistoryService.UseSerilog 
+            if (!settings.CurrentValue.TradingHistoryService.UseSerilog
                 && string.IsNullOrWhiteSpace(settings.CurrentValue.TradingHistoryService.Db.LogsConnString))
             {
                 throw new Exception("Either UseSerilog must be true or LogsConnString must be set");
@@ -234,31 +231,18 @@ namespace MarginTrading.TradingHistory
             }
             else if (settings.CurrentValue.TradingHistoryService.Db.StorageMode == StorageMode.Azure)
             {
-                var persistenceManager = new LykkeLogToAzureStoragePersistenceManager(
-                    AzureTableStorage<LogEntity>.Create(settings.Nested(x => x.TradingHistoryService.Db.LogsConnString), 
-                        "TradingHistoryServiceLog", consoleLogger),
-                    consoleLogger);
-                
-                // Creating azure storage logger, which logs own messages to concole log
-                var azureStorageLogger = new LykkeLogToAzureStorage(
-                    persistenceManager,
-                    null,
-                    consoleLogger);
-
-                azureStorageLogger.Start();
-
-                aggregateLogger.AddLog(azureStorageLogger);
+                throw new NotSupportedException("Azure storage is not supported for logs");
             }
             else if (settings.CurrentValue.TradingHistoryService.Db.StorageMode == StorageMode.SqlServer)
             {
                 var sqlLogger = new LogToSql(new SqlLogRepository("TradingHistoryAPIsLog",
                     settings.CurrentValue.TradingHistoryService.Db.LogsConnString));
-                
+
                 aggregateLogger.AddLog(sqlLogger);
             }
 
             LogLocator.Log = aggregateLogger;
-            
+
             return aggregateLogger;
         }
     }

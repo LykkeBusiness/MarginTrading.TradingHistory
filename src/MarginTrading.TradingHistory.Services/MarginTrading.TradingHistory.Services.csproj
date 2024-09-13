@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" />
-    <PackageReference Include="Lykke.Common" />
+    <PackageReference Include="LykkeBiz.Common" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference
