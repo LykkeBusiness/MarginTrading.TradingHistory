@@ -33,10 +33,10 @@
   </Target>
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" />
-    <PackageReference Include="Lykke.Common.ApiLibrary" />
-    <PackageReference Include="Lykke.Logs" />
-    <PackageReference Include="Lykke.Logs.MsSql" />
-    <PackageReference Include="Lykke.Logs.Serilog" />
+    <PackageReference Include="LykkeBiz.Common.ApiLibrary" />
+    <PackageReference Include="LykkeBiz.Logs" />
+    <PackageReference Include="LykkeBiz.Logs.MsSql" />
+    <PackageReference Include="LykkeBiz.Logs.Serilog" />
     <PackageReference Include="Lykke.MarginTrading.BackendSnow.Contracts" />
     <PackageReference Include="LykkeBiz.SettingsReader" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />

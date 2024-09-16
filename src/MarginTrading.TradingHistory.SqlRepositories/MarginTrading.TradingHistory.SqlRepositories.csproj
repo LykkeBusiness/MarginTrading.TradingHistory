@@ -14,7 +14,6 @@
     <PackageReference Include="Dapper.SqlBuilder" />
     <PackageReference Include="Lykke.Snow.Common" />
     <PackageReference Include="LykkeBiz.Common.MsSql" />
-    <PackageReference Include="Microsoft.Data.SqlClient" />
     <PackageReference Include="morelinq" />
   </ItemGroup>
   <ItemGroup>
