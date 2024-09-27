@@ -3,7 +3,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>MarginTrading.TradingHistory.AzureRepositories</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.AzureRepositories</RootNamespace>
-    <Version>2.16.2</Version>
+    <Version>2.21.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Lykke.AzureStorage" />

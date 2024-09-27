@@ -1,3 +1,9 @@
+## 2.21.0 - Nova 2. Delivery 46 (September 27, 2024)
+### What's changed
+* LT-5594: Migrate to net 8.
+* LT-5549: Failed to handle the message.
+
+
 ## 2.20.0 - Nova 2. Delivery 44 (August 19, 2024)
 ### What's changed
 * LT-5510: Update rabbitmq broker library with new rabbitmq.client and templates.
