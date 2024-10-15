@@ -170,8 +170,6 @@ namespace MarginTrading.TradingHistory
             try
             {
                 // NOTE: Service not yet receive and process requests here
-                ApplicationContainer.Resolve<AssemblyLogger>().StartLogging();
-                
                 Program.AppHost.WriteLogs(Environment, LogLocator.Log);
 
                 await Log.WriteMonitorAsync("", $"Env: {Program.EnvInfo}", "Started");
