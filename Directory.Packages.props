@@ -24,7 +24,7 @@
     <PackageVersion Include="LykkeBiz.Common.MsSql" Version="5.0.2" />
     <PackageVersion Include="LykkeBiz.HttpClientGenerator" Version="6.0.0" />
     <PackageVersion Include="LykkeBiz.RabbitMqBroker" Version="15.1.1" />
-    <PackageVersion Include="LykkeBiz.MarginTrading.BrokerBase" Version="8.6.0" />
+    <PackageVersion Include="LykkeBiz.MarginTrading.BrokerBase" Version="8.6.1" />
     <PackageVersion Include="LykkeBiz.SettingsReader" Version="9.0.0" />
     <PackageVersion Include="MarginTrading.TradingHistory.Client" Version="3.23.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.7" />
