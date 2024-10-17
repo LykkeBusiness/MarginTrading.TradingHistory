@@ -113,7 +113,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             {
                 var gridReader = await conn.QueryMultipleAsync(
                     $"SELECT * FROM {ViewName} WITH (NOLOCK) {whereClause} {paginationClause}; SELECT COUNT(*) FROM {ViewName} WITH (NOLOCK) {whereClause}",
-                    new {accountId, assetPairId, directions = directions.Select(x => x.ToString()), closeTimeStart, closeTimeEnd});
+                    new {accountId, assetPairId, directions = directions?.Select(x => x.ToString()), closeTimeStart, closeTimeEnd});
                 var deals = (await gridReader.ReadAsync<DealWithCommissionParamsEntity>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
             
@@ -161,7 +161,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                       {whereClause}
                       GROUP BY {nameof(IAggregatedDeal.AccountId)}, {nameof(IAggregatedDeal.AssetPairId)}
                       {paginationClause}; SELECT COUNT(DISTINCT {nameof(IAggregatedDeal.AssetPairId)}) FROM {ViewName} WITH (NOLOCK) {whereClause}",
-                    new { accountId, assetPairId, directions = directions.Select(x => x.ToString()), closeTimeStart, closeTimeEnd });
+                    new { accountId, assetPairId, directions = directions?.Select(x => x.ToString()), closeTimeStart, closeTimeEnd });
                 var deals = (await gridReader.ReadAsync<AggregatedDeal>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
 
@@ -207,7 +207,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 var query = $"SELECT ISNULL(SUM(Fpl), 0) FROM {TableName} WITH (NOLOCK) {whereClause}";
 
                 return await conn.QuerySingleOrDefaultAsync<decimal>(query,
-                    new {accountId, assetPairId, directions = directions.Select(x => x.ToString()), closeTimeStart, closeTimeEnd});
+                    new {accountId, assetPairId, directions = directions?.Select(x => x.ToString()), closeTimeStart, closeTimeEnd});
             }
         }
 
