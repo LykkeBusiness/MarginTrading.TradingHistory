@@ -25,7 +25,6 @@
   </Target>
   <ItemGroup>
     <PackageReference Include="LykkeBiz.MarginTrading.BrokerBase" />
-    <PackageReference Include="LykkeBiz.RabbitMqBroker" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference
