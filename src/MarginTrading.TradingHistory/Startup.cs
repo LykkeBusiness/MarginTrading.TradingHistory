@@ -19,6 +19,7 @@ using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Settings;
 using MarginTrading.TradingHistory.Modules;
 using Lykke.SettingsReader;
+using Lykke.Snow.Common.AssemblyLogging;
 using Lykke.Snow.Common.Correlation;
 using Lykke.Snow.Common.Correlation.Cqrs;
 using Lykke.Snow.Common.Correlation.Http;
@@ -69,6 +70,7 @@ namespace MarginTrading.TradingHistory
         {
             try
             {
+                services.AddAssemblyLogger();
                 services
                     .AddControllers()
                     .AddNewtonsoftJson(options =>
@@ -168,7 +170,6 @@ namespace MarginTrading.TradingHistory
             try
             {
                 // NOTE: Service not yet receive and process requests here
-
                 Program.AppHost.WriteLogs(Environment, LogLocator.Log);
 
                 await Log.WriteMonitorAsync("", $"Env: {Program.EnvInfo}", "Started");
