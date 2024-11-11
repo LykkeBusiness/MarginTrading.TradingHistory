@@ -14,17 +14,17 @@
     <PackageVersion Include="Lykke.AzureStorage" Version="8.13.4" />
     <PackageVersion Include="LykkeBiz.Common.ApiLibrary" Version="5.0.0" />
     <PackageVersion Include="LykkeBiz.Common" Version="8.3.0" />
-    <PackageVersion Include="Lykke.Contracts" Version="3.0.0" />
+    <PackageVersion Include="Lykke.Contracts" Version="4.0.1" />
     <PackageVersion Include="LykkeBiz.Logs.MsSql" Version="4.0.0" />
     <PackageVersion Include="LykkeBiz.Logs.Serilog" Version="3.3.3" />
     <PackageVersion Include="LykkeBiz.Logs" Version="10.0.0" />
-    <PackageVersion Include="Lykke.MarginTrading.BackendSnow.Contracts" Version="1.46.0" />
-    <PackageVersion Include="Lykke.Snow.Common.Startup" Version="4.0.0" />
-    <PackageVersion Include="Lykke.Snow.Common" Version="4.0.3" />
+    <PackageVersion Include="Lykke.MarginTrading.BackendSnow.Contracts" Version="1.57.0" />
+    <PackageVersion Include="Lykke.Snow.Common.Startup" Version="4.2.0" />
+    <PackageVersion Include="Lykke.Snow.Common" Version="5.0.1" />
     <PackageVersion Include="LykkeBiz.Common.MsSql" Version="5.0.2" />
     <PackageVersion Include="LykkeBiz.HttpClientGenerator" Version="6.0.0" />
+    <PackageVersion Include="LykkeBiz.SettingsReader" Version="9.0.1" />
     <PackageVersion Include="LykkeBiz.MarginTrading.BrokerBase" Version="8.8.1" />
-    <PackageVersion Include="LykkeBiz.SettingsReader" Version="9.0.0" />
     <PackageVersion Include="MarginTrading.TradingHistory.Client" Version="3.23.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.7" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
