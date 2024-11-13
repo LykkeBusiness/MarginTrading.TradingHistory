@@ -19,6 +19,8 @@ using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Settings;
 using MarginTrading.TradingHistory.Modules;
 using Lykke.SettingsReader;
+using Lykke.SettingsReader.ConfigurationProvider;
+using Lykke.SettingsReader.SettingsTemplate;
 using Lykke.Snow.Common.AssemblyLogging;
 using Lykke.Snow.Common.Correlation;
 using Lykke.Snow.Common.Correlation.Cqrs;
@@ -60,6 +62,7 @@ namespace MarginTrading.TradingHistory
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddSerilogJson(env)
+                .AddHttpSourceConfiguration()
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -101,6 +104,8 @@ namespace MarginTrading.TradingHistory
                 Log = CreateLog(Configuration, services, _mtSettingsManager, correlationContextAccessor);
 
                 services.AddSingleton<ILoggerFactory>(x => new WebHostLoggerFactory(Log));
+
+                services.AddSettingsTemplateGenerator();
             }
             catch (Exception ex)
             {
@@ -139,6 +144,7 @@ namespace MarginTrading.TradingHistory
                 app.UseEndpoints(endpoints =>
                 {
                     endpoints.MapControllers();
+                    endpoints.AddSettingsTemplateEndpoint();
                 });
                 app.UseSwagger(c =>
                 {

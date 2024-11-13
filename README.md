@@ -56,17 +56,14 @@ All variables and value constraints are default. For instance, to set host URL t
 
 ### Settings ###
 
-Settings schema is:
+TradingHistoryService settings schema is:
+<!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./service.json) -->
+<!-- MARKDOWN-AUTO-DOCS:END -->
 
-```json
-{
-    "TradingHistoryService": {
-        "Db": {
-            "StorageMode": "SqlServer",
-            "LogsConnString": "logs connection string",
-            "HistoryConnString": "data connection string"
-        },
-        "UseSerilog": false
-    }
-}
-```
+OrderHistoryBroker settings schema is:
+<!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./orderHistoryBroker.json) -->
+<!-- MARKDOWN-AUTO-DOCS:END -->
+
+PositionHistoryBroker settings schema is:
+<!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./positionHistoryBroker.json) -->
+<!-- MARKDOWN-AUTO-DOCS:END -->
