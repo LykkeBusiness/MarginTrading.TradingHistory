@@ -62,7 +62,6 @@ namespace MarginTrading.TradingHistory
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddSerilogJson(env)
-                .AddHttpSourceConfiguration()
                 .AddEnvironmentVariables()
                 .Build();
 
