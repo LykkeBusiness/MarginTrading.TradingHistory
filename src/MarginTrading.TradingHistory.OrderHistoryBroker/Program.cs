@@ -11,7 +11,7 @@ namespace MarginTrading.TradingHistory.OrderHistoryBroker
     {
         public static void Main(string[] args)
         {
-            RunOnPort(5041);
+            RunOnPort(5041, true);
         }
     }
 }

@@ -7,13 +7,18 @@ using JetBrains.Annotations;
 using Lykke.MarginTrading.BrokerBase;
 using Lykke.MarginTrading.BrokerBase.Settings;
 using Lykke.SettingsReader;
+using Lykke.SettingsReader.SettingsTemplate;
+
 using MarginTrading.Backend.Contracts.Events;
 using MarginTrading.TradingHistory.Core;
 using MarginTrading.TradingHistory.Core.Repositories;
 using MarginTrading.TradingHistory.Core.Services;
 using MarginTrading.TradingHistory.Services;
 using MarginTrading.TradingHistory.SqlRepositories;
+
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -28,12 +33,23 @@ namespace MarginTrading.TradingHistory.PositionHistoryBroker
 
         protected override string ApplicationName => "PositionHistoryBroker";
 
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            base.ConfigureServices(services);
+            services.AddSettingsTemplateGenerator();
+        }
+
+        protected override void ConfigureEndpoints(IEndpointRouteBuilder endpointRouteBuilder)
+        {
+            endpointRouteBuilder.MapSettingsTemplate();
+        }
+
         protected override void RegisterCustomServices(ContainerBuilder builder, IReloadingManager<Settings> settings)
         {
             builder.AddJsonBrokerMessagingFactory<PositionHistoryEvent>();
             builder.RegisterType<Application>().As<IBrokerApplication>().SingleInstance();
             builder.RegisterType<ConvertService>().As<IConvertService>().SingleInstance();
-            
+
             if (settings.CurrentValue.Db.StorageMode == StorageMode.Azure)
             {
                 throw new NotImplementedException("Azure storage is not implemented yet");
