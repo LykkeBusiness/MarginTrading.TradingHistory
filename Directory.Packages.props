@@ -3,6 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+      <PackageVersion Include="AsyncFriendlyStackTrace" Version="1.7.0" />
     <PackageVersion Include="Autofac.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageVersion Include="AutoFixture.Xunit2" Version="4.18.1" />
     <PackageVersion Include="AutoMapper" Version="13.0.1" />
@@ -18,14 +19,14 @@
     <PackageVersion Include="LykkeBiz.Logs.MsSql" Version="4.0.0" />
     <PackageVersion Include="LykkeBiz.Logs.Serilog" Version="3.3.3" />
     <PackageVersion Include="LykkeBiz.Logs" Version="10.0.0" />
-    <PackageVersion Include="Lykke.MarginTrading.BackendSnow.Contracts" Version="1.57.0" />
-    <PackageVersion Include="Lykke.Snow.Common.Startup" Version="4.2.0" />
+    <PackageVersion Include="Lykke.MarginTrading.BackendSnow.Contracts" Version="2.0.0" />
+    <PackageVersion Include="Lykke.Snow.Common.Startup" Version="5.0.0" />
     <PackageVersion Include="Lykke.Snow.Common" Version="5.0.1" />
     <PackageVersion Include="LykkeBiz.Common.MsSql" Version="5.0.2" />
-    <PackageVersion Include="LykkeBiz.HttpClientGenerator" Version="6.0.0" />
+    <PackageVersion Include="LykkeBiz.HttpClientGenerator" Version="7.0.0" />
     <PackageVersion Include="LykkeBiz.SettingsReader" Version="9.2.0" />
-    <PackageVersion Include="LykkeBiz.MarginTrading.BrokerBase" Version="8.9.0" />
-    <PackageVersion Include="MarginTrading.TradingHistory.Client" Version="3.23.1" />
+    <PackageVersion Include="LykkeBiz.MarginTrading.BrokerBase" Version="8.10.0" />
+    <PackageVersion Include="MarginTrading.TradingHistory.Client" Version="3.24.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.7" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
@@ -35,7 +36,7 @@
     <PackageVersion Include="Moq" Version="4.13.1" />
     <PackageVersion Include="morelinq" Version="3.3.2" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="Refit" Version="5.1.27" />
+    <PackageVersion Include="Refit" Version="8.0.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.6.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageVersion Include="xunit" Version="2.9.0" />
