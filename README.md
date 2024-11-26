@@ -58,12 +58,187 @@ All variables and value constraints are default. For instance, to set host URL t
 
 TradingHistoryService settings schema is:
 <!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./service.json) -->
+<!-- The below code snippet is automatically added from ./service.json -->
+```json
+{
+  "APP_UID": "Integer",
+  "ASPNETCORE_ENVIRONMENT": "String",
+  "ASPNETCORE_ENVIRONMENT_TEST": "String",
+  "ENVIRONMENT": "String",
+  "ENVIRONMENT_TEST": "String",
+  "IsLive": "Boolean",
+  "Kestrel": {
+    "EndPoints": {
+      "Http": {
+        "Url": "String"
+      }
+    }
+  },
+  "serilog": {
+    "minimumLevel": {
+      "default": "String"
+    }
+  },
+  "TradingHistoryClient": {
+    "ApiKey": "String",
+    "ServiceUrl": "String"
+  },
+  "TradingHistoryService": {
+    "ApiKey": "String",
+    "Db": {
+      "HistoryConnString": "String",
+      "LogsConnString": "String",
+      "OrderBlotterExecutionTimeout": "DateTime",
+      "StorageMode": "String"
+    },
+    "UseSerilog": "Boolean"
+  },
+  "TZ": "String"
+}
+```
 <!-- MARKDOWN-AUTO-DOCS:END -->
 
 OrderHistoryBroker settings schema is:
 <!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./orderHistoryBroker.json) -->
+<!-- The below code snippet is automatically added from ./orderHistoryBroker.json -->
+```json
+{
+  "APP_UID": "Integer",
+  "ASPNETCORE_ENVIRONMENT": "String",
+  "ASPNETCORE_ENVIRONMENT_TEST1": "String",
+  "ENVIRONMENT": "String",
+  "ENVIRONMENT_TEST1": "String",
+  "IsLive": "Boolean",
+  "Kestrel": {
+    "EndPoints": {
+      "Http": {
+        "Url": "String"
+      }
+    }
+  },
+  "MtBrokerSettings": {
+    "CancelledTradeIdAttributeName": "String",
+    "ConsumerCount": "Integer",
+    "Db": {
+      "ConnString": "String",
+      "StorageMode": "String"
+    },
+    "IsCancellationTradeAttributeName": "String",
+    "MtRabbitMqConnString": "String",
+    "RabbitMqQueues": {
+      "OrderHistory": {
+        "ExchangeName": "String"
+      }
+    }
+  },
+  "MtBrokersLogs": {
+    "LogsConnString": "String",
+    "StorageMode": "String",
+    "UseSerilog": "Boolean"
+  },
+  "serilog": {
+    "Enrich": [
+      "String"
+    ],
+    "minimumLevel": {
+      "default": "String"
+    },
+    "Properties": {
+      "Application": "String"
+    },
+    "Using": [
+      "String"
+    ],
+    "writeTo": [
+      {
+        "Args": {
+          "configure": [
+            {
+              "Args": {
+                "outputTemplate": "String"
+              },
+              "Name": "String"
+            }
+          ]
+        },
+        "Name": "String"
+      }
+    ]
+  },
+  "TZ": "String"
+}
+```
 <!-- MARKDOWN-AUTO-DOCS:END -->
 
 PositionHistoryBroker settings schema is:
 <!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./positionHistoryBroker.json) -->
+<!-- The below code snippet is automatically added from ./positionHistoryBroker.json -->
+```json
+{
+  "APP_UID": "Integer",
+  "ASPNETCORE_ENVIRONMENT": "String",
+  "ASPNETCORE_ENVIRONMENT_TEST1": "String",
+  "ENVIRONMENT": "String",
+  "ENVIRONMENT_TEST1": "String",
+  "IsLive": "Boolean",
+  "Kestrel": {
+    "EndPoints": {
+      "Http": {
+        "Url": "String"
+      }
+    }
+  },
+  "MtBrokerSettings": {
+    "ConsumerCount": "Integer",
+    "Db": {
+      "ConnString": "String",
+      "StorageMode": "String"
+    },
+    "MtRabbitMqConnString": "String",
+    "RabbitMqQueues": {
+      "PositionsHistory": {
+        "ExchangeName": "String"
+      },
+      "Trades": {
+        "ExchangeName": "String"
+      }
+    }
+  },
+  "MtBrokersLogs": {
+    "LogsConnString": "String",
+    "StorageMode": "String",
+    "UseSerilog": "Boolean"
+  },
+  "serilog": {
+    "Enrich": [
+      "String"
+    ],
+    "minimumLevel": {
+      "default": "String"
+    },
+    "Properties": {
+      "Application": "String"
+    },
+    "Using": [
+      "String"
+    ],
+    "writeTo": [
+      {
+        "Args": {
+          "configure": [
+            {
+              "Args": {
+                "outputTemplate": "String"
+              },
+              "Name": "String"
+            }
+          ]
+        },
+        "Name": "String"
+      }
+    ]
+  },
+  "TZ": "String"
+}
+```
 <!-- MARKDOWN-AUTO-DOCS:END -->
