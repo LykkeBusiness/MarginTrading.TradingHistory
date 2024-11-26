@@ -63,9 +63,7 @@ TradingHistoryService settings schema is:
 {
   "APP_UID": "Integer",
   "ASPNETCORE_ENVIRONMENT": "String",
-  "ASPNETCORE_ENVIRONMENT_TEST": "String",
   "ENVIRONMENT": "String",
-  "ENVIRONMENT_TEST": "String",
   "IsLive": "Boolean",
   "Kestrel": {
     "EndPoints": {
