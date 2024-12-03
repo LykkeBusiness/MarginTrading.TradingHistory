@@ -9,6 +9,7 @@
     <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
   </PropertyGroup>
   <ItemGroup>
+      <PackageReference Include="AsyncFriendlyStackTrace" />
     <PackageReference Include="LykkeBiz.HttpClientGenerator" />
     <PackageReference Include="MarginTrading.TradingHistory.Client" />
     <PackageReference Include="Moq" />
