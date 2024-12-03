@@ -103,7 +103,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             var whereClause = "WHERE 1=1 "
                               + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId=@accountId")
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
-                              + (directions?.Count == 0 ? "" : " AND Direction IN @directions")
+                              + ((directions?.Count ?? 0) == 0 ? "" : " AND Direction IN @directions")
                               + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
                               + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
             var order = isAscending ? string.Empty : Constants.DescendingOrder;
@@ -136,7 +136,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
 
             var whereClause = "WHERE AccountId=@accountId"
                               + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId=@assetPairId")
-                              + (directions?.Count == 0 ? "" : " AND Direction IN @directions")
+                              + ((directions?.Count ?? 0) == 0 ? "" : " AND Direction IN @directions")
                               + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
                               + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
             var order = isAscending ? string.Empty : Constants.DescendingOrder;
@@ -200,7 +200,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
                 var whereClause = "WHERE 1=1 "
                              + (string.IsNullOrWhiteSpace(accountId) ? "" : " AND AccountId = @accountId")
                              + (string.IsNullOrWhiteSpace(assetPairId) ? "" : " AND AssetPairId = @assetPairId")
-                             + (directions?.Count == 0 ? "" : " AND Direction IN @directions")
+                             + ((directions?.Count ?? 0) == 0 ? "" : " AND Direction IN @directions")
                              + (closeTimeStart == null ? "" : " AND Created >= @closeTimeStart")
                              + (closeTimeEnd == null ? "" : " AND Created < @closeTimeEnd");
                 
