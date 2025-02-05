@@ -2,14 +2,14 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
-    <Version>2.18.2</Version>
+    <Version>2.22.2</Version>
     <AssemblyName>MarginTrading.TradingHistory.TestClient</AssemblyName>
     <RootNamespace>MarginTrading.TradingHistory.TestClient</RootNamespace>
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
   </PropertyGroup>
   <ItemGroup>
-      <PackageReference Include="AsyncFriendlyStackTrace" />
+    <PackageReference Include="AsyncFriendlyStackTrace" />
     <PackageReference Include="LykkeBiz.HttpClientGenerator" />
     <PackageReference Include="MarginTrading.TradingHistory.Client" />
     <PackageReference Include="Moq" />

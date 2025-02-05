@@ -3,7 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-      <PackageVersion Include="AsyncFriendlyStackTrace" Version="1.7.0" />
+    <PackageVersion Include="AsyncFriendlyStackTrace" Version="1.7.0" />
     <PackageVersion Include="Autofac.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageVersion Include="AutoFixture.Xunit2" Version="4.18.1" />
     <PackageVersion Include="AutoMapper" Version="13.0.1" />
