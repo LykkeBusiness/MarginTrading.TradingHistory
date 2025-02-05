@@ -1,3 +1,8 @@
+## 2.22.2 - Nova 2. Delivery 47. Hotfix 4 (February 5, 2025)
+### What's changed
+* LT-6033: Fix issue with directions (mobile/web request)
+
+
 ## 2.22.1 - Nova 2. Delivery 47. Hotfix 2 (January 15, 2025)
 ### What's changed
 * LT-5991: Bump LykkeBiz.RabbitMqBroker to 8.11.1
