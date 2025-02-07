@@ -1,3 +1,8 @@
+## 2.24.0 - Nova 2. Delivery 49 (February 07, 2025)
+### What's changed
+* LT-5992: Update rabbitmqbroker in margintrading.tradinghistory.
+
+
 ## 2.22.2 - Nova 2. Delivery 47. Hotfix 4 (February 5, 2025)
 ### What's changed
 * LT-6033: Fix issue with directions (mobile/web request)
