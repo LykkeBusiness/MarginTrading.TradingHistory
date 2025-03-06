@@ -361,7 +361,7 @@ OUTER APPLY (
                         ? string.Join(",", OrderHistoryWithAdditionalEntity.ExecutedOrdersEssentialFieldsOnly)
                         : "*");
                 var sql =
-                    $"WITH history AS (SELECT * FROM {TableName} WITH (NOLOCK) {whereClause}) {additionalFieldsScript} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause}";
+                    $"WITH history AS (SELECT * FROM {TableName} WITH (NOLOCK) {whereClause}) {additionalFieldsScript} {paginationClause}; SELECT COUNT(*) FROM {TableName} WITH (NOLOCK) {whereClause}";
 
                 var gridReader = await conn.QueryMultipleAsync(
                     sql,
