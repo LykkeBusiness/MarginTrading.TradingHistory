@@ -78,7 +78,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
             using (var conn = new SqlConnection(_connectionString))
             {
                 var gridReader = await conn.QueryMultipleAsync(
-                    $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} {whereClause} WITH (NOLOCK)",
+                    $"SELECT * FROM {TableName} {whereClause} {paginationClause}; SELECT COUNT(*) FROM {TableName} WITH (NOLOCK) {whereClause}",
                     new {accountId, assetPairId});
                 var trades = (await gridReader.ReadAsync<TradeEntity>()).ToList();
                 var totalCount = await gridReader.ReadSingleAsync<int>();
