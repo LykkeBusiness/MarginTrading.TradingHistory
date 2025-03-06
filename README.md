@@ -72,6 +72,11 @@ TradingHistoryService settings schema is:
       }
     }
   },
+  "Logging": {
+    "LogLevel": {
+      "Microsoft": "String"
+    }
+  },
   "serilog": {
     "minimumLevel": {
       "default": "String"
@@ -111,26 +116,6 @@ OrderHistoryBroker settings schema is:
         "Url": "String"
       }
     }
-  },
-  "MtBrokerSettings": {
-    "CancelledTradeIdAttributeName": "String",
-    "ConsumerCount": "Integer",
-    "Db": {
-      "ConnString": "String",
-      "StorageMode": "String"
-    },
-    "IsCancellationTradeAttributeName": "String",
-    "MtRabbitMqConnString": "String",
-    "RabbitMqQueues": {
-      "OrderHistory": {
-        "ExchangeName": "String"
-      }
-    }
-  },
-  "MtBrokersLogs": {
-    "LogsConnString": "String",
-    "StorageMode": "String",
-    "UseSerilog": "Boolean"
   },
   "serilog": {
     "Enrich": [
@@ -181,27 +166,6 @@ PositionHistoryBroker settings schema is:
         "Url": "String"
       }
     }
-  },
-  "MtBrokerSettings": {
-    "ConsumerCount": "Integer",
-    "Db": {
-      "ConnString": "String",
-      "StorageMode": "String"
-    },
-    "MtRabbitMqConnString": "String",
-    "RabbitMqQueues": {
-      "PositionsHistory": {
-        "ExchangeName": "String"
-      },
-      "Trades": {
-        "ExchangeName": "String"
-      }
-    }
-  },
-  "MtBrokersLogs": {
-    "LogsConnString": "String",
-    "StorageMode": "String",
-    "UseSerilog": "Boolean"
   },
   "serilog": {
     "Enrich": [
