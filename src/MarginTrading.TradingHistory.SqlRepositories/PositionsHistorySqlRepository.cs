@@ -135,7 +135,7 @@ namespace MarginTrading.TradingHistory.SqlRepositories
         public async Task<List<IPositionHistory>> GetAsync(string id)
         {
             using var conn = new SqlConnection(_connectionString);
-            var query = $"SELECT * FROM {TableName} WITH (NOLOCK) Where Id = @id";
+            var query = $"SELECT * FROM {TableName} WITH(NOLOCK) Where Id = @id";
             var objects = await conn.QueryAsync<PositionsHistoryEntity>(query, new {id});
                 
             return objects.Cast<IPositionHistory>().ToList();
