@@ -1,3 +1,9 @@
+## 2.25.0 - Nova 2. Delivery 50 (March 07, 2025)
+### What's changed
+* LT-6089: Timeout on /api/order-events.
+* LT-6053: Don't use settingsservice expliciltly in brokers.
+
+
 ## 2.24.1 - Nova 2. Delivery 49. Hotfix 1 (February 17, 2025)
 ### What's changed
 * LT-6053: Don't use settingsService expliciltly in brokers.
